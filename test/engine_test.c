@@ -218,6 +218,36 @@ int main(void) {
     CHECK(got > 100 && got <= need && diff == 0, "state round trip (%d bytes, %d differences)", got, diff);
     free(st);
     E->destroy(s2);
+    /* a note held across a preset change ends when its key is let go (the preset moves the octave) */
+    setp(s, "preset", 0);
+    note(s, 1, 60, 100);
+    run(s, 50);
+    setp(s, "preset", 2);   /* DARK FIGURE: timbre octave -1 */
+    note(s, 1, 62, 100);
+    run(s, 50);
+    note(s, 0, 60, 0);
+    note(s, 0, 62, 0);
+    level_t tail = run(s, 345 * 6);
+    level_t after = run(s, 345);
+    CHECK(after.rms < 0.0005, "no note keeps sounding after a preset change (rms %.5f after 6 s)", after.rms);
+    (void)tail;
+    /* your own presets: save, change, load */
+    setp(s, "preset", 3);
+    setp(s, "timbre", 1); setp(s, "b_tune", 7); setp(s, "timbre", 0);
+    setp(s, "user_slot", 123);
+    setp(s, "save_user", 1);
+    char ud[96];
+    E->get_param(s, "user_slot_display", ud, sizeof ud);
+    CHECK(strstr(ud, "SAVED") != NULL, "save to MY PRESET 123 (\"%s\")", ud);
+    setp(s, "preset", 0);
+    setp(s, "user_slot", 122);
+    E->get_param(s, "user_slot_display", ud, sizeof ud);
+    int empty = strstr(ud, "empty") != NULL;
+    setp(s, "user_slot", 123);
+    setp(s, "load_user", 1);
+    setp(s, "timbre", 1);
+    CHECK(empty && getp(s, "preset") == 3 && fabs(getp(s, "b_tune") - 7) < 1e-3, "slot 122 shows empty, slot 123 loads back (preset %.0f, B tune %.0f)", getp(s, "preset"), getp(s, "b_tune"));
+    setp(s, "timbre", 0);
     /* CPU: the worst case */
     setp(s, "preset", 0);
     setp(s, "voices", 1);

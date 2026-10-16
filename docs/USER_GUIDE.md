@@ -146,7 +146,7 @@ ORBITER SYNC as on MAIN; **SYNC TO** sets how long one orbit takes when synced: 
 On an oscilloscope in X/Y mode, it draws the shape. A STAR sounds buzzy, a CIRCLE pure, a SPIRO rich. It turns with
 ROTATE and 3D SPIN.
 
-**SHAPE FILES**: FILE (drag it or turn its Q-Link to step through the files in the Shapes folder), **LOAD** (makes it
+**SHAPE FILES**: FILE (drag it or turn its Q-Link to step through the files in the Shapes folders), **LOAD** (makes it
 the USER shape of the timbre you are editing), **RESCAN** (reads the folder again after you added files). The field
 shows LOADING..., LOADED, or why a file couldn't be read.
 
@@ -156,6 +156,8 @@ pitch and stereo).
 
 **TIMBRES**: KEYS PLAY (LOWER, AUTO, UPPER), WITH KEYS ON AUTO (DUAL or SPLIT), SPLIT NOTE, VOICES (8 or 16). See
 [Two timbres](#two-timbres).
+
+**MY PRESETS**: SLOT, SAVE, LOAD: your own presets, 999 slots. See [Presets and saving](#presets-and-saving).
 
 ## ARP page
 
@@ -189,8 +191,13 @@ In this order after the voices:
 
 ## Your own shapes
 
-Put files in the `Shapes` folder of the plugin (`ANDREALPHEUS - VST - VADER/Shapes/` in the Synths folder it is
-installed in). Subfolders work, two levels deep. On the ORBIT page: pick the FILE, press LOAD.
+Put files in either place:
+- the `Shapes` folder of the plugin (`ANDREALPHEUS - VST - VADER/Shapes/` in the Synths folder it is installed in);
+- a folder called **`VADER Shapes`** at the top of your SD card or USB drive (make it on your computer, copy your files in,
+  put the card or drive in the Force). Its files show with the drive's name in front, like `[CARD] logo.svg`.
+
+Subfolders work, two levels deep. On the ORBIT page: press **RESCAN** if you just added files, pick the FILE, press
+**LOAD**. The shape becomes the USER shape of the timbre you are editing.
 
 | Format | What VADER uses |
 |---|---|
@@ -204,8 +211,9 @@ Tips:
 - Size and position don't matter: every shape is centred and fitted in the square, keeping its proportions.
 - A wide shape reaches the side corners (A/C and B/D); a tall one the top and bottom corners. Rotate it (ROTATE) to
   change which corners it visits.
-- The project saves the file's name. When it opens again, VADER loads the file again from the Shapes folder; if it has
-  gone, the timbre plays a CIRCLE.
+- The project saves the file's name. When it opens again, VADER loads the file again; if it has gone (or the card is
+  out), the timbre plays a CIRCLE.
+- On the screen, your shapes and the 3D shapes are drawn with the fine tiles; the built-in 2D shapes as crisp pictures.
 
 Examples included: `lightning.svg`, `infinity.svg`, `wave.svg`, `pyramid.obj`, `torus.obj`, `crescent.png`, `gear.png`.
 
@@ -248,8 +256,17 @@ Loading a timbre from a preset: presets set both timbres (most set B the same as
 
 A preset keeps what you are editing (timbre, corner), the ALT and MOTION switches, the file and the voice count.
 
-**Saving**: your sound is saved with the MPC project or program (both timbres, every setting and the name of the loaded
-shape file). MPC has no separate save for a plugin's own preset.
+**MY PRESETS** (ORBIT page, bottom right): 999 slots for your own sounds.
+- **Save**: turn **SLOT** to a number (it shows `empty` or `saved`), press **SAVE**. It shows `SAVED`. Saving to a
+  slot that has a sound replaces it.
+- **Load**: turn SLOT to a saved one, press **LOAD**. It shows `LOADED` (or `EMPTY SLOT`).
+- A slot holds everything: both timbres, the effects, the arpeggiator and the name of the loaded shape file.
+- They are files in `ANDREALPHEUS - VST - VADER/User Presets/` (`USER 001.vader` ...): copy that folder to back them up
+  or to take them to another Force.
+
+Your sound is also saved with the MPC project or program, as with any plugin.
+
+Changing preset (or loading a slot) stops every note that was playing, so nothing keeps sounding.
 
 ## Q-Links
 
@@ -299,7 +316,7 @@ precisely (MPC's knob overlay).
   lower ORBIT SIZE to mix more.
 - **Clicks on fast orbits**: that's the mix changing very fast (ORBIT SPEED near the top is meant to buzz). Lower it, or
   raise SUBORBIT SIZE so the jumps are smoothed.
-- **"NO FILES IN Shapes/"**: put files in the plugin's Shapes folder and press RESCAN.
+- **"NO FILES IN Shapes/"**: put files in the plugin's Shapes folder or `VADER Shapes` on the card, and press RESCAN.
 - **A file won't load**: the field says why (not an SVG/OBJ/PNG/JPG, no lines found, no shape found in the picture).
   Pictures: use a high-contrast silhouette.
 - **CPU**: lower VOICES to 8, UNISON to 1, and turn MOTION off in a heavy project (that saves MPC's screen CPU, not

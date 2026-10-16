@@ -18,6 +18,7 @@ rm -rf build/skin
 SHADOW_ART="$PWD/build/tools/shadow_art" \
   python3 "$MPC_VST/tools/gen_vst.py" vst.json 2>&1 | grep -v -e "TOUCH" -e "EDGE" -e "MODULE_DIR" -e "QLINK" || true
 [ -f build/params.h ] && [ -d "build/skin/$NAME/Plugin Skins" ]
+gcc -O1 -w -std=gnu11 -Isrc -o build/tools/shape_dump tools/shape_dump.c src/shape.c -lm   # the built-in shapes, for their pictures
 python3 tools/vader_skin.py "build/skin/$NAME/Plugin Skins"      # every page, from tools/vader_skin.py
 python3 tools/check_skin.py "build/skin/$NAME"                    # touch boxes, edges, Q-Links, as MPC loads it (open lists excepted)
 

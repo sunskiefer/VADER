@@ -33,7 +33,20 @@ CORNERS = "ABCD"
 
 # Screen geometry (tools/vader_art.py draws the same grid)
 TILE_COLS, TILE_ROWS = 32, 16
-TILE_FRAMES = 11          # 0 empty, 1-4 shape (- | / \), 5-8 trail (- | / \), 9 path dot, 10 orbiter dot
+TILE_W, TILE_H = 20, 18
+# A tile shows one straight piece of line, stored by its angle and its distance from the tile's middle (src/screen.c),
+# or one of the two dots at one of 5 x 5 places in the tile. Frames:
+#   0 empty | the shape's pieces: SHAPE_ANG angles x SHAPE_OFF offsets | the trail's: TRAIL_ANG x TRAIL_OFF |
+#   the path dot at 25 places | the orbiter dot at 25 places
+SHAPE_ANG, SHAPE_OFF, SHAPE_DSTEP = 24, 19, 1.4
+TRAIL_ANG, TRAIL_OFF, TRAIL_DSTEP = 12, 11, 2.6
+DOT_NX, DOT_NY = 5, 5
+TILE_FRAMES = 1 + SHAPE_ANG * SHAPE_OFF + TRAIL_ANG * TRAIL_OFF + 2 * DOT_NX * DOT_NY
+# the built-in 2D shapes as ready-drawn pictures: one per shape, size step and quarter turn
+PIC_SHAPES, PIC_SIZES, PIC_ROTS = 13, 8, 4
+PIC_COUNT = PIC_SHAPES * PIC_SIZES * PIC_ROTS
+SQUARE_X = 176            # the corners' square on the screen: x 176..464, y 0..288 (true proportions)
+SQUARE = 288
 ENV_COLS, ENV_ROWS = 32, 14
 ENV_FRAMES = ENV_ROWS * (ENV_ROWS + 1) // 2
 
@@ -133,6 +146,9 @@ GLOBAL = [
     ("preset", "PRESET", 0, 0, 15, None, True),
 ]
 TRIGGERS = [("tap", "TAP"), ("load", "LOAD"), ("rescan", "RESCAN")]
+# 0.2.0, appended at the end (saved projects keep every earlier index)
+GLOBAL_LATE = [("user_slot", "MY PRESET", 1, 1, 999, None, True)]
+TRIGGERS_LATE = [("save_user", "SAVE"), ("load_user", "LOAD PRESET")]
 
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
 POPUPS = ["shape", "orb_div", "arp_mode", "arp_rate", "dly_div"] + ["%s_%s" % (c, f) for c in "abcd" for f in ("mode", "ftype")]
@@ -168,7 +184,7 @@ def build():
             snd_slots.append("%s_%s" % (c, f))
     for k, *_ in SOUND:
         snd_slots.append(k)
-    glob_slots = [k for k, *_ in GLOBAL]
+    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE]
 
     # 1. the main page's corner knobs
     for i, (f, name) in enumerate(FRONT):
@@ -208,6 +224,12 @@ def build():
     for k in POPUPS:
         params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
         rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
+    # 0.2.0 (appended): which ready-drawn shape picture the screen shows (0: none, the tiles draw the shape)
+    add("shape_pic", "SHAPE PICTURE", 0, 0, PIC_COUNT, None, True, "DISP", 2000)
+    for k, name, d, lo, hi, opts, isint in GLOBAL_LATE:
+        add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), {"dynamic_display": True, "nudge_pct": 10})
+    for k, name in TRIGGERS_LATE:
+        add(k, name, 0, 0, 1, None, False, "TRIG", 0, {"momentary": True})
     return params, rows, snd_slots, glob_slots
 
 
@@ -233,6 +255,10 @@ def write():
     L.append("#define NGLOB %d" % len(glob))
     L.append("#define NCF %d   /* fields per corner */" % len(CORNER))
     L.append("#define TILE_COLS %d\n#define TILE_ROWS %d\n#define TILE_FRAMES %d" % (TILE_COLS, TILE_ROWS, TILE_FRAMES))
+    for k in ("TILE_W", "TILE_H", "SHAPE_ANG", "SHAPE_OFF", "TRAIL_ANG", "TRAIL_OFF", "DOT_NX", "DOT_NY", "PIC_SHAPES",
+              "PIC_SIZES", "PIC_ROTS", "PIC_COUNT", "SQUARE_X", "SQUARE"):
+        L.append("#define %s %d" % (k, globals()[k]))
+    L.append("#define SHAPE_DSTEP %sf\n#define TRAIL_DSTEP %sf" % (SHAPE_DSTEP, TRAIL_DSTEP))
     L.append("#define ENV_COLS %d\n#define ENV_ROWS %d\n#define ENV_FRAMES %d" % (ENV_COLS, ENV_ROWS, ENV_FRAMES))
     L.append("enum { " + ", ".join("P_%s" % c_name(r[0]) for r in rows) + " };")
     L.append("enum { " + ", ".join("S_%s" % c_name(k) for k in snd) + " };")

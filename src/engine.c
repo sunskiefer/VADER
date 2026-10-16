@@ -16,6 +16,7 @@
 #include <string.h>
 #include <strings.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "engine.h"
 #include "vader.h"
 
@@ -51,9 +52,10 @@ static int find(const char *s) { return find_n(s, (int)strlen(s)); }
 /* ------------------------------------------------------------------------------------------------ the instance */
 #define MAXFILES 500
 #define MAXHELD 32
+typedef struct { char *path, *label; } shapefile_t;   /* a shape file found: where it is, how it's listed */
 
 typedef struct {
-    int active, timbre, note, released, held_by_pedal;
+    int active, timbre, note, key, released, held_by_pedal;   /* key: the key that played it (note: with the timbre's octave) */
     float vel;
     float freq, target;          /* Hz, with glide */
     float cents, pan;            /* unison spread */
@@ -66,6 +68,7 @@ typedef struct {
     float orb_t, orb_o;          /* its own orbit (RETRIG) */
     float w[4];                  /* corner weights at the end of the last block */
     float ox, oy, fx, fy;        /* where its orbiter / path point is */
+    float shown_t, shown_o;      /* the orbit and suborbit phases it last played (for the screen) */
     unsigned age;
 } voice_t;
 
@@ -103,7 +106,9 @@ typedef struct {
     unsigned rng;
     /* screen */
     screen_t scr;
-    unsigned char sent_tiles[TILE_COLS * TILE_ROWS], sent_env[ENV_COLS];
+    unsigned short sent_tiles[TILE_COLS * TILE_ROWS];
+    unsigned char sent_env[ENV_COLS];
+    int sent_pic;
     unsigned char sent_w[4], sent_rd;
     int scr_wait;                /* frames until the next screen update */
     int shape_wait;
@@ -113,22 +118,26 @@ typedef struct {
     int last_voice;
     /* files */
     char dir[512];
-    char *files[MAXFILES];
+    shapefile_t files[MAXFILES];
     int nfiles;
     path_t user;
     int has_user;
-    char user_file[256];
+    char user_file[1024];
     pthread_t loader;
     int loader_joinable;
     volatile int load_state;     /* 0 idle, 1 loading, 2 done ok, 3 failed */
     path_t load_buf;
     char load_err[96];
-    char load_name[256];
+    char load_name[1024];
     char status[96];             /* the file field's message (loaded / failed) */
     int load_select;             /* a LOAD press: the loaded shape becomes the edited timbre's (a restore keeps its own) */
     double tap_last;             /* seconds, for TAP */
     double clock_s;
     int preset;
+    /* your own presets: <plugin folder>/User Presets/USER 001.vader ... */
+    char pdir[600];
+    unsigned char uknown[1000];   /* 0 not looked at yet, 1 empty, 2 saved */
+    char ustatus[48];
 } vader_t;
 
 /* ------------------------------------------------------------------------------------------------ helpers */
@@ -195,11 +204,18 @@ static int is_shape_file(const char *n) {
     return e && (!strcasecmp(e, ".svg") || !strcasecmp(e, ".obj") || !strcasecmp(e, ".png") || !strcasecmp(e, ".jpg") ||
                  !strcasecmp(e, ".jpeg"));
 }
-static int cmp_str(const void *a, const void *b) { return strcasecmp(*(char *const *)a, *(char *const *)b); }
+/* the shape files: the plugin's own Shapes folder, then a "VADER Shapes" folder on the internal card and on any SD card
+ * or USB drive (/media/<drive>/VADER Shapes), so new shapes can be copied on a computer and plugged in */
+static int cmp_file(const void *a, const void *b) {
+    const shapefile_t *x = a, *y = b;
+    int ex = x->label[0] == '[', ey = y->label[0] == '[';   /* the plugin's own first, then the drives' */
+    if (ex != ey) return ex - ey;
+    return strcasecmp(x->label, y->label);
+}
 
-static void scan_dir(vader_t *s, const char *rel, int depth) {
+static void scan_dir(vader_t *s, const char *root, const char *rel, const char *tag, int depth) {
     char path[1024];
-    snprintf(path, sizeof path, "%s%s%s", s->dir, rel[0] ? "/" : "", rel);
+    snprintf(path, sizeof path, "%s%s%s", root, rel[0] ? "/" : "", rel);
     DIR *d = opendir(path);
     if (!d) return;
     struct dirent *e;
@@ -207,40 +223,66 @@ static void scan_dir(vader_t *s, const char *rel, int depth) {
         if (e->d_name[0] == '.') continue;
         char r2[512], full[1024];
         snprintf(r2, sizeof r2, "%s%s%s", rel, rel[0] ? "/" : "", e->d_name);
-        snprintf(full, sizeof full, "%s/%s", s->dir, r2);
+        snprintf(full, sizeof full, "%s/%s", root, r2);
         struct stat st;
-        if (lstat(full, &st)) continue;
+        if (lstat(full, &st)) continue;   /* lstat: links are not followed */
         if (S_ISDIR(st.st_mode)) {
-            if (depth < 2) scan_dir(s, r2, depth + 1);
+            if (depth < 2) scan_dir(s, root, r2, tag, depth + 1);
         } else if (S_ISREG(st.st_mode) && is_shape_file(e->d_name)) {
-            s->files[s->nfiles++] = strdup(r2);
+            char label[600];
+            snprintf(label, sizeof label, "%s%s", tag, r2);
+            s->files[s->nfiles].path = strdup(full);
+            s->files[s->nfiles].label = strdup(label);
+            s->nfiles++;
         }
     }
     closedir(d);
 }
 
+#ifndef VADER_MEDIA
+#define VADER_MEDIA "/media"
+#endif
+#ifndef VADER_SDCARD
+#define VADER_SDCARD "/sdcard"
+#endif
+
 static void rescan(vader_t *s) {
-    for (int i = 0; i < s->nfiles; i++) free(s->files[i]);
+    for (int i = 0; i < s->nfiles; i++) { free(s->files[i].path); free(s->files[i].label); }
     s->nfiles = 0;
-    if (s->dir[0]) scan_dir(s, "", 0);
-    qsort(s->files, (size_t)s->nfiles, sizeof(char *), cmp_str);
+    if (s->dir[0]) scan_dir(s, s->dir, "", "", 0);
+    char root[600];
+    snprintf(root, sizeof root, "%s/VADER Shapes", VADER_SDCARD);
+    scan_dir(s, root, "", "[CARD] ", 0);
+    DIR *m = opendir(VADER_MEDIA);
+    if (m) {
+        struct dirent *e;
+        while ((e = readdir(m))) {
+            if (e->d_name[0] == '.') continue;
+            char tag[96];
+            snprintf(root, sizeof root, "%s/%s/VADER Shapes", VADER_MEDIA, e->d_name);
+            snprintf(tag, sizeof tag, "[%.80s] ", e->d_name);
+            scan_dir(s, root, "", tag, 0);
+        }
+        closedir(m);
+    }
+    qsort(s->files, (size_t)s->nfiles, sizeof(shapefile_t), cmp_file);
     s->status[0] = 0;
     mark(s, P_FILE);
 }
 
 static void *load_thread(void *arg) {
     vader_t *s = arg;
-    char full[1024];
-    snprintf(full, sizeof full, "%s/%s", s->dir, s->load_name);
-    int rc = shape_load_file(full, &s->load_buf, s->load_err, sizeof s->load_err);
+    int rc = shape_load_file(s->load_name, &s->load_buf, s->load_err, sizeof s->load_err);
     __atomic_store_n(&s->load_state, rc ? 3 : 2, __ATOMIC_RELEASE);
     return NULL;
 }
 
-static void start_load(vader_t *s, const char *rel) {
+/* path: the file's full path (a saved project from 0.1.0 has it relative to the Shapes folder) */
+static void start_load(vader_t *s, const char *path) {
     if (__atomic_load_n(&s->load_state, __ATOMIC_ACQUIRE) == 1) return;   /* one at a time */
     if (s->loader_joinable) { pthread_join(s->loader, NULL); s->loader_joinable = 0; }
-    snprintf(s->load_name, sizeof s->load_name, "%s", rel);
+    if (path[0] == '/' || access(path, R_OK) == 0) snprintf(s->load_name, sizeof s->load_name, "%s", path);
+    else snprintf(s->load_name, sizeof s->load_name, "%s/%s", s->dir, path);
     __atomic_store_n(&s->load_state, 1, __ATOMIC_RELEASE);
     snprintf(s->status, sizeof s->status, "LOADING...");
     mark(s, P_FILE);
@@ -269,13 +311,14 @@ static void collect_load(vader_t *s) {
     mark(s, P_FILE);
 }
 
-static const char *file_at(vader_t *s) {
+static const shapefile_t *file_at(vader_t *s) {
     int i = (int)s->g[G_FILE];
     if (s->nfiles <= 0) return NULL;
     if (i >= s->nfiles) i = s->nfiles - 1;
-    return s->files[i];
+    return &s->files[i];
 }
 
+static void release_all(vader_t *s);
 /* ------------------------------------------------------------------------------------------------ presets */
 typedef struct { const char *key; float v; } kv_t;
 typedef struct { const char *name; kv_t a[40]; kv_t b[24]; kv_t g[24]; } preset_t;
@@ -348,6 +391,7 @@ static void all_dirty(vader_t *s) {
 
 static void load_preset(vader_t *s, int n) {
     if (n < 0 || n >= NPRESET) return;
+    release_all(s);   /* nothing keeps sounding from the sound before */
     const preset_t *P = &PRESETS[n];
     /* keep how the instance is being used: what's edited, the screen, the file */
     float keep[] = {s->g[G_TIMBRE], s->g[G_CORNER], s->g[G_ALT], s->g[G_MOTION], s->g[G_FILE], s->g[G_VOICES]};
@@ -401,7 +445,7 @@ static voice_t *alloc_voice(vader_t *s, int t) {
     return free_v;
 }
 
-static void voice_on(vader_t *s, int t, int note, float vel) {
+static void voice_on(vader_t *s, int t, int note, int key, float vel) {
     static const int UNI[4] = {1, 2, 4, 8};
     int u = UNI[(int)T(t)[S_UNISON] & 3];
     float det = T(t)[S_DETUNE];
@@ -416,6 +460,7 @@ static void voice_on(vader_t *s, int t, int note, float vel) {
         v->active = 1;
         v->timbre = t;
         v->note = note;
+        v->key = key;
         v->vel = vel;
         v->age = ++s->age;
         float spread = u > 1 ? (2.0f * k / (u - 1) - 1) : 0;
@@ -430,10 +475,11 @@ static void voice_on(vader_t *s, int t, int note, float vel) {
     }
 }
 
-static void voice_off(vader_t *s, int t, int note) {
+/* a key let go: every voice it started stops, whatever has changed since (octave, KEYS, split, a preset) */
+static void voice_off(vader_t *s, int key) {
     for (int i = 0; i < MAXV; i++) {
         voice_t *v = &s->v[i];
-        if (v->active && !v->released && v->timbre == t && v->note == note) {
+        if (v->active && !v->released && v->key == key) {
             if (s->pedal) v->held_by_pedal = 1;
             else { v->released = 1; v->stage = 3; }
         }
@@ -453,14 +499,10 @@ static void play_on(vader_t *s, int note, float vel) {
     for (int t = 0; t < 2; t++)
         if (r & (1 << t)) {
             int n = note + 12 * (int)T(t)[S_OCTAVE];
-            if (n >= 0 && n < 128) voice_on(s, t, n, vel);
+            if (n >= 0 && n < 128) voice_on(s, t, n, note, vel);
         }
 }
-static void play_off(vader_t *s, int note) {
-    int r = route(s, note);
-    for (int t = 0; t < 2; t++)
-        if (r & (1 << t)) voice_off(s, t, note + 12 * (int)T(t)[S_OCTAVE]);
-}
+static void play_off(vader_t *s, int note) { voice_off(s, note); }
 
 /* ------------------------------------------------------------------------------------------------ arpeggiator */
 static float arp_step_beats(vader_t *s) {
@@ -524,6 +566,16 @@ static void arp_step(vader_t *s, float step_frames) {
         play_on(s, note, vel);
     }
     s->arp_off_at = (long)(step_frames * (0.05f + 0.93f * s->g[G_NOTE_LEN]));
+}
+
+/* every note lets go (they fade with their release), the arpeggiator forgets its keys */
+static void release_all(vader_t *s) {
+    arp_release(s);
+    s->nheld = 0;
+    s->latch_fresh = 0;
+    s->pedal = 0;
+    all_off(s, 0);
+    for (int i = 0; i < MAXV; i++) s->v[i].held_by_pedal = 0;
 }
 
 static void key_on(vader_t *s, int note, float vel) {
@@ -629,6 +681,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     float sr_ = P[S_SUB_SIZE] * 0.6f;
     float ox = clampf(px + sr_ * cosf(TWO_PI * oo), -1, 1), oy = clampf(py + sr_ * sinf(TWO_PI * oo), -1, 1);
     v->fx = px; v->fy = py; v->ox = ox; v->oy = oy;
+    v->shown_t = ot; v->shown_o = oo;
     float u = (ox + 1) * 0.5f, w_ = (oy + 1) * 0.5f;
     float wt[4] = {(1 - u) * (1 - w_), u * (1 - w_), (1 - u) * w_, u * w_};
     float w0[4], wd[4];
@@ -742,6 +795,21 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
 }
 
 /* ------------------------------------------------------------------------------------------------ the screen */
+/* the built-in 2D shapes are ready-drawn pictures for 8 sizes and 4 quarter turns (tools/vader_skin.py): which one, or
+ * 0 when the tiles draw the shape (your own file, the 3D shapes) */
+static int shape_picture(vader_t *s, int t, int *size_step, int *quarter) {
+    const float *P = T(t);
+    int idx = (int)P[S_SHAPE];
+    if (idx >= PIC_SHAPES || s->tm[t].base.is3d) return 0;
+    int k = (int)lroundf(P[S_ORB_SIZE] * PIC_SIZES);
+    if (k < 1) k = 1;
+    if (k > PIC_SIZES) k = PIC_SIZES;
+    int q = (int)lroundf(P[S_ROTATE] * PIC_ROTS) % PIC_ROTS;
+    *size_step = k;
+    *quarter = q;
+    return 1 + idx * PIC_SIZES * PIC_ROTS + (k - 1) * PIC_ROTS + q;
+}
+
 static void screen_update(vader_t *s, int force_shape) {
     int t = edit(s);
     const float *P = T(t);
@@ -751,28 +819,39 @@ static void screen_update(vader_t *s, int force_shape) {
     voice_t *best = NULL;
     for (int i = 0; i < MAXV; i++)
         if (s->v[i].active && s->v[i].timbre == t && (!best || s->v[i].age > best->age)) best = &s->v[i];
-    float fx, fy, ox, oy, size = P[S_ORB_SIZE];
-    if (best) { fx = best->fx; fy = best->fy; ox = best->ox; oy = best->oy; }
-    else {
-        path_at(m->x2, m->y2, m->orb_t, &fx, &fy);
-        fx *= size; fy *= size;
-        float sr_ = P[S_SUB_SIZE] * 0.6f;
-        ox = clampf(fx + sr_ * cosf(TWO_PI * m->orb_o), -1, 1);
-        oy = clampf(fy + sr_ * sinf(TWO_PI * m->orb_o), -1, 1);
+    float ot = best ? best->shown_t : m->orb_t, oo = best ? best->shown_o : m->orb_o;
+    float sr_ = P[S_SUB_SIZE] * 0.6f, size = P[S_ORB_SIZE];
+    int k = 0, q = 0, pic = shape_picture(s, t, &k, &q);
+    float fx, fy;
+    if (pic) {
+        /* on the picture: the path at the picture's size and quarter turn (the sound uses the knobs' exact values) */
+        float bx, by;
+        path_at(m->base.x, m->base.y, ot, &bx, &by);
+        float c = q == 1 ? 0 : q == 3 ? 0 : q == 2 ? -1 : 1, sn = q == 1 ? 1 : q == 3 ? -1 : 0;
+        fx = (bx * c - by * sn) * k / PIC_SIZES;
+        fy = (bx * sn + by * c) * k / PIC_SIZES;
+    } else {
+        path_at(m->x2, m->y2, ot, &fx, &fy);
+        fx *= size;
+        fy *= size;
     }
+    float ox = clampf(fx + sr_ * cosf(TWO_PI * oo), -1, 1), oy = clampf(fy + sr_ * sinf(TWO_PI * oo), -1, 1);
+    if (pic != s->sent_pic) { s->sent_pic = pic; mark(s, P_SHAPE_PIC); force_shape = 1; }
     if (force_shape || s->shape_wait <= 0) {
-        screen_shape(&s->scr, m->x2, m->y2, size);
+        screen_shape(&s->scr, m->x2, m->y2, size, !pic);
         s->shape_wait = m->base.is3d && P[S_SPIN] > 0.01f ? 4 : 1 << 30;   /* a turning 3D shape: redrawn 2.5 times a second */
     } else s->shape_wait--;
     screen_frame(&s->scr, fx, fy, ox, oy, motion);
     for (int i = 0; i < TILE_COLS * TILE_ROWS; i++)
         if (s->scr.tiles[i] != s->sent_tiles[i]) { s->sent_tiles[i] = s->scr.tiles[i]; mark(s, P_T000 + i); }
     if (motion) {
-        float u = (ox + 1) * 0.5f, w = (oy + 1) * 0.5f;
+        /* the corner bars: what the sound really hears */
+        float sx = best ? best->ox : ox, sy = best ? best->oy : oy;
+        float u = (sx + 1) * 0.5f, w = (sy + 1) * 0.5f;
         float wt[4] = {(1 - u) * (1 - w), u * (1 - w), (1 - u) * w, u * w};
         for (int c = 0; c < 4; c++) {
-            unsigned char q = (unsigned char)lroundf(wt[c] * 100);
-            if (q != s->sent_w[c]) { s->sent_w[c] = q; mark(s, P_WA + c); }
+            unsigned char qv = (unsigned char)lroundf(wt[c] * 100);
+            if (qv != s->sent_w[c]) { s->sent_w[c] = qv; mark(s, P_WA + c); }
         }
     }
 }
@@ -785,6 +864,7 @@ static void env_update(vader_t *s) {
 }
 
 /* ------------------------------------------------------------------------------------------------ the readout */
+static int user_saved(vader_t *s, int n);
 static void value_text(vader_t *s, int p, float v, char *buf, int len) {
     const vp_t *q = &VP[p];
     if (p == P_SHAPE && (int)v == SHAPE_USER && s->has_user) {
@@ -793,8 +873,13 @@ static void value_text(vader_t *s, int p, float v, char *buf, int len) {
     }
     if (q->nopts) { int i = (int)v; snprintf(buf, (size_t)len, "%s", q->opts[i < 0 ? 0 : i >= q->nopts ? q->nopts - 1 : i]); return; }
     if (p == P_FILE) {
-        const char *f = file_at(s);
-        snprintf(buf, (size_t)len, "%s", s->status[0] ? s->status : f ? f : "NO FILES IN Shapes/");
+        const shapefile_t *f = file_at(s);
+        snprintf(buf, (size_t)len, "%s", s->status[0] ? s->status : f ? f->label : "NO SHAPE FILES FOUND");
+        return;
+    }
+    if (p == P_USER_SLOT) {
+        int n = (int)lroundf(v);
+        snprintf(buf, (size_t)len, "USER %03d   %s", n, s->ustatus[0] ? s->ustatus : user_saved(s, n) ? "saved" : "empty");
         return;
     }
     if (p == P_PRESET) { int i = (int)v; snprintf(buf, (size_t)len, "%s", PRESETS[i < 0 ? 0 : i >= NPRESET ? NPRESET - 1 : i].name); return; }
@@ -826,7 +911,16 @@ static void *create(const char *data_dir) {
     if (!s) return NULL;
     s->fx = fx_new();
     if (!s->fx) { free(s); return NULL; }
-    if (data_dir) snprintf(s->dir, sizeof s->dir, "%s", data_dir);
+    if (data_dir) {
+        snprintf(s->dir, sizeof s->dir, "%s", data_dir);
+        /* the presets go next to the Shapes folder, in the plugin's own folder */
+        char base[512];
+        snprintf(base, sizeof base, "%s", data_dir);
+        size_t bl = strlen(base);
+        if (bl > 7 && !strcmp(base + bl - 7, "/Shapes")) base[bl - 7] = 0;
+        else if (!strcmp(base, "Shapes") || !strcmp(base, "shapes")) snprintf(base, sizeof base, ".");
+        snprintf(s->pdir, sizeof s->pdir, "%s/User Presets", base);
+    }
     memcpy(s->g, GLOB_DEF, sizeof s->g);
     memcpy(T(0), SND_DEF, sizeof(float) * NSND);
     memcpy(T(1), SND_DEF, sizeof(float) * NSND);
@@ -835,6 +929,7 @@ static void *create(const char *data_dir) {
     for (int t = 0; t < 2; t++) timbre_shape(s, t);
     for (int t = 0; t < 2; t++) project(s, t, 0);
     memset(s->sent_tiles, 0xff, sizeof s->sent_tiles);
+    s->sent_pic = -1;
     memset(s->sent_env, 0xff, sizeof s->sent_env);
     memset(s->sent_w, 0xff, sizeof s->sent_w);
     s->sent_rd = 0xff;
@@ -849,7 +944,7 @@ static void destroy(void *p) {
     vader_t *s = p;
     if (!s) return;
     if (s->loader_joinable) pthread_join(s->loader, NULL);
-    for (int i = 0; i < s->nfiles; i++) free(s->files[i]);
+    for (int i = 0; i < s->nfiles; i++) { free(s->files[i].path); free(s->files[i].label); }
     fx_free(s->fx);
     free(s);
 }
@@ -899,30 +994,17 @@ static void tap(vader_t *s) {
     }
 }
 
-static void set_param(void *p, const char *key, const char *val) {
-    vader_t *s = p;
-    collect_load(s);
-    if (!strcmp(key, "host_time")) {
-        int pl = 0;
-        double ppq = 0, tempo = 0;
-        if (sscanf(val, "%d %lf %lf", &pl, &ppq, &tempo) == 3) {
-            if (pl != s->playing) { s->arp_next = -1; if (pl) { s->arp_count = 0; s->arp_idx = 0; } }
-            s->playing = pl;
-            s->ppq = ppq;
-            if (tempo > 0) s->tempo = (float)tempo;
-        }
-        return;
-    }
-    if (!strcmp(key, "state")) {   /* restore (the wrapper passes the chunk text) */
+/* a saved state (MPC's project chunk, or one of your preset files): every value of both timbres and the instance */
+static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapper passes the chunk text) */
         memcpy(s->g, GLOB_DEF, sizeof s->g);
         memcpy(T(0), SND_DEF, sizeof(float) * NSND);
         memcpy(T(1), SND_DEF, sizeof(float) * NSND);
-        char line[512];
+        char line[1100];
         const char *q = val;
-        char user[256] = "";
+        char user[1024] = "";
         while (*q) {
             int n = 0;
-            while (q[n] && q[n] != '\n' && n < 511) { line[n] = q[n]; n++; }
+            while (q[n] && q[n] != '\n' && n < (int)sizeof line - 1) { line[n] = q[n]; n++; }
             line[n] = 0;
             q += n;
             if (*q == '\n') q++;
@@ -939,8 +1021,80 @@ static void set_param(void *p, const char *key, const char *val) {
         s->load_select = 0;
         if (user[0]) start_load(s, user);   /* the shape file again, by name */
         for (int t = 0; t < 2; t++) timbre_shape(s, t);
+        release_all(s);
         all_off(s, 1);
         all_dirty(s);
+        }
+
+static int state_text(vader_t *s, char *buf, int len);
+
+static void user_path(vader_t *s, int n, char *out, int len) { snprintf(out, (size_t)len, "%s/USER %03d.vader", s->pdir, n); }
+
+static int user_saved(vader_t *s, int n) {
+    if (n < 1 || n > 999 || !s->pdir[0]) return 0;
+    if (!s->uknown[n]) {
+        char path[700];
+        struct stat st;
+        user_path(s, n, path, sizeof path);
+        s->uknown[n] = stat(path, &st) == 0 ? 2 : 1;
+    }
+    return s->uknown[n] == 2;
+}
+
+static void save_user(vader_t *s) {
+    int n = (int)s->g[G_USER_SLOT];
+    char path[700];
+    if (!s->pdir[0]) { snprintf(s->ustatus, sizeof s->ustatus, "NO FOLDER"); return; }
+    mkdir(s->pdir, 0755);
+    user_path(s, n, path, sizeof path);
+    int cap = 64 * 1024;
+    char *buf = malloc((size_t)cap);
+    if (!buf) return;
+    int len = state_text(s, buf, cap) - 1;
+    FILE *f = fopen(path, "wb");
+    if (f && len > 0 && fwrite(buf, 1, (size_t)len, f) == (size_t)len) {
+        snprintf(s->ustatus, sizeof s->ustatus, "SAVED");
+        s->uknown[n] = 2;
+    } else snprintf(s->ustatus, sizeof s->ustatus, "COULDN'T SAVE");
+    if (f) fclose(f);
+    free(buf);
+}
+
+static void load_user(vader_t *s) {
+    int n = (int)s->g[G_USER_SLOT];
+    char path[700];
+    user_path(s, n, path, sizeof path);
+    FILE *f = fopen(path, "rb");
+    if (!f) { snprintf(s->ustatus, sizeof s->ustatus, "EMPTY SLOT"); return; }
+    char *buf = malloc(256 * 1024);
+    size_t got = buf ? fread(buf, 1, 256 * 1024 - 1, f) : 0;
+    fclose(f);
+    if (!buf) return;
+    buf[got] = 0;
+    float keep_slot = s->g[G_USER_SLOT], keep_file = s->g[G_FILE];
+    restore_state(s, buf);
+    s->g[G_USER_SLOT] = keep_slot;
+    s->g[G_FILE] = keep_file;
+    free(buf);
+    snprintf(s->ustatus, sizeof s->ustatus, "LOADED");
+}
+
+static void set_param(void *p, const char *key, const char *val) {
+    vader_t *s = p;
+    collect_load(s);
+    if (!strcmp(key, "host_time")) {
+        int pl = 0;
+        double ppq = 0, tempo = 0;
+        if (sscanf(val, "%d %lf %lf", &pl, &ppq, &tempo) == 3) {
+            if (pl != s->playing) { s->arp_next = -1; if (pl) { s->arp_count = 0; s->arp_idx = 0; } }
+            s->playing = pl;
+            s->ppq = ppq;
+            if (tempo > 0) s->tempo = (float)tempo;
+        }
+        return;
+    }
+    if (!strcmp(key, "state")) {   /* restore (the wrapper passes the chunk text) */
+        restore_state(s, val);
         return;
     }
     int i = find(key);
@@ -979,14 +1133,23 @@ static void set_param(void *p, const char *key, const char *val) {
         if (q->slot == G_CORNER) mark_corner_view(s);
         if (q->slot == G_VOICES) all_off(s, 1);
         if (q->slot == G_FILE) s->status[0] = 0;
+        if (q->slot == G_USER_SLOT) s->ustatus[0] = 0;
         if (q->slot == G_ARP_ON && !(int)v) { s->nheld = 0; arp_release(s); }
         if (q->slot == G_MOTION) s->shape_wait = 0;
         break;
     case K_TRIG:
         if (v > 0.5f) {
             if (i == P_TAP) tap(s);
-            else if (i == P_LOAD) { const char *f = file_at(s); s->load_select = 1; if (f) start_load(s, f); else snprintf(s->status, sizeof s->status, "NO FILES IN Shapes/"); mark(s, P_FILE); }
-            else if (i == P_RESCAN) rescan(s);
+            else if (i == P_LOAD) {
+                const shapefile_t *f = file_at(s);
+                s->load_select = 1;
+                if (f) start_load(s, f->path);
+                else snprintf(s->status, sizeof s->status, "NO SHAPE FILES FOUND");
+                mark(s, P_FILE);
+            }
+            else if (i == P_RESCAN) { rescan(s); memset(s->uknown, 0, sizeof s->uknown); }
+            else if (i == P_SAVE_USER) { save_user(s); mark(s, P_USER_SLOT); }
+            else if (i == P_LOAD_USER) { load_user(s); mark(s, P_USER_SLOT); }
         }
         break;
     default:
@@ -1035,6 +1198,7 @@ static int get_param(void *p, const char *key, char *buf, int len) {
             if (i >= P_WA && i <= P_WD) return snprintf(buf, (size_t)len, "%d", s->sent_w[i - P_WA] == 0xff ? 25 : s->sent_w[i - P_WA]);
             if (i >= P_E00 && i < P_E00 + ENV_COLS) return snprintf(buf, (size_t)len, "%d", s->sent_env[i - P_E00]);
             if (i >= P_T000 && i < P_T000 + TILE_COLS * TILE_ROWS) return snprintf(buf, (size_t)len, "%d", s->sent_tiles[i - P_T000]);
+            if (i == P_SHAPE_PIC) return snprintf(buf, (size_t)len, "%d", s->sent_pic < 0 ? 0 : s->sent_pic);
             return snprintf(buf, (size_t)len, "0");
         default: return 0;
         }

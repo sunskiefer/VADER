@@ -83,16 +83,22 @@ void fx_process(fx_t *f, const fx_params_t *p, float *l, float *r, int n);
 void fx_clear(fx_t *f);
 
 /* ---- screen.c: the line screen (tiles) and the envelope line */
-enum { TL_EMPTY = 0, TL_SHAPE = 1, TL_TRAIL = 5, TL_PATHDOT = 9, TL_ORBDOT = 10 };
 #define TRAIL_N 14
+#define FR_SHAPE 1
+#define FR_TRAIL (FR_SHAPE + SHAPE_ANG * SHAPE_OFF)
+#define FR_PATHDOT (FR_TRAIL + TRAIL_ANG * TRAIL_OFF)
+#define FR_ORBDOT (FR_PATHDOT + DOT_NX * DOT_NY)
 typedef struct {
-    unsigned char tiles[TILE_COLS * TILE_ROWS];
-    unsigned char shape[TILE_COLS * TILE_ROWS];   /* the shape alone (redrawn when the shape moves) */
-    float trail_x[TRAIL_N], trail_y[TRAIL_N];
+    unsigned short tiles[TILE_COLS * TILE_ROWS];
+    unsigned short shape[TILE_COLS * TILE_ROWS];   /* the shape alone (when the tiles draw it) */
+    float trail_x[TRAIL_N], trail_y[TRAIL_N];      /* screen pixels */
     int trail_n;
     unsigned char env[ENV_COLS];
 } screen_t;
-void screen_shape(screen_t *s, const float *x2, const float *y2, float size);
+/* x, y in -1..1 (the corners' square) -> the screen's pixels (640 x 288: the square in the middle, true proportions) */
+static inline float scr_x(float x) { return SQUARE_X + (x + 1) * 0.5f * SQUARE; }
+static inline float scr_y(float y) { return (y + 1) * 0.5f * SQUARE; }
+void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int draw);
 void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, int motion);
 void screen_env(screen_t *s, float a, float d, float sus, float r);
 int env_pair_index(int r0, int r1);

@@ -33,7 +33,7 @@ INK_DIM = (111, 143, 184)
 WHITE = (255, 255, 255)
 AMBER = (255, 176, 32)
 CYAN = (125, 252, 255)
-GROUND = (6, 10, 18)
+GROUND = (0, 0, 0)
 BTN_ON = (15, 42, 74)
 BTN_OFF = (11, 20, 36)
 
@@ -179,6 +179,8 @@ def page_orbit():
           hl("split", Cc, 240, 400, "SPLIT NOTE"), text("VOICES", Cc, 300, 17), radio("voices", Cc, 322, 400, h=42),
           text("LOWER plays timbre A, UPPER timbre B, AUTO both: layered (DUAL) or split at the SPLIT NOTE "
                "(A below, B above). TIMBRE A/B in the top strip picks the one you edit.", Cc, 380, 16, w=400)]
+    c += [title("MY PRESETS", Cc, 470, 400), field("user_slot", Cc, 494, 400, "SLOT", h=52),
+          btn("save_user", Cc, 556, 192, "SAVE", h=48), btn("load_user", Cc + 208, 556, 192, "LOAD", h=48)]
     q = [("ORBIT", ["orb_speed", "orb_size", "sub_size", "sub_speed", "rotate", "orb_env", "spin", "tilt",
                     "shape", "shape_osc", "detune", "glide", "octave", "t_volume", "velocity", "file"])]
     return c, q
@@ -327,30 +329,131 @@ def meter_strip(w, h, frames=101, colour=ACCENT):
     return strip
 
 
-def tile_strip():
-    """the screen's pieces (src/screen.c): empty; the shape's line - | / \\ (dim); the trail's (bright); the dots"""
+SS = 4   # drawn 4 times larger, then shrunk: smooth edges
+
+
+def _piece(fr, ang, k, A, step, colour, width, glow):
+    """a straight piece: angle ang of A steps, k steps of step px from the tile's middle (src/screen.c piece_frame)"""
     Image, ImageDraw, ImageFilter, _ = _pil()
     w, h = TILE_W, TILE_H
+    th = ang * math.pi / A
+    ux, uy, nx, ny = math.cos(th), math.sin(th), -math.sin(th), math.cos(th)
+    px, py = w / 2 + nx * k * step, h / 2 + ny * k * step
+    t0, t1 = -100.0, 100.0
+    for p_, q_ in ((-ux, px), (ux, w - px), (-uy, py), (uy, h - py)):
+        if abs(p_) < 1e-9:
+            if q_ < 0:
+                return
+            continue
+        r = q_ / p_
+        if p_ < 0:
+            t0 = max(t0, r)
+        else:
+            t1 = min(t1, r)
+    if t1 - t0 < 0.5:
+        return
+    a, b = (px + ux * t0, py + uy * t0), (px + ux * t1, py + uy * t1)
+    big = Image.new("RGBA", (w * SS, h * SS), colour + (0,))
+    m = Image.new("L", (w * SS, h * SS), 0)
+    ImageDraw.Draw(m).line([(a[0] * SS, a[1] * SS), (b[0] * SS, b[1] * SS)], fill=255, width=int(width * SS))
+    halo = m.filter(ImageFilter.GaussianBlur(glow * SS)).point(lambda v: int(min(255, v * 1.6)))
+    big.putalpha(Image.fromarray(__import__("numpy").maximum(__import__("numpy").asarray(m), __import__("numpy").asarray(halo) * 0.55).astype("uint8")))
+    fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
+
+
+def _dot(fr, sx, sy, colour):
+    Image, ImageDraw, ImageFilter, _ = _pil()
+    w, h = TILE_W, TILE_H
+    cx, cy = (sx + 0.5) * w / G.DOT_NX, (sy + 0.5) * h / G.DOT_NY
+    big = Image.new("RGBA", (w * SS, h * SS), colour + (0,))
+    m = Image.new("L", (w * SS, h * SS), 0)
+    ImageDraw.Draw(m).ellipse([(cx - 6.5) * SS, (cy - 6.5) * SS, (cx + 6.5) * SS, (cy + 6.5) * SS], fill=130)
+    m = m.filter(ImageFilter.GaussianBlur(1.6 * SS))
+    ImageDraw.Draw(m).ellipse([(cx - 4.3) * SS, (cy - 4.3) * SS, (cx + 4.3) * SS, (cy + 4.3) * SS], fill=255)
+    big.putalpha(m)
+    fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
+
+
+def tile_strip():
+    """the screen's pieces, in src/screen.c's order: empty; every straight piece of the shape (dim blue); every piece
+    of the trail (bright cyan); the path dot (amber) and the orbiter dot (cyan) at each of their 5 x 5 places"""
+    Image, _, _, _ = _pil()
+    w, h = TILE_W, TILE_H
     strip = Image.new("RGBA", (w, h * G.TILE_FRAMES), (0, 0, 0, 0))
-    ends = [((0, h / 2), (w, h / 2)), ((w / 2, 0), (w / 2, h)), ((0, h), (w, 0)), ((0, 0), (w, h))]
-    for k in range(G.TILE_FRAMES):
+    frames = [None]
+    hs, ht = (G.SHAPE_OFF - 1) // 2, (G.TRAIL_OFF - 1) // 2
+    frames += [("s", a, k - hs) for a in range(G.SHAPE_ANG) for k in range(G.SHAPE_OFF)]
+    frames += [("t", a, k - ht) for a in range(G.TRAIL_ANG) for k in range(G.TRAIL_OFF)]
+    frames += [("p", j % G.DOT_NX, j // G.DOT_NX) for j in range(G.DOT_NX * G.DOT_NY)]
+    frames += [("o", j % G.DOT_NX, j // G.DOT_NX) for j in range(G.DOT_NX * G.DOT_NY)]
+    assert len(frames) == G.TILE_FRAMES
+    for i, f in enumerate(frames):
+        if f is None:
+            continue
         fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-        if 1 <= k <= 4:
-            a, b = ends[k - 1]
-            glow_line(fr, a, b, (40, 110, 190), 2, glow=3, strength=0.5)
-        elif 5 <= k <= 8:
-            a, b = ends[k - 5]
-            glow_line(fr, a, b, CYAN, 3, glow=5)
-        elif k in (9, 10):
-            col = AMBER if k == 9 else CYAN
-            g = Image.new("RGBA", (w, h), col + (0,))
-            m = Image.new("L", (w, h), 0)
-            ImageDraw.Draw(m).ellipse([w / 2 - 8, h / 2 - 8, w / 2 + 8, h / 2 + 8], fill=200)
-            g.putalpha(m.filter(ImageFilter.GaussianBlur(2.5)))
-            fr.alpha_composite(g)
-            ImageDraw.Draw(fr).ellipse([w / 2 - 5, h / 2 - 5, w / 2 + 5, h / 2 + 5], fill=col + (255,))
-        strip.alpha_composite(fr, (0, k * h))
+        if f[0] == "s":
+            _piece(fr, f[1], f[2], G.SHAPE_ANG, G.SHAPE_DSTEP, (70, 160, 255), 1.7, 1.0)
+        elif f[0] == "t":
+            _piece(fr, f[1], f[2], G.TRAIL_ANG, G.TRAIL_DSTEP, CYAN, 2.2, 1.2)
+        else:
+            _dot(fr, f[1], f[2], AMBER if f[0] == "p" else CYAN)
+        strip.alpha_composite(fr, (0, i * h))
     return strip
+
+
+_paths = None
+
+
+def builtin_paths():
+    """the built-in 2D shapes' paths, from the engine itself (tools/shape_dump.c, built by build.sh)"""
+    global _paths
+    if _paths is None:
+        import subprocess
+        exe = os.path.join(ROOT, "build", "tools", "shape_dump")
+        out = subprocess.run([exe], capture_output=True, text=True, check=True).stdout.strip().splitlines()
+        _paths = [[tuple(float(v) for v in pt.split(",")) for pt in line.split()] for line in out]
+    return _paths
+
+
+def shape_picture(idx, k, q):
+    """the ready-drawn outline of built-in shape idx at size step k (1..8) and quarter turn q: (image, x, y) on the
+    screen, the same place the engine puts its path (src/engine.c screen_update)"""
+    Image, ImageDraw, ImageFilter, _ = _pil()
+    import numpy as np
+    c, s_ = [(1, 0), (0, 1), (-1, 0), (0, -1)][q]
+    sc = k / G.PIC_SIZES
+    pts = []
+    for x, y in builtin_paths()[idx]:
+        xr, yr = (x * c - y * s_) * sc, (x * s_ + y * c) * sc
+        pts.append((G.SQUARE_X + (xr + 1) * 0.5 * G.SQUARE, (yr + 1) * 0.5 * G.SQUARE))
+    pad = 12
+    x0, y0 = max(0, int(min(p[0] for p in pts)) - pad), max(0, int(min(p[1] for p in pts)) - pad)
+    x1 = min(G.TILE_COLS * TILE_W, int(max(p[0] for p in pts)) + pad + 1)
+    y1 = min(G.TILE_ROWS * TILE_H, int(max(p[1] for p in pts)) + pad + 1)
+    w, h = x1 - x0, y1 - y0
+    m = Image.new("L", (w * SS, h * SS), 0)
+    seq = [((px - x0) * SS, (py - y0) * SS) for px, py in pts]
+    ImageDraw.Draw(m).line(seq + [seq[0]], fill=255, width=int(2.4 * SS), joint="curve")
+    halo = m.filter(ImageFilter.GaussianBlur(4 * SS))
+    a = np.maximum(np.asarray(m, np.float32), np.minimum(255, np.asarray(halo, np.float32) * 2.2) * 0.5)
+    big = Image.new("RGBA", (w * SS, h * SS), (58, 160, 255, 0))
+    big.putalpha(Image.fromarray(a.astype("uint8")))
+    return big.resize((w, h), Image.LANCZOS), x0, y0
+
+
+def glass():
+    """the fixed glass over the screen: thin scanlines and darker edges"""
+    Image, ImageDraw, _, _ = _pil()
+    import numpy as np
+    w, h = G.TILE_COLS * TILE_W, G.TILE_ROWS * TILE_H
+    a = np.zeros((h, w), np.float32)
+    a[::3, :] = 70
+    yy, xx = np.mgrid[0:h, 0:w]
+    v = np.clip(((xx - w / 2) / (w * 0.62)) ** 2 + ((yy - h / 2) / (h * 0.75)) ** 2 - 0.35, 0, 1) * 200
+    a = np.clip(a + v, 0, 200)
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    im.putalpha(Image.fromarray(a.astype("uint8")))
+    return im
 
 
 def env_strip():
@@ -511,12 +614,9 @@ def background(page_no):
         import numpy as np
         rng = np.random.default_rng(11 + page_no)
         a = np.zeros((H, W, 3), np.float32) + np.array(GROUND, np.float32)
-        a += rng.normal(0, 1.6, (H, W))[..., None]
-        yy, xx = np.mgrid[0:H, 0:W]
-        a += (6 * np.exp(-(((xx - W / 2) / 700) ** 2 + ((yy - H / 2) / 420) ** 2)))[..., None] * np.array([0.4, 0.7, 1.2])
         bg = Image.fromarray(np.clip(a, 0, 255).astype("uint8"), "RGB").convert("RGBA")
     # the stripe
-    band = Image.new("RGBA", (W, 60), (4, 10, 22, 224))
+    band = Image.new("RGBA", (W, 60), (0, 0, 0, 230))
     bg.alpha_composite(band, (0, 0))
     d = ImageDraw.Draw(bg)
     d.line([(0, 60), (W, 60)], fill=TRACK + (255,), width=2)
@@ -686,15 +786,29 @@ def build_page(sk, page_no, comps):
                 kids.append(placed(dk, "env %d" % i, sk.index["e%02d" % i], (ENV_XY[0] + i * ENV_CW, ENV_XY[1], ENV_CW, eh), False))
         elif k == "screen":
             window(d, SCREEN, 12)
-            # the unlit grid: a faint dot in every tile
-            for r in range(G.TILE_ROWS):
-                for q in range(G.TILE_COLS):
-                    cx, cy = TILES_XY[0] + q * TILE_W + TILE_W / 2, TILES_XY[1] + r * TILE_H + TILE_H / 2
-                    d.ellipse([cx - 1.2, cy - 1.2, cx + 1.2, cy + 1.2], fill=(26, 48, 76, 255))
+            # the corners: at the corners of the square (true proportions)
+            sq = (TILES_XY[0] + G.SQUARE_X, TILES_XY[1], G.SQUARE, G.SQUARE)
             for (lab, ax, ay) in (("A", 0, 0), ("B", 1, 0), ("C", 0, 1), ("D", 1, 1)):
-                sx = SCREEN[0] + 10 if not ax else SCREEN[0] + SCREEN[2] - 24
-                sy = SCREEN[1] + 6 if not ay else SCREEN[1] + SCREEN[3] - 28
+                sx = sq[0] - 26 if not ax else sq[0] + sq[2] + 10
+                sy = sq[1] + 2 if not ay else sq[1] + sq[3] - 26
                 d.text((sx, sy), lab, font=font(20), fill=(70, 120, 180, 255))
+            # faint corner marks of the square
+            for (cx_, cy_, dx, dy) in ((sq[0], sq[1], 1, 1), (sq[0] + sq[2], sq[1], -1, 1), (sq[0], sq[1] + sq[3], 1, -1),
+                                       (sq[0] + sq[2], sq[1] + sq[3], -1, -1)):
+                d.line([(cx_, cy_), (cx_ + 14 * dx, cy_)], fill=(30, 60, 100, 255), width=2)
+                d.line([(cx_, cy_), (cx_, cy_ + 14 * dy)], fill=(30, 60, 100, 255), width=2)
+            # the built-in shapes' pictures, one shown at a time (the engine's "shape_pic")
+            n = G.PIC_COUNT + 1
+            for idx in range(G.PIC_SHAPES):
+                for k_ in range(1, G.PIC_SIZES + 1):
+                    for q in range(G.PIC_ROTS):
+                        pic = 1 + idx * G.PIC_SIZES * G.PIC_ROTS + (k_ - 1) * G.PIC_ROTS + q
+                        im, px, py = shape_picture(idx, k_, q)
+                        name = sk.save(im, "vd_shape_%d.png" % pic)
+                        dk = define("vdShapePic_%d" % pic, [], [image(name, 0, 0, im.width, im.height)], ignore=True)
+                        cond = "IndexedEnabling/%d/%d/Parameter %d" % (pic, n, sk.index["shape_pic"])
+                        kids.append(placed(dk, "shape %d" % pic, sk.index["shape_pic"],
+                                           (TILES_XY[0] + px, TILES_XY[1] + py, im.width, im.height), False, cond=cond))
         elif k == "tiles":
             strip = sk.save(tile_strip(), "vd_tiles.png")
             dk = define("vdTile", [], [filmstrip(strip, G.TILE_FRAMES, TILE_W, TILE_H, "Vertical")], ignore=True)
@@ -703,6 +817,10 @@ def build_page(sk, page_no, comps):
                     i = r * G.TILE_COLS + q
                     kids.append(placed(dk, "t%d" % i, sk.index["t%03d" % i],
                                        (TILES_XY[0] + q * TILE_W, TILES_XY[1] + r * TILE_H, TILE_W, TILE_H), False))
+            gname = sk.save(glass(), "vd_glass.png")
+            gk = define("vdGlass", [], [image(gname, 0, 0, G.TILE_COLS * TILE_W, G.TILE_ROWS * TILE_H)], ignore=True)
+            kids.append(placed(gk, "glass", sk.index["shape_pic"], (TILES_XY[0], TILES_XY[1], G.TILE_COLS * TILE_W,
+                                                                  G.TILE_ROWS * TILE_H), False))
         elif k == "bars":
             strip = sk.save(meter_strip(124, 14, colour=CYAN), "vd_bar.png")
             dk = define("vdBar", [], [filmstrip(strip, 101, 124, 14, "Horizontal")], ignore=True)

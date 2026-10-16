@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 (2026-10-16)
+
+Not yet tested on a device.
+
+- **The screen, sharper**: the built-in 2D shapes are ready-drawn glowing pictures (following ORBIT SIZE and ROTATE in
+  steps). The tiles are finer (32 × 16) and hold straight pieces at 24 angles, so lines stay straight; the orbiter and
+  the path point move in small steps. A glass layer (scanlines, darker edges) on top. The square is drawn at its true
+  proportions.
+- **Black** background behind everything.
+- **MY PRESETS** on the ORBIT page: 999 slots of your own (SLOT, SAVE, LOAD), files in `User Presets/`.
+- **Shapes from the card**: a `VADER Shapes` folder on the SD card or a USB drive is read too.
+- Fixed: notes kept sounding forever after changing preset. A preset change now stops every note, and a note-off always
+  finds its note.
+- Fixed: loading a shape file could fail with "can't open the file".
+
 ## 0.1.0 (2026-10-16)
 
 First release: not yet tested on a device.
