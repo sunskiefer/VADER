@@ -358,15 +358,15 @@ def _piece(fr, ang, k, A, step, colour, width, glow):
     fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
 
 
-def _dot(fr, sx, sy, colour):
+def _dot(fr, cx, cy, colour, core, halo):
+    """a round dot centred at (cx, cy) in the tile (the centre may lie outside it: the tile shows its part)"""
     Image, ImageDraw, ImageFilter, _ = _pil()
     w, h = TILE_W, TILE_H
-    cx, cy = (sx + 0.5) * w / G.DOT_NX, (sy + 0.5) * h / G.DOT_NY
     big = Image.new("RGBA", (w * SS, h * SS), colour + (0,))
     m = Image.new("L", (w * SS, h * SS), 0)
-    ImageDraw.Draw(m).ellipse([(cx - 6.5) * SS, (cy - 6.5) * SS, (cx + 6.5) * SS, (cy + 6.5) * SS], fill=130)
-    m = m.filter(ImageFilter.GaussianBlur(1.6 * SS))
-    ImageDraw.Draw(m).ellipse([(cx - 4.3) * SS, (cy - 4.3) * SS, (cx + 4.3) * SS, (cy + 4.3) * SS], fill=255)
+    ImageDraw.Draw(m).ellipse([(cx - halo) * SS, (cy - halo) * SS, (cx + halo) * SS, (cy + halo) * SS], fill=110)
+    m = m.filter(ImageFilter.GaussianBlur(1.4 * SS))
+    ImageDraw.Draw(m).ellipse([(cx - core) * SS, (cy - core) * SS, (cx + core) * SS, (cy + core) * SS], fill=255)
     big.putalpha(m)
     fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
 
@@ -382,7 +382,7 @@ def tile_strip():
     frames += [("s", a, k - hs) for a in range(G.SHAPE_ANG) for k in range(G.SHAPE_OFF)]
     frames += [("t", a, k - ht) for a in range(G.TRAIL_ANG) for k in range(G.TRAIL_OFF)]
     frames += [("p", j % G.DOT_NX, j // G.DOT_NX) for j in range(G.DOT_NX * G.DOT_NY)]
-    frames += [("o", j % G.DOT_NX, j // G.DOT_NX) for j in range(G.DOT_NX * G.DOT_NY)]
+    frames += [("o", j % G.ORB_NX, j // G.ORB_NX) for j in range(G.ORB_NX * G.ORB_NY)]
     assert len(frames) == G.TILE_FRAMES
     for i, f in enumerate(frames):
         if f is None:
@@ -392,8 +392,10 @@ def tile_strip():
             _piece(fr, f[1], f[2], G.SHAPE_ANG, G.SHAPE_DSTEP, (70, 160, 255), 1.7, 1.0)
         elif f[0] == "t":
             _piece(fr, f[1], f[2], G.TRAIL_ANG, G.TRAIL_DSTEP, CYAN, 2.2, 1.2)
+        elif f[0] == "p":
+            _dot(fr, (f[1] + 0.5) * w / G.DOT_NX, (f[2] + 0.5) * h / G.DOT_NY, AMBER, 2.4, 3.6)
         else:
-            _dot(fr, f[1], f[2], AMBER if f[0] == "p" else CYAN)
+            _dot(fr, G.ORB_X0 + f[1] * G.ORB_STEP, G.ORB_Y0 + f[2] * G.ORB_STEP, CYAN, 3.4, 5.0)
         strip.alpha_composite(fr, (0, i * h))
     return strip
 

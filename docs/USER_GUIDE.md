@@ -101,7 +101,7 @@ TREM DEPTH (level). With V/T sync on (SYNC section), the speeds pick note values
 once (and shows corner A's value).
 
 **SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in dim blue, the
-orbiter's recent path in bright cyan, the path point (amber) and the orbiter (cyan). A, B, C and D mark the corners;
+the path point (amber) and the orbiter (cyan). A, B, C and D mark the corners;
 the four bars under it show how much of each you are hearing. It follows the newest note of the timbre you are editing.
 If you load a shape file, it is drawn there too. Under the lines, a cloud of fine dots: it gathers around the shape,
 trails behind the orbiter and fades, and grows at each corner as loud as that corner is heard.

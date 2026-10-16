@@ -85,8 +85,7 @@ void fx_clear(fx_t *f);
 /* ---- screen.c: the line screen (tiles) and the envelope line */
 #define TRAIL_N 14
 #define FR_SHAPE 1
-#define FR_TRAIL (FR_SHAPE + SHAPE_ANG * SHAPE_OFF)
-#define FR_PATHDOT (FR_TRAIL + TRAIL_ANG * TRAIL_OFF)
+#define FR_PATHDOT (FR_SHAPE + SHAPE_ANG * SHAPE_OFF)
 #define FR_ORBDOT (FR_PATHDOT + DOT_NX * DOT_NY)
 typedef struct {
     unsigned short tiles[TILE_COLS * TILE_ROWS];

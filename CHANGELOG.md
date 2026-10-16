@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 (2026-10-16)
+
+- The orbiter's trail line is gone (it was drawn in coarse pieces and looked ragged); the trail is the fading cloud of
+  dots behind the orbiter.
+- The orbiter is one round dot that moves in 2 px steps and is never cut at a tile's edge.
+
 ## 0.3.0 (2026-10-16)
 
 Not yet tested on a device.

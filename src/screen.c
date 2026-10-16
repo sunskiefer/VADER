@@ -29,7 +29,7 @@ static int piece_frame(int cell, float ax, float ay, float bx, float by, int tra
     int half = (OFF - 1) / 2, k = (int)lroundf(d / step);
     if (k < -half) k = -half;
     if (k > half) k = half;
-    return (trail ? FR_TRAIL : FR_SHAPE) + ai * OFF + (k + half);
+    return FR_SHAPE + ai * OFF + (k + half);
 }
 
 static int dot_frame(float px, float py, int base, int *cell) {
@@ -113,19 +113,17 @@ void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, int motio
     memmove(s->trail_y + 1, s->trail_y, sizeof(float) * (TRAIL_N - 1));
     s->trail_x[0] = scr_x(ox);
     s->trail_y[0] = scr_y(oy);
-    if (s->trail_n > 1) {
-        walk_t w;
-        memset(&w, 0, sizeof w);
-        w.g = s->tiles;
-        w.trail = 1;
-        w.cell = -1;
-        for (int i = s->trail_n - 1; i > 0; i--) segment(&w, s->trail_x[i], s->trail_y[i], s->trail_x[i - 1], s->trail_y[i - 1]);
-        finish(&w);
-    }
     int f = dot_frame(scr_x(fx), scr_y(fy), FR_PATHDOT, &cell);
     s->tiles[cell] = (unsigned short)f;
-    f = dot_frame(scr_x(ox), scr_y(oy), FR_ORBDOT, &cell);
-    s->tiles[cell] = (unsigned short)f;
+    /* the orbiter: every tile it reaches draws its part of the dot */
+    float px = scr_x(ox), py = scr_y(oy);
+    for (int r = (int)floorf(py / TILE_H) - 1; r <= (int)floorf(py / TILE_H) + 1; r++)
+        for (int c = (int)floorf(px / TILE_W) - 1; c <= (int)floorf(px / TILE_W) + 1; c++) {
+            if (r < 0 || r >= TILE_ROWS || c < 0 || c >= TILE_COLS) continue;
+            int ix = (int)lroundf((px - c * TILE_W - ORB_X0) / ORB_STEP), iy = (int)lroundf((py - r * TILE_H - ORB_Y0) / ORB_STEP);
+            if (ix < 0 || ix >= ORB_NX || iy < 0 || iy >= ORB_NY) continue;
+            s->tiles[r * TILE_COLS + c] = (unsigned short)(FR_ORBDOT + iy * ORB_NX + ix);
+        }
 }
 
 /* ---- the stipple layer */
@@ -158,7 +156,7 @@ void screen_fog(screen_t *s, float ox, float oy, const float *wt, int motion) {
         float d = s->glow[v];
         if (motion) {
             float ex = gx - px, ey = gy - py, h = expf(-(ex * ex + ey * ey) / (2 * 24.0f * 24.0f));
-            s->heat[v] = fmaxf(s->heat[v] * 0.82f, h);
+            s->heat[v] = fmaxf(s->heat[v] * 0.86f, h);
             d = fmaxf(d, s->heat[v]);
             for (int c = 0; c < 4; c++) {   /* the corners, as loud as they are heard */
                 float cx = SQUARE_X + CX[c] * SQUARE, cy = CY[c] * SQUARE, r = 26.0f + 70.0f * wt[c];

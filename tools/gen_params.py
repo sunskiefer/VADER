@@ -39,9 +39,12 @@ TILE_W, TILE_H = 20, 18
 #   0 empty | the shape's pieces: SHAPE_ANG angles x SHAPE_OFF offsets | the trail's: TRAIL_ANG x TRAIL_OFF |
 #   the path dot at 25 places | the orbiter dot at 25 places
 SHAPE_ANG, SHAPE_OFF, SHAPE_DSTEP = 24, 19, 1.4
-TRAIL_ANG, TRAIL_OFF, TRAIL_DSTEP = 12, 11, 2.6
+TRAIL_ANG, TRAIL_OFF, TRAIL_DSTEP = 0, 0, 2.6   # 0.3.1: no trail line (the dots' trail shows it)
 DOT_NX, DOT_NY = 5, 5
-TILE_FRAMES = 1 + SHAPE_ANG * SHAPE_OFF + TRAIL_ANG * TRAIL_OFF + 2 * DOT_NX * DOT_NY
+# the orbiter: a round dot at 2 px steps, its centre up to 3 px outside the tile, so the tiles around it draw their
+# parts of it and it is never cut at a tile's edge
+ORB_NX, ORB_NY, ORB_X0, ORB_Y0, ORB_STEP = 14, 13, -3, -3, 2
+TILE_FRAMES = 1 + SHAPE_ANG * SHAPE_OFF + TRAIL_ANG * TRAIL_OFF + DOT_NX * DOT_NY + ORB_NX * ORB_NY
 # the built-in 2D shapes as ready-drawn pictures: one per shape, size step and quarter turn
 PIC_SHAPES, PIC_SIZES, PIC_ROTS = 13, 8, 4
 PIC_COUNT = PIC_SHAPES * PIC_SIZES * PIC_ROTS
@@ -263,7 +266,7 @@ def write():
     L.append("#define NGLOB %d" % len(glob))
     L.append("#define NCF %d   /* fields per corner */" % len(CORNER))
     L.append("#define TILE_COLS %d\n#define TILE_ROWS %d\n#define TILE_FRAMES %d" % (TILE_COLS, TILE_ROWS, TILE_FRAMES))
-    for k in ("TILE_W", "TILE_H", "SHAPE_ANG", "SHAPE_OFF", "TRAIL_ANG", "TRAIL_OFF", "DOT_NX", "DOT_NY", "PIC_SHAPES",
+    for k in ("TILE_W", "TILE_H", "SHAPE_ANG", "SHAPE_OFF", "TRAIL_ANG", "TRAIL_OFF", "DOT_NX", "DOT_NY", "ORB_NX", "ORB_NY", "ORB_X0", "ORB_Y0", "ORB_STEP", "PIC_SHAPES",
               "PIC_SIZES", "PIC_ROTS", "PIC_COUNT", "SQUARE_X", "SQUARE", "FOG_COLS", "FOG_ROWS", "FOG_W", "FOG_H",
               "FOG_LV", "FOG_FRAMES"):
         L.append("#define %s %d" % (k, globals()[k]))

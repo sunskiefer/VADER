@@ -5,7 +5,7 @@
 A note plays four sound sources at once, one in each corner of a square. A point, the **orbiter**, travels around a
 **shape** inside that square, and where it is decides how much of each corner you hear. Move the point and the sound
 morphs. The shape can be one of fifteen built-in figures, or one you bring yourself: a drawing (SVG), a 3D wireframe
-(OBJ) or a picture (PNG/JPG), traced into a line. The screen draws that line, the orbiter's trail and the envelope,
+(OBJ) or a picture (PNG/JPG), traced into a line. The screen draws that line, the orbiter with its trail of dots and the envelope,
 live, as glowing lines.
 
 ![VADER's main page, playing the GLASS STAR preset](docs/img/main_star.png)
@@ -68,12 +68,12 @@ MPC draws a plugin's screen itself, from pictures and the plugin's values; a plu
 directly. So VADER's screen is built from pieces MPC can switch:
 - the **built-in 2D shapes** as ready-drawn, glowing pictures (13 shapes, 8 sizes, 4 quarter turns), so they stay crisp;
   the picture follows ORBIT SIZE and ROTATE in steps;
-- a grid of **32 × 16 fine tiles** for the rest: your own shapes, the 3D shapes, the orbiter's trail and the two dots.
+- a grid of **32 × 16 fine tiles** for the rest: your own shapes, the 3D shapes, the path point and the orbiter.
   Each tile holds a straight piece of line at one of 24 angles and 19 positions, so a line stays straight across tiles,
   or a dot at one of 25 places, so the orbiter moves in small steps;
 - a **stipple layer** under the lines: fine dots that cloud around the shape, trail behind the orbiter and gather at
   each corner as loud as it is heard (16 x 8 tiles whose dot density blends smoothly into the next);
-- the shape and the trail drawn as **chains of dots**;
+- the shape drawn as a **chain of dots**, the orbiter as a round dot moving in 2 px steps;
 - a light **glass** layer on top (fine scanlines, darker edges), like a CRT;
 - the **envelope**, drawn as 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE;
 - **four corner bars**, showing how much A, B, C and D you hear.
@@ -81,7 +81,7 @@ directly. So VADER's screen is built from pieces MPC can switch:
 The square of the corners is drawn square, at its true proportions.
 
 The engine works out what each piece shows, about ten times a second, and only tells MPC about the pieces that changed.
-The shape is drawn in dim blue, the orbiter's trail in bright cyan, the path point in amber and the orbiter in cyan.
+The shape is drawn in dim blue, the path point in amber and the orbiter in cyan.
 **MOTION** off freezes the screen, which saves MPC's screen CPU in a heavy project.
 
 | | |
@@ -123,7 +123,7 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.3.0 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
+**0.3.1 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
 Force can show:
