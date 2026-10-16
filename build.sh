@@ -2,12 +2,12 @@
 # Build VADER for MPC OS (armv7-a hard-float, glibc <= 2.31 so it also loads on MPC OS 2.x).
 #   ./build.sh                     (MPC_VST=../mpc-vst-plugins to use another framework checkout)
 # Needs: python3 + Pillow and numpy, a host gcc (for shadow_art), and Zig (pip install ziglang). No Docker.
-# Output: build/package/ANDREALPHEUS - VST - VADER/  (skin, vader.so and the Shapes folder)
+# Output: build/package/L'Cronx - VST - VADER/  (skin, vader.so and the Shapes folder)
 set -euo pipefail
 cd "$(dirname "$0")"
 MPC_VST="${MPC_VST:-$PWD/third_party/mpc-vst-plugins}"
 ZIG="${ZIG:-python3 -m ziglang}"
-NAME="ANDREALPHEUS - VST - VADER"
+NAME="L'Cronx - VST - VADER"
 . ./build_srcs.sh
 python3 tools/gen_params.py
 python3 tools/vader_skin.py --layout

@@ -192,7 +192,7 @@ In this order after the voices:
 ## Your own shapes
 
 Put files in either place:
-- the `Shapes` folder of the plugin (`ANDREALPHEUS - VST - VADER/Shapes/` in the Synths folder it is installed in);
+- the `Shapes` folder of the plugin (`L'Cronx - VST - VADER/Shapes/` in the Synths folder it is installed in);
 - a folder called **`VADER Shapes`** at the top of your SD card or USB drive (make it on your computer, copy your files in,
   put the card or drive in the Force). Its files show with the drive's name in front, like `[CARD] logo.svg`.
 
@@ -261,7 +261,7 @@ A preset keeps what you are editing (timbre, corner), the ALT and MOTION switche
   slot that has a sound replaces it.
 - **Load**: turn SLOT to a saved one, press **LOAD**. It shows `LOADED` (or `EMPTY SLOT`).
 - A slot holds everything: both timbres, the effects, the arpeggiator and the name of the loaded shape file.
-- They are files in `ANDREALPHEUS - VST - VADER/User Presets/` (`USER 001.vader` ...): copy that folder to back them up
+- They are files in `L'Cronx - VST - VADER/User Presets/` (`USER 001.vader` ...): copy that folder to back them up
   or to take them to another Force.
 
 Your sound is also saved with the MPC project or program, as with any plugin.

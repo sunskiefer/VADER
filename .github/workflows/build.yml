@@ -53,11 +53,11 @@ jobs:
           VERSION="${{ steps.ver.outputs.version }}"
           python3 third_party/mpc-vst-plugins/tools/release.py \
             --so build/arm/vader.so \
-            --skin "build/skin/ANDREALPHEUS - VST - VADER" \
+            --skin "build/skin/L'Cronx - VST - VADER" \
             --extra shapes:Shapes \
             --entry build/pluginlist-entry.xml \
             --version "$VERSION" \
-            --about "VADER by ANDREALPHEUS: an orbit-based vector synth for MPC OS, with shapes of your own" \
+            --about "VADER by L'Cronx: an orbit-based vector synth for MPC OS, with shapes of your own" \
             --id vader --repo sunskiefer/VADER --license MIT \
             -o dist
 

@@ -1,8 +1,8 @@
 {
   "name": "VADER",
-  "vendor": "ANDREALPHEUS",
+  "vendor": "L'Cronx",
   "uid": "AnVd",
-  "version": 2000,
+  "version": 2001,
   "so": "vader.so",
   "params": "params.json",
   "layout": "layout.conf",

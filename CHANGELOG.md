@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 (2026-10-16)
+
+- Packed under **L'Cronx**: the plugin folder is now `L'Cronx - VST - VADER` and MPC lists the maker as L'Cronx.
+  If you installed 0.2.0, run its `uninstall.sh` first (copy out `User Presets` if you saved any), then install 0.2.1.
+- The installer handles a ' in the folder name.
+
 ## 0.2.0 (2026-10-16)
 
 Not yet tested on a device.

@@ -92,7 +92,7 @@ The shape is drawn in dim blue, the orbiter's trail in bright cyan, the path poi
 2. Unzip it and follow `INSTALL.md` inside. It needs root SSH access to the device (MockbaMod, for example); the
    installer stops MPC, adds VADER to the plugin list and starts MPC again.
 3. Load it on a track: Plugin → VST → **VADER**.
-4. Put your own shapes in `ANDREALPHEUS - VST - VADER/Shapes/` inside the Synths folder you installed to, or in a
+4. Put your own shapes in `L'Cronx - VST - VADER/Shapes/` inside the Synths folder you installed to, or in a
    folder called `VADER Shapes` at the top of your SD card or USB drive.
 
 MPC OS 3.x. The skin uses the MPC OS 3 format.
@@ -110,7 +110,7 @@ like. Press **ALT** for the second function of each knob.
 
 ```
 pip install ziglang pillow numpy
-./build.sh                 # -> build/package/ANDREALPHEUS - VST - VADER/
+./build.sh                 # -> build/package/L'Cronx - VST - VADER/
 test/run_tests.sh          # the engine and the VST2 wrapper, under valgrind (NOVG=1 to skip it)
 test/arm_sim.sh            # the engine test as ARM code under qemu (needs qemu-user)
 ```
@@ -120,7 +120,7 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.2.0 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
+**0.2.1 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
 Force can show:
