@@ -1,0 +1,17 @@
+{
+  "id": "airwindows-matrixverb",
+  "name": "Airwindows MatrixVerb",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": [
+    "airwindows",
+    "reverb",
+    "algorithmic"
+  ],
+  "license": "MIT",
+  "summary": "Classic algorithmic reverb with filter, damping, modulation and room size.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/MatrixVerb.jpg",
+  "asset_pattern": "MatrixVerb-*-mpc-armv7.zip"
+}

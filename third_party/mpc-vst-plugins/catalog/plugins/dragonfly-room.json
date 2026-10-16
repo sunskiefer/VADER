@@ -1,0 +1,12 @@
+{
+  "id": "dragonfly-room",
+  "name": "Dragonfly Room",
+  "author": "gmorb",
+  "repo": "gmorb/mpc-vst-dragonfly-room",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": ["reverb", "room", "dragonfly"],
+  "license": "GPL-3.0-only",
+  "summary": "Dragonfly Room reverb as a native insert effect, with a touchscreen skin and Q-Links.",
+  "asset_pattern": "Room-*-mpc-armv7.zip"
+}

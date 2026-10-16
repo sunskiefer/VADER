@@ -1,0 +1,95 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang valgrind qemu-user
+          pip install ziglang pillow numpy
+
+      - name: Tests (x86, under valgrind)
+        run: test/run_tests.sh
+
+      - name: Tests (ARM code, under qemu)
+        run: test/arm_sim.sh
+
+      - name: Build (armv7, glibc 2.31)
+        run: |
+          if ! ./build.sh > build.log 2>&1; then
+            tail -40 build.log | while IFS= read -r line; do echo "::error title=build.sh::$line"; done
+            exit 1
+          fi
+          tail -3 build.log
+
+      # A release is made by a v* tag, or by a push to main whose top CHANGELOG version ("## X.Y.Z...") has no tag yet.
+      - name: Version
+        id: ver
+        run: |
+          REL=0; V="0.0.0-dev"
+          case "$GITHUB_REF" in
+            refs/tags/v*) V="${GITHUB_REF_NAME#v}"; REL=1 ;;
+            refs/heads/main)
+              C=$(sed -n 's/^## \([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*$/\1/p' CHANGELOG.md | head -1)
+              if [ -n "$C" ] && ! git ls-remote --exit-code --tags origin "refs/tags/v$C" > /dev/null; then V="$C"; REL=1; fi ;;
+          esac
+          echo "version=$V" >> "$GITHUB_OUTPUT"; echo "release=$REL" >> "$GITHUB_OUTPUT"; echo "version $V, release $REL"
+
+      - name: Package
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          python3 third_party/mpc-vst-plugins/tools/release.py \
+            --so build/arm/vader.so \
+            --skin "build/skin/ANDREALPHEUS - VST - VADER" \
+            --extra shapes:Shapes \
+            --entry build/pluginlist-entry.xml \
+            --version "$VERSION" \
+            --about "VADER by ANDREALPHEUS: an orbit-based vector synth for MPC OS, with shapes of your own" \
+            --id vader --repo sunskiefer/VADER --license MIT \
+            -o dist
+
+      - name: Catalog check
+        if: steps.ver.outputs.release == '1'
+        run: python3 third_party/mpc-vst-plugins/tools/catalog_check.py dist/*-mpc-armv7.zip --catalog
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VADER-mpc-armv7
+          path: dist/*.zip
+
+      - name: Release
+        if: steps.ver.outputs.release == '1'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: VADER ${{ steps.ver.outputs.version }}
+          make_latest: true
+          files: dist/*.zip
+          body_path: .github/RELEASE_NOTES.md
+          prerelease: true
+
+      # A version listed in tested.json (tested on a device) is a full release, not a pre-release.
+      - name: Promote tested releases
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for v in $(python3 -c "import json; print(' '.join(sorted({e['version'] for e in json.load(open('tested.json'))})))"); do
+            if [ "$(gh release view "v$v" --json isPrerelease -q .isPrerelease 2>/dev/null)" = "true" ]; then
+              gh release edit "v$v" --prerelease=false --notes-file .github/RELEASE_NOTES.md && echo "v$v: now a full release"
+            fi
+          done

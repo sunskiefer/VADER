@@ -1,0 +1,10 @@
+build/
+*.so
+dist/
+__pycache__/
+.scratch/
+
+# local reference copy of stock skin content (never commit Akai assets)
+Assets/
+catalog/dist/
+catalog/.cache/

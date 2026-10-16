@@ -1,0 +1,95 @@
+# Tests tools/desktop on every change; "Run workflow" builds the Windows, macOS and Linux binaries into a DRAFT release
+# (desktop-v<version>). Install it on a device, try it, then publish the draft (tools/desktop/README.md).
+name: Desktop installer
+on:
+  push:
+    branches: [main]
+    paths: ['tools/desktop/**', '.github/workflows/desktop.yml']
+  pull_request:
+    paths: ['tools/desktop/**', '.github/workflows/desktop.yml']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version, e.g. 0.1.0
+        required: true
+      changes:
+        description: What is new in this version (one line each, separated by | ), shown at the top of the release notes
+        required: false
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/desktop/go.mod
+      - name: Format, vet, test (with the race detector)
+        working-directory: tools/desktop
+        run: |
+          test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+          go vet ./...
+          go test -race ./...
+  release:
+    needs: test
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/desktop/go.mod
+      - name: Build every target
+        working-directory: tools/desktop
+        env:
+          VERSION: ${{ inputs.version }}
+          CGO_ENABLED: '0'
+        run: |
+          set -e
+          echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.]+)?$' || { echo "bad version"; exit 1; }
+          mkdir -p ../../dist
+          for t in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            os=${t%/*}; arch=${t#*/}
+            # plain names for people who do not know their processor: Windows, Mac with an Apple chip, Mac with an Intel chip, Linux
+            case "$os/$arch" in
+              windows/amd64) label=windows ;;       windows/arm64) label=windows-arm64 ;;
+              darwin/arm64)  label=mac-apple-silicon ;; darwin/amd64) label=mac-intel ;;
+              linux/amd64)   label=linux ;;         linux/arm64)   label=linux-arm64 ;;
+            esac
+            d=$(mktemp -d); bin=mpc-installer; [ "$os" = windows ] && bin=mpc-installer.exe
+            GOOS=$os GOARCH=$arch go build -trimpath -ldflags="-s -w -X main.version=$VERSION" -o "$d/$bin" .
+            cp FIRST-RUN.txt "$d/README.txt"
+            name="mpc-installer-$VERSION-$label"
+            if [ "$os" = windows ]; then (cd "$d" && zip -q "$GITHUB_WORKSPACE/dist/$name.zip" "$bin" README.txt)
+            else tar -C "$d" -czf "../../dist/$name.tar.gz" "$bin" README.txt; fi
+          done
+          (cd ../../dist && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          CHANGES: ${{ inputs.changes }}
+        run: |
+          : > notes.md
+          if [ -n "$CHANGES" ]; then
+            { echo "## What is new"; echo; echo "$CHANGES" | tr '|' '\n' | sed 's/^ *//; /^$/d; s/^/- /'; echo; } >> notes.md
+          fi
+          cat >> notes.md <<EOF
+          The MPC plugin installer: a small app that installs, updates and removes plugins on a modded MPC or Force from your computer. Guide: https://sd88me.github.io/mpc-vst-plugins/install.html
+
+          ## Which file do I need?
+
+          | Your computer | Download |
+          |---|---|
+          | **Windows** (almost every PC) | \`mpc-installer-$VERSION-windows.zip\` |
+          | Windows on an ARM chip (rare) | \`mpc-installer-$VERSION-windows-arm64.zip\` |
+          | **Mac with an Apple chip** (M1, M2, M3, M4 or later: any Mac from late 2020 on) | \`mpc-installer-$VERSION-mac-apple-silicon.tar.gz\` |
+          | **Mac with an Intel chip** (older Macs: Apple menu > About This Mac says "Intel") | \`mpc-installer-$VERSION-mac-intel.tar.gz\` |
+          | Linux | \`mpc-installer-$VERSION-linux.tar.gz\` (on an ARM chip: \`-linux-arm64.tar.gz\`) |
+
+          Unpack it and start \`mpc-installer\`. It is not signed, so your system warns the first time (Windows: *More info*, then *Run anyway*; Mac: right-click the file, *Open*, then *Open*). \`README.txt\` in the archive has the steps. Check a download against \`SHA256SUMS\`.
+          EOF
+          gh release create "desktop-v$VERSION" dist/* --draft --target "$GITHUB_SHA" --title "MPC plugin installer v$VERSION" --notes-file notes.md

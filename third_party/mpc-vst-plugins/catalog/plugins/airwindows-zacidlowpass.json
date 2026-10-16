@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-zacidlowpass",
+  "name": "Airwindows ZAcidLowpass",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "filter",
+  "tags": [
+    "airwindows",
+    "filter",
+    "lowpass",
+    "acid"
+  ],
+  "license": "MIT",
+  "summary": "Acid-style overdriven resonant lowpass filter.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/ZAcidLowpass.jpg",
+  "asset_pattern": "ZAcidLowpass-*-mpc-armv7.zip"
+}

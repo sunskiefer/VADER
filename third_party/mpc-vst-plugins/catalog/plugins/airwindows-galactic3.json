@@ -1,0 +1,17 @@
+{
+  "id": "airwindows-galactic3",
+  "name": "Airwindows Galactic3",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": [
+    "airwindows",
+    "reverb",
+    "ambient"
+  ],
+  "license": "MIT",
+  "summary": "Galactic reverb with brightness, detune, derez and size controls.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/Galactic3.jpg",
+  "asset_pattern": "Galactic3-*-mpc-armv7.zip"
+}

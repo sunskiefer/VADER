@@ -1,0 +1,17 @@
+{
+  "id": "airwindows-chamber2",
+  "name": "Airwindows Chamber2",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": [
+    "airwindows",
+    "reverb",
+    "chamber"
+  ],
+  "license": "MIT",
+  "summary": "Chamber reverb with delay, regeneration and thickness controls.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/Chamber2.jpg",
+  "asset_pattern": "Chamber2-*-mpc-armv7.zip"
+}

@@ -1,0 +1,23 @@
+# Checks the device patches: the patch script's contract and catalog/patches.json (docs/PATCHES.md).
+name: Patches
+on:
+  push:
+    branches: [main]
+    paths: ['catalog/patches.json', 'tools/patch_check.py', 'tools/test_patches.py', 'tools/test_drive_exec.py', 'tools/test_hwremap_patch.py', 'tools/mpc_patch/**', '.github/workflows/patches.yml']
+  pull_request:
+    paths: ['catalog/patches.json', 'tools/patch_check.py', 'tools/test_patches.py', 'tools/test_drive_exec.py', 'tools/test_hwremap_patch.py', 'tools/mpc_patch/**', '.github/workflows/patches.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: python3 tools/test_patches.py
+      - name: Drive exec patch, with real mounts (root, private mount namespace)
+        run: sudo python3 tools/test_drive_exec.py
+      - name: Button remap patch
+        run: python3 tools/test_hwremap_patch.py
+      - name: Validate the patch manifest
+        run: python3 tools/patch_check.py

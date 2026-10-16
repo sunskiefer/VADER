@@ -1,0 +1,41 @@
+name: Discord release announcement
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Discord
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+          TAG: ${{ github.event.release.tag_name }}
+          NAME: ${{ github.event.release.name }}
+          URL: ${{ github.event.release.html_url }}
+          BODY: ${{ github.event.release.body }}
+          PRE: ${{ github.event.release.prerelease }}
+          REPO: ${{ github.repository }}
+          AUTHOR: ${{ github.event.release.author.login }}
+          ROLE_ID: ${{ vars.DISCORD_RELEASE_ROLE_ID }}
+        run: |
+          [ -z "$WEBHOOK" ] && { echo "DISCORD_RELEASE_WEBHOOK secret not set"; exit 1; }
+          TITLE="${NAME:-$TAG}"
+          [ "$PRE" = "true" ] && TITLE="$TITLE (pre-release)"
+          # Discord embed description limit is 4096; keep it short
+          DESC="$(printf '%s' "$BODY" | head -c 1800)"
+          MENTION=""
+          [ -n "$ROLE_ID" ] && [ "$PRE" != "true" ] && MENTION="<@&${ROLE_ID}>"
+          jq -n \
+            --arg content "$MENTION" \
+            --arg title "$REPO $TITLE" \
+            --arg url "$URL" \
+            --arg desc "$DESC" \
+            --arg author "$AUTHOR" \
+            --argjson color "$([ "$PRE" = "true" ] && echo 16753920 || echo 5763719)" \
+            '{content: $content,
+              allowed_mentions: {parse: ["roles"]},
+              embeds: [{title: $title, url: $url, description: $desc,
+                        color: $color, footer: {text: ("released by " + $author)}}]}' \
+          | curl -fsS -H "Content-Type: application/json" -d @- "$WEBHOOK"

@@ -1,0 +1,265 @@
+{
+ "about": "Data versions and field names used by the stock skins of MPC OS 2.15.1 (an MPC Live), read from 110 skins. Version numbers and field names only; see tools/skin_compat.py.",
+ "roles": {
+  "QLinks:(root)": {
+   "4": [
+    "Program Mode Q-Links",
+    "Screen Mode Q-Links",
+    "info"
+   ]
+  },
+  "QLinks:Screen Mode Q-Links": {
+   "4": [
+    "map"
+   ]
+  },
+  "QLinks:info": {
+   "1": [
+    "type"
+   ]
+  },
+  "TUI:actions[]": {
+   "1": [
+    "additionalData",
+    "handleName",
+    "handler",
+    "onAction"
+   ]
+  },
+  "TUI:backgroundData": {
+   "1": [
+    "focussed",
+    "unfocussed"
+   ]
+  },
+  "TUI:bounds": {
+   "1": [
+    "acceptsHWFocus",
+    "bounds",
+    "boundsType",
+    "relativeBounds",
+    "showWhenDataModelInvalid",
+    "whenVisible"
+   ],
+   "2": [
+    "acceptsHWFocus",
+    "additionalInvalidatingHandles",
+    "bounds",
+    "boundsType",
+    "showWhenDataModelInvalid",
+    "whenVisible"
+   ]
+  },
+  "TUI:componentData": {
+   "1": [
+    "data",
+    "name",
+    "type"
+   ]
+  },
+  "TUI:componentDefinition": {
+   "1": [
+    "actions",
+    "backgroundData",
+    "componentsData",
+    "ignoreMousePresses"
+   ],
+   "2": [
+    "actions",
+    "backgroundData",
+    "componentsData",
+    "disableCoarseDataWheel",
+    "ignoreMousePresses"
+   ]
+  },
+  "TUI:componentDefinitions": {
+   "2": [
+    "importFiles",
+    "localComponentDefinitions"
+   ]
+  },
+  "TUI:componentsData[]": {
+   "1": [
+    "bounds",
+    "componentData",
+    "map"
+   ],
+   "2": [
+    "bounds",
+    "componentData",
+    "handle remapping"
+   ]
+  },
+  "TUI:data:(local widget)": {
+   "1": [
+    "handleName"
+   ]
+  },
+  "TUI:data:Button": {
+   "1": [
+    "buttonId",
+    "handleName",
+    "numButtonsInGroup",
+    "offImage",
+    "onImage"
+   ]
+  },
+  "TUI:data:Decorator": {
+   "2": [
+    "backgroundColour",
+    "foregroundColour",
+    "handleName",
+    "type"
+   ]
+  },
+  "TUI:data:Focus": {
+   "1": [
+    "backgroundColour",
+    "backgroundInset",
+    "outlineColour",
+    "outlineThickness"
+   ]
+  },
+  "TUI:data:Image": {
+   "1": [
+    "colour",
+    "image"
+   ],
+   "2": [
+    "colour",
+    "handleName",
+    "image",
+    "imageType",
+    "numFrames"
+   ]
+  },
+  "TUI:data:Indicator": {
+   "1": [
+    "handleName",
+    "indicatorId",
+    "numIndicatorsInGroup",
+    "offImage",
+    "onImage"
+   ]
+  },
+  "TUI:data:Knob": {
+   "1": [
+    "filmStrip",
+    "handleName",
+    "knobType",
+    "numFrames"
+   ],
+   "2": [
+    "filmStrip",
+    "handleName",
+    "invert",
+    "knobType",
+    "numFrames",
+    "textStyle",
+    "type"
+   ]
+  },
+  "TUI:data:Label": {
+   "1": [
+    "handleName",
+    "textStyle",
+    "type"
+   ]
+  },
+  "TUI:data:Meter": {
+   "3": [
+    "direction",
+    "inactiveImage",
+    "invert",
+    "peakHandle",
+    "peakHoldColour",
+    "peakHoldHandle",
+    "peakHoldSize",
+    "peakImage",
+    "rmsHandle",
+    "rmsImage"
+   ]
+  },
+  "TUI:data:Slider": {
+   "1": [
+    "handleName"
+   ],
+   "3": [
+    "direction",
+    "handleName",
+    "revealedImage",
+    "sliderType",
+    "thumbImage",
+    "thumbTrackVisible"
+   ]
+  },
+  "TUI:focussed": {
+   "1": [
+    "colour",
+    "image"
+   ]
+  },
+  "TUI:font": {
+   "1": [
+    "height",
+    "name",
+    "style"
+   ]
+  },
+  "TUI:handle remapping": {
+   "1": [
+    "map"
+   ]
+  },
+  "TUI:info": {
+   "1": [
+    "type"
+   ]
+  },
+  "TUI:pageData": {
+   "1": [
+    "componentDefinitions",
+    "info",
+    "tabs"
+   ]
+  },
+  "TUI:tabs[]": {
+   "1": [
+    "componentDefinition",
+    "fnKeyIndex",
+    "fnKeySubIndex",
+    "qlinkBoundsData",
+    "tabName"
+   ]
+  },
+  "TUI:textStyle": {
+   "1": [
+    "case",
+    "colour",
+    "font",
+    "justification"
+   ]
+  },
+  "TUI:unfocussed": {
+   "1": [
+    "colour",
+    "image"
+   ]
+  },
+  "TUI:value": {
+   "1": [
+    "actions",
+    "backgroundData",
+    "componentsData",
+    "ignoreMousePresses"
+   ],
+   "2": [
+    "actions",
+    "backgroundData",
+    "componentsData",
+    "disableCoarseDataWheel",
+    "ignoreMousePresses"
+   ]
+  }
+ }
+}

@@ -1,0 +1,68 @@
+# Builds catalog/dist/catalog.json from the registry and the plugins' GitHub releases (docs/CATALOG.md).
+# PRs touching the catalog only validate the registry entries; the nightly and manual runs do the full build.
+name: Catalog build
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['catalog/**', 'tools/catalog_*.py', 'tools/catalog_site/**', 'tools/skin_compat.py', 'tools/skin_roles_2x.json', 'tools/test_skin_compat.py']
+  pull_request:
+    paths: ['catalog/**', 'tools/catalog_*.py', 'tools/catalog_site/**', 'tools/skin_compat.py', 'tools/skin_roles_2x.json', 'tools/test_skin_compat.py']
+permissions:
+  contents: read
+  issues: write
+# One run at a time per branch: two overlapping runs each opened the same issue (#112, #113).
+concurrency:
+  group: catalog-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: python3 tools/test_catalog.py
+      - name: Skin compatibility tests
+        run: python3 tools/test_skin_compat.py
+      - name: Validate the registry
+        run: python3 tools/catalog_build.py --check-registry
+      - name: Build the catalog
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/catalog_build.py
+      - name: Open and close issues for failing releases
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/catalog_issues.py
+      - name: Generate the site
+        if: ${{ github.event_name != 'pull_request' }}
+        run: python3 tools/catalog_site.py
+      - name: Upload the Pages artifact
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: catalog/dist/site
+      - name: Upload catalog.json and problems.json
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog
+          path: catalog/dist/
+  deploy:
+    # Needs Settings > Pages > Source: GitHub Actions (one-time, by the repo owner).
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

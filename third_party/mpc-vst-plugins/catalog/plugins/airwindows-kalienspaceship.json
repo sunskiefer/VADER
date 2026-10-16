@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-kalienspaceship",
+  "name": "Airwindows kAlienSpaceship",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": [
+    "airwindows",
+    "reverb",
+    "sci-fi",
+    "ambient"
+  ],
+  "license": "MIT",
+  "summary": "Enormous sci-fi space reverb from the kCathedral family.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/kAlienSpaceship.jpg",
+  "asset_pattern": "kAlienSpaceship-*-mpc-armv7.zip"
+}

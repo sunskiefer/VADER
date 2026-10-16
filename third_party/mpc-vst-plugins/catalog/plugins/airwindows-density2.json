@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-density2",
+  "name": "Airwindows Density2",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "saturation",
+  "tags": [
+    "airwindows",
+    "saturation",
+    "distortion",
+    "density"
+  ],
+  "license": "MIT",
+  "summary": "Density saturation with a highpass, for thickening and fattening sounds.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/Density2.jpg",
+  "asset_pattern": "Density2-*-mpc-armv7.zip"
+}

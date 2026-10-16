@@ -1,0 +1,17 @@
+{
+  "name": "VADER",
+  "vendor": "ANDREALPHEUS",
+  "uid": "AnVd",
+  "version": 1000,
+  "so": "vader.so",
+  "params": "params.json",
+  "layout": "layout.conf",
+  "programs": {"param": "preset"},
+  "defines": {
+    "HAS_HOST_TIME": 1,
+    "HAS_DIRTY": 1,
+    "SAMPLE_ACCURATE": 1,
+    "PARAM_TEXT_MAX": 64,
+    "MODULE_SUBDIR": "\"Shapes\""
+  }
+}

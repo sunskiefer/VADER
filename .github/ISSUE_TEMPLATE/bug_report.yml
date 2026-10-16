@@ -1,0 +1,42 @@
+name: Bug report
+description: Something in VADER doesn't work as it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! The more of this you fill in, the faster it can be fixed. For questions, use the Discussions tab instead.
+  - type: input
+    id: version
+    attributes:
+      label: VADER version
+      description: Shown in the release name, e.g. 0.1.0
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options: [Akai Force, MPC Live, MPC Live II, MPC One, MPC One+, MPC X, MPC Key 37, MPC Key 61, Other]
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: MPC OS version
+      placeholder: "3.9.1"
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: "1. Tap LOAD, then KIT\n2. Turn DATA to a kit\n3. ...\n\nExpected: ...\nWhat happened: ..."
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Photos, videos or anything else
+      description: A photo of the screen helps a lot. Drag files here.

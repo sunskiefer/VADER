@@ -1,0 +1,18 @@
+{ "id": "monomodule", "name": "Monomodule One + FX", "author": "sd88me", "repo": "sd88me/mpc-vst-monomodule",
+  "kind": "instrument", "style": "synth", "tags": ["elektron", "monomachine", "firmware-derived"], "license": "AGPL-3.0-only",
+  "summary": "The Elektron Monomachine's synth engine (15 machines) as an instrument, plus its 7 effect machines as an audio effect, each with a touchscreen skin and Q-Links.",
+  "distribution": "build-yourself",
+  "requires_user_files": [
+    { "name": "Monomachine OS 1.32B .syx", "description": "Your own copy of the Monomachine OS file. Its DSP program is recompiled into your build, so the result is personal." }
+  ],
+  "build": {
+    "command": "release/release.sh <Monomachine OS 1.32B .syx> [-d <device-ip>]",
+    "script": "release/release.sh",
+    "docs_url": "https://github.com/sd88me/mpc-vst-monomodule/blob/main/README.md#install",
+    "needs": ["Docker", "ssh and scp (only with -d)"]
+  },
+  "components": [
+    { "id": "monomodule-one", "name": "Monomodule One", "kind": "instrument", "uid": "MnmO" },
+    { "id": "monomodule-fx", "name": "Monomodule FX", "kind": "effect", "uid": "MnmF" }
+  ],
+  "screenshot": "https://raw.githubusercontent.com/sd88me/mpc-vst-monomodule/main/docs/img/monomodule.png" }

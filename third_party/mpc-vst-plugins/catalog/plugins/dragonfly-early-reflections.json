@@ -1,0 +1,12 @@
+{
+  "id": "dragonfly-early-reflections",
+  "name": "Dragonfly Early Reflections",
+  "author": "gmorb",
+  "repo": "gmorb/mpc-vst-dragonfly-early-reflections",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": ["reverb", "early-reflections", "dragonfly"],
+  "license": "GPL-3.0-only",
+  "summary": "Dragonfly Early Reflections as a native insert effect, with a touchscreen skin and Q-Links.",
+  "asset_pattern": "Early-Refl-*-mpc-armv7.zip"
+}

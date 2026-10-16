@@ -1,0 +1,11 @@
+{
+  "name": "MPC Input Probe",
+  "vendor": "sd88me",
+  "uid": "InPr",
+  "version": 1000,
+  "so": "inputprobe.so",
+  "params": "params.json",
+  "layout": "layout.conf",
+  "defines": {"WRAP_TRACE": 1},
+  "build": {"root": "../..", "sources": ["poc/inputprobe/engine.c"], "cflags": [], "libs": ["-lm"]}
+}

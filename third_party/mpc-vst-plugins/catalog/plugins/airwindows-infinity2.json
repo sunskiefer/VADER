@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-infinity2",
+  "name": "Airwindows Infinity2",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": [
+    "airwindows",
+    "reverb",
+    "ambient",
+    "freeze"
+  ],
+  "license": "MIT",
+  "summary": "Infinite-sustain reverb with filtering, damping and allpass diffusion.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/Infinity2.jpg",
+  "asset_pattern": "Infinity2-*-mpc-armv7.zip"
+}

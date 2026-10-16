@@ -1,0 +1,18 @@
+{
+  "id": "commander",
+  "name": "MPC Commander",
+  "author": "jacob-sabella",
+  "repo": "jacob-sabella/mpc-addin-commander",
+  "kind": "addin",
+  "style": "utility",
+  "tags": [
+    "desktop",
+    "plugins",
+    "skins",
+    "transport",
+    "midi"
+  ],
+  "license": "MIT",
+  "summary": "The plugins MPC loads, with their own skins, and MPC's transport, on a desktop app. Listens on the device only: reach it through an SSH tunnel (no login; bind=0.0.0.0 opens it to your network).",
+  "asset_pattern": "MPC-Commander-addin-*-mpc-armv7.zip"
+}

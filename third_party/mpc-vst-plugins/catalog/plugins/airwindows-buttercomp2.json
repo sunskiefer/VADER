@@ -1,0 +1,17 @@
+{
+  "id": "airwindows-buttercomp2",
+  "name": "Airwindows ButterComp2",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "compressor",
+  "tags": [
+    "airwindows",
+    "compressor",
+    "dynamics"
+  ],
+  "license": "MIT",
+  "summary": "Smooth, buttery bipolar compressor that stays transparent even when pushed.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/ButterComp2.jpg",
+  "asset_pattern": "ButterComp2-*-mpc-armv7.zip"
+}

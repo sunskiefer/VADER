@@ -1,0 +1,18 @@
+{
+  "id": "chordsmith",
+  "name": "Chordsmith",
+  "author": "jacob-sabella",
+  "repo": "jacob-sabella/mpc-vst-chordsmith",
+  "kind": "instrument",
+  "style": "utility",
+  "tags": [
+    "chords",
+    "midi",
+    "arpeggiator",
+    "strum",
+    "chord-builder"
+  ],
+  "license": "MIT",
+  "summary": "Chord tool: pads, keys or chord buttons play scale, set or custom chords with voicing, strum, arp and harp modes, MIDI out to other tracks and a built-in preview synth.",
+  "screenshot": "https://raw.githubusercontent.com/jacob-sabella/mpc-vst-chordsmith/188d34ca0d9482d2d1ba840edb12ccd8c3773f76/docs/screenshots/chordsmith.png"
+}

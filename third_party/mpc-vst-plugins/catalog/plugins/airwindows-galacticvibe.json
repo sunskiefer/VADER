@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-galacticvibe",
+  "name": "Airwindows GalacticVibe",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "chorus",
+  "tags": [
+    "airwindows",
+    "vibrato",
+    "modulation",
+    "chorus"
+  ],
+  "license": "MIT",
+  "summary": "The pitch-wobble vibrato stage of the Galactic reverbs on its own.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/GalacticVibe.jpg",
+  "asset_pattern": "GalacticVibe-*-mpc-armv7.zip"
+}

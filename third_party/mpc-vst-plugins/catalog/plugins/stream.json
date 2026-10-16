@@ -1,0 +1,3 @@
+{ "id": "stream", "name": "Stream", "author": "johnny", "repo": "stampman3000-jpg/mpc-stream",
+  "kind": "effect", "style": "utility", "tags": ["utility"], "license": "MIT",
+  "summary": "Multichannel USB audio effect send from an MPC to a Mac. Needs BlackHole 64ch and a Mac helper app." }

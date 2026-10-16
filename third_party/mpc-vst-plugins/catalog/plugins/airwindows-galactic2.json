@@ -1,0 +1,17 @@
+{
+  "id": "airwindows-galactic2",
+  "name": "Airwindows Galactic2",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": [
+    "airwindows",
+    "reverb",
+    "ambient"
+  ],
+  "license": "MIT",
+  "summary": "Galactic reverb with drive, sustain and darkening for vast ambient tails.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/Galactic2.jpg",
+  "asset_pattern": "Galactic2-*-mpc-armv7.zip"
+}

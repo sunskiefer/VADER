@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-chorusensemble",
+  "name": "Airwindows ChorusEnsemble",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "chorus",
+  "tags": [
+    "airwindows",
+    "chorus",
+    "ensemble",
+    "modulation"
+  ],
+  "license": "MIT",
+  "summary": "Lush multi-tap ensemble chorus.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/ChorusEnsemble.jpg",
+  "asset_pattern": "ChorusEnsemble-*-mpc-armv7.zip"
+}

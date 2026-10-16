@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-kcosmos",
+  "name": "Airwindows kCosmos",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": [
+    "airwindows",
+    "reverb",
+    "ambient",
+    "cosmic"
+  ],
+  "license": "MIT",
+  "summary": "Vast cosmic reverb with predelay and early reflections.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/kCosmos.jpg",
+  "asset_pattern": "kCosmos-*-mpc-armv7.zip"
+}

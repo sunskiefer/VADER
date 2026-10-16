@@ -1,0 +1,5743 @@
+{
+ "params": [
+  {
+   "key": "f_og1",
+   "name": "OVERTONE GEN 1",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_name": true,
+   "dynamic_display": true
+  },
+  {
+   "key": "f_og2",
+   "name": "OVERTONE GEN 2",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "dynamic_name": true,
+   "dynamic_display": true
+  },
+  {
+   "key": "f_blend",
+   "name": "OVERTONE BLEND",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_name": true,
+   "dynamic_display": true
+  },
+  {
+   "key": "f_cutoff",
+   "name": "FILTER CUTOFF",
+   "default": 0.75,
+   "min": 0,
+   "max": 1,
+   "dynamic_name": true,
+   "dynamic_display": true
+  },
+  {
+   "key": "f_reso",
+   "name": "FILTER RESONANCE",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "dynamic_name": true,
+   "dynamic_display": true
+  },
+  {
+   "key": "shape",
+   "name": "SHAPE",
+   "options": [
+    "CIRCLE",
+    "FIGURE 8",
+    "STAR",
+    "SQUARE",
+    "TRIANGLE",
+    "LISSA 3:2",
+    "LISSA 5:4",
+    "ROSE 3",
+    "ROSE 5",
+    "SPIRAL",
+    "HEART",
+    "ZIGZAG",
+    "SPIRO",
+    "CUBE",
+    "ICOSA",
+    "USER"
+   ],
+   "default": "STAR",
+   "dynamic_display": true
+  },
+  {
+   "key": "orb_speed",
+   "name": "ORBIT SPEED",
+   "default": 0.35,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "orb_size",
+   "name": "ORBIT SIZE",
+   "default": 0.7,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "sub_size",
+   "name": "SUBORBIT SIZE",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "sub_speed",
+   "name": "SUBORBIT SPEED",
+   "default": 0.45,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "detune",
+   "name": "DETUNE",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "glide",
+   "name": "GLIDE",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "rotate",
+   "name": "ROTATE",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "spin",
+   "name": "3D SPIN",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "tilt",
+   "name": "3D TILT",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "orb_env",
+   "name": "ORBIT ENV",
+   "default": 0.0,
+   "min": -1,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "retrig",
+   "name": "RETRIG",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "orb_sync",
+   "name": "ORBITER SYNC",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "orb_div",
+   "name": "ORBIT SYNC",
+   "options": [
+    "4 BARS",
+    "2 BARS",
+    "1 BAR",
+    "1/2",
+    "1/4",
+    "1/8",
+    "1/16"
+   ],
+   "default": "1 BAR"
+  },
+  {
+   "key": "attack",
+   "name": "ATTACK",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "decay",
+   "name": "DECAY",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "sustain",
+   "name": "SUSTAIN",
+   "default": 0.7,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "release",
+   "name": "RELEASE",
+   "default": 0.35,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "vib_speed",
+   "name": "VIBRATO SPEED",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "vib_depth",
+   "name": "VIBRATO DEPTH",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "trem_speed",
+   "name": "TREMOLO SPEED",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "trem_depth",
+   "name": "TREMOLO DEPTH",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "vt_sync",
+   "name": "VIB/TREM SYNC",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "octave",
+   "name": "TIMBRE OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int"
+  },
+  {
+   "key": "t_volume",
+   "name": "TIMBRE VOLUME",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "unison",
+   "name": "UNISON",
+   "options": [
+    "1",
+    "2",
+    "4",
+    "8"
+   ],
+   "default": "1"
+  },
+  {
+   "key": "shape_osc",
+   "name": "SHAPE SOUND",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "velocity",
+   "name": "VELOCITY",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_og1",
+   "name": "A GEN 1",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_og2",
+   "name": "A GEN 2",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_oct",
+   "name": "A OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int"
+  },
+  {
+   "key": "a_tune",
+   "name": "A GEN 2 TUNE",
+   "default": 0,
+   "min": -24,
+   "max": 24,
+   "display": "int"
+  },
+  {
+   "key": "a_fine",
+   "name": "A GEN 2 FINE",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "display": "int"
+  },
+  {
+   "key": "a_mode",
+   "name": "A BLEND MODE",
+   "options": [
+    "MIX",
+    "AM",
+    "PM",
+    "AM+PM",
+    "PD",
+    "RING",
+    "FOLD"
+   ],
+   "default": "MIX"
+  },
+  {
+   "key": "a_blend",
+   "name": "A BLEND",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_cutoff",
+   "name": "A CUTOFF",
+   "default": 0.75,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_reso",
+   "name": "A RESONANCE",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_ftype",
+   "name": "A FILTER",
+   "options": [
+    "LP12",
+    "LP24",
+    "BP",
+    "HP",
+    "LADDER"
+   ],
+   "default": "LP12"
+  },
+  {
+   "key": "a_fpos",
+   "name": "A FILTER ON",
+   "options": [
+    "POST",
+    "GEN 1",
+    "GEN 2"
+   ],
+   "default": "POST"
+  },
+  {
+   "key": "a_level",
+   "name": "A LEVEL",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_og1",
+   "name": "B GEN 1",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_og2",
+   "name": "B GEN 2",
+   "default": 0.55,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_oct",
+   "name": "B OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int"
+  },
+  {
+   "key": "b_tune",
+   "name": "B GEN 2 TUNE",
+   "default": 0,
+   "min": -24,
+   "max": 24,
+   "display": "int"
+  },
+  {
+   "key": "b_fine",
+   "name": "B GEN 2 FINE",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "display": "int"
+  },
+  {
+   "key": "b_mode",
+   "name": "B BLEND MODE",
+   "options": [
+    "MIX",
+    "AM",
+    "PM",
+    "AM+PM",
+    "PD",
+    "RING",
+    "FOLD"
+   ],
+   "default": "PM"
+  },
+  {
+   "key": "b_blend",
+   "name": "B BLEND",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_cutoff",
+   "name": "B CUTOFF",
+   "default": 0.75,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_reso",
+   "name": "B RESONANCE",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_ftype",
+   "name": "B FILTER",
+   "options": [
+    "LP12",
+    "LP24",
+    "BP",
+    "HP",
+    "LADDER"
+   ],
+   "default": "LP12"
+  },
+  {
+   "key": "b_fpos",
+   "name": "B FILTER ON",
+   "options": [
+    "POST",
+    "GEN 1",
+    "GEN 2"
+   ],
+   "default": "POST"
+  },
+  {
+   "key": "b_level",
+   "name": "B LEVEL",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_og1",
+   "name": "C GEN 1",
+   "default": 0.62,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_og2",
+   "name": "C GEN 2",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_oct",
+   "name": "C OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int"
+  },
+  {
+   "key": "c_tune",
+   "name": "C GEN 2 TUNE",
+   "default": 12,
+   "min": -24,
+   "max": 24,
+   "display": "int"
+  },
+  {
+   "key": "c_fine",
+   "name": "C GEN 2 FINE",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "display": "int"
+  },
+  {
+   "key": "c_mode",
+   "name": "C BLEND MODE",
+   "options": [
+    "MIX",
+    "AM",
+    "PM",
+    "AM+PM",
+    "PD",
+    "RING",
+    "FOLD"
+   ],
+   "default": "MIX"
+  },
+  {
+   "key": "c_blend",
+   "name": "C BLEND",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_cutoff",
+   "name": "C CUTOFF",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_reso",
+   "name": "C RESONANCE",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_ftype",
+   "name": "C FILTER",
+   "options": [
+    "LP12",
+    "LP24",
+    "BP",
+    "HP",
+    "LADDER"
+   ],
+   "default": "LP12"
+  },
+  {
+   "key": "c_fpos",
+   "name": "C FILTER ON",
+   "options": [
+    "POST",
+    "GEN 1",
+    "GEN 2"
+   ],
+   "default": "POST"
+  },
+  {
+   "key": "c_level",
+   "name": "C LEVEL",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_og1",
+   "name": "D GEN 1",
+   "default": 0.85,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_og2",
+   "name": "D GEN 2",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_oct",
+   "name": "D OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int"
+  },
+  {
+   "key": "d_tune",
+   "name": "D GEN 2 TUNE",
+   "default": 7,
+   "min": -24,
+   "max": 24,
+   "display": "int"
+  },
+  {
+   "key": "d_fine",
+   "name": "D GEN 2 FINE",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "display": "int"
+  },
+  {
+   "key": "d_mode",
+   "name": "D BLEND MODE",
+   "options": [
+    "MIX",
+    "AM",
+    "PM",
+    "AM+PM",
+    "PD",
+    "RING",
+    "FOLD"
+   ],
+   "default": "PD"
+  },
+  {
+   "key": "d_blend",
+   "name": "D BLEND",
+   "default": 0.45,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_cutoff",
+   "name": "D CUTOFF",
+   "default": 0.75,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_reso",
+   "name": "D RESONANCE",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_ftype",
+   "name": "D FILTER",
+   "options": [
+    "LP12",
+    "LP24",
+    "BP",
+    "HP",
+    "LADDER"
+   ],
+   "default": "LP12"
+  },
+  {
+   "key": "d_fpos",
+   "name": "D FILTER ON",
+   "options": [
+    "POST",
+    "GEN 1",
+    "GEN 2"
+   ],
+   "default": "POST"
+  },
+  {
+   "key": "d_level",
+   "name": "D LEVEL",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "timbre",
+   "name": "EDIT TIMBRE",
+   "options": [
+    "A",
+    "B"
+   ],
+   "default": "A"
+  },
+  {
+   "key": "keys",
+   "name": "KEYS",
+   "options": [
+    "LOWER",
+    "AUTO",
+    "UPPER"
+   ],
+   "default": "LOWER"
+  },
+  {
+   "key": "tmode",
+   "name": "TIMBRE MODE",
+   "options": [
+    "DUAL",
+    "SPLIT"
+   ],
+   "default": "DUAL"
+  },
+  {
+   "key": "split",
+   "name": "SPLIT NOTE",
+   "default": 60,
+   "min": 24,
+   "max": 96,
+   "display": "int"
+  },
+  {
+   "key": "voices",
+   "name": "VOICES",
+   "options": [
+    "8",
+    "16"
+   ],
+   "default": "8"
+  },
+  {
+   "key": "corner",
+   "name": "CORNER SELECT",
+   "options": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "ALL"
+   ],
+   "default": "ALL"
+  },
+  {
+   "key": "alt",
+   "name": "ALT",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "motion",
+   "name": "MOTION",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "arp_on",
+   "name": "ARP ACTIVE",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "arp_mode",
+   "name": "ARP DIRECTION",
+   "options": [
+    "UP",
+    "DOWN",
+    "UP-DOWN",
+    "RANDOM",
+    "ORDER",
+    "CHORD"
+   ],
+   "default": "UP"
+  },
+  {
+   "key": "arp_rate",
+   "name": "ARP RATE",
+   "options": [
+    "1/4",
+    "1/8",
+    "1/8T",
+    "1/16",
+    "1/16T",
+    "1/32"
+   ],
+   "default": "1/16"
+  },
+  {
+   "key": "arp_oct",
+   "name": "ARP OCTAVES",
+   "default": 1,
+   "min": 1,
+   "max": 4,
+   "display": "int"
+  },
+  {
+   "key": "note_len",
+   "name": "NOTE LENGTH",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "latch",
+   "name": "LATCH",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "arp_steps",
+   "name": "STEPS",
+   "default": 16,
+   "min": 1,
+   "max": 16,
+   "display": "int"
+  },
+  {
+   "key": "step1",
+   "name": "STEP 1",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step2",
+   "name": "STEP 2",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step3",
+   "name": "STEP 3",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step4",
+   "name": "STEP 4",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step5",
+   "name": "STEP 5",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step6",
+   "name": "STEP 6",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step7",
+   "name": "STEP 7",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step8",
+   "name": "STEP 8",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step9",
+   "name": "STEP 9",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step10",
+   "name": "STEP 10",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step11",
+   "name": "STEP 11",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step12",
+   "name": "STEP 12",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step13",
+   "name": "STEP 13",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step14",
+   "name": "STEP 14",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step15",
+   "name": "STEP 15",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "step16",
+   "name": "STEP 16",
+   "options": [
+    "OFF",
+    "ON",
+    "ACCENT",
+    "TIE"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "drive",
+   "name": "DRIVE AMOUNT",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "drive_col",
+   "name": "DRIVE COLOUR",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "ch_speed",
+   "name": "CHORUS SPEED",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "ch_depth",
+   "name": "CHORUS DEPTH",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "ch_col",
+   "name": "CHORUS COLOUR",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "ch_sync",
+   "name": "CHORUS SYNC",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "dly_time",
+   "name": "DELAY TIME",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "dly_fb",
+   "name": "DELAY FEEDBACK",
+   "default": 0.35,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "dly_sync",
+   "name": "DELAY SYNC",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "dly_div",
+   "name": "DELAY DIVISION",
+   "options": [
+    "4 BARS",
+    "2 BARS",
+    "1 BAR",
+    "1/2",
+    "1/4",
+    "1/8",
+    "1/16"
+   ],
+   "default": "1/8"
+  },
+  {
+   "key": "rev_size",
+   "name": "REVERB SIZE",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "rev_col",
+   "name": "REVERB COLOUR",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mres",
+   "name": "MASTER RESONANCE",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mix_rev",
+   "name": "REVERB",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mix_ch",
+   "name": "CHORUS",
+   "default": 0.2,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mix_dly",
+   "name": "DELAY",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "volume",
+   "name": "VOLUME",
+   "default": 0.75,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "file",
+   "name": "SHAPE FILE",
+   "default": 0,
+   "min": 0,
+   "max": 499,
+   "display": "int",
+   "dynamic_display": true,
+   "nudge_pct": 10
+  },
+  {
+   "key": "preset",
+   "name": "PRESET",
+   "default": 0,
+   "min": 0,
+   "max": 15,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "tap",
+   "name": "TAP",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "load",
+   "name": "LOAD",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "rescan",
+   "name": "RESCAN",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "readout",
+   "name": "READOUT",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "rd_line",
+   "name": "READOUT LINE",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "wa",
+   "name": "CORNER A MIX",
+   "default": 25,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "wb",
+   "name": "CORNER B MIX",
+   "default": 25,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "wc",
+   "name": "CORNER C MIX",
+   "default": 25,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "wd",
+   "name": "CORNER D MIX",
+   "default": 25,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "e00",
+   "name": "ENV LINE 1",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e01",
+   "name": "ENV LINE 2",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e02",
+   "name": "ENV LINE 3",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e03",
+   "name": "ENV LINE 4",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e04",
+   "name": "ENV LINE 5",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e05",
+   "name": "ENV LINE 6",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e06",
+   "name": "ENV LINE 7",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e07",
+   "name": "ENV LINE 8",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e08",
+   "name": "ENV LINE 9",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e09",
+   "name": "ENV LINE 10",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e10",
+   "name": "ENV LINE 11",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e11",
+   "name": "ENV LINE 12",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e12",
+   "name": "ENV LINE 13",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e13",
+   "name": "ENV LINE 14",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e14",
+   "name": "ENV LINE 15",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e15",
+   "name": "ENV LINE 16",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e16",
+   "name": "ENV LINE 17",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e17",
+   "name": "ENV LINE 18",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e18",
+   "name": "ENV LINE 19",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e19",
+   "name": "ENV LINE 20",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e20",
+   "name": "ENV LINE 21",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e21",
+   "name": "ENV LINE 22",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e22",
+   "name": "ENV LINE 23",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e23",
+   "name": "ENV LINE 24",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e24",
+   "name": "ENV LINE 25",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e25",
+   "name": "ENV LINE 26",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e26",
+   "name": "ENV LINE 27",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e27",
+   "name": "ENV LINE 28",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e28",
+   "name": "ENV LINE 29",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e29",
+   "name": "ENV LINE 30",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e30",
+   "name": "ENV LINE 31",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "e31",
+   "name": "ENV LINE 32",
+   "default": 0,
+   "min": 0,
+   "max": 104,
+   "display": "int"
+  },
+  {
+   "key": "t000",
+   "name": "SCREEN 1",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t001",
+   "name": "SCREEN 2",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t002",
+   "name": "SCREEN 3",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t003",
+   "name": "SCREEN 4",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t004",
+   "name": "SCREEN 5",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t005",
+   "name": "SCREEN 6",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t006",
+   "name": "SCREEN 7",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t007",
+   "name": "SCREEN 8",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t008",
+   "name": "SCREEN 9",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t009",
+   "name": "SCREEN 10",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t010",
+   "name": "SCREEN 11",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t011",
+   "name": "SCREEN 12",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t012",
+   "name": "SCREEN 13",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t013",
+   "name": "SCREEN 14",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t014",
+   "name": "SCREEN 15",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t015",
+   "name": "SCREEN 16",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t016",
+   "name": "SCREEN 17",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t017",
+   "name": "SCREEN 18",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t018",
+   "name": "SCREEN 19",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t019",
+   "name": "SCREEN 20",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t020",
+   "name": "SCREEN 21",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t021",
+   "name": "SCREEN 22",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t022",
+   "name": "SCREEN 23",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t023",
+   "name": "SCREEN 24",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t024",
+   "name": "SCREEN 25",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t025",
+   "name": "SCREEN 26",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t026",
+   "name": "SCREEN 27",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t027",
+   "name": "SCREEN 28",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t028",
+   "name": "SCREEN 29",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t029",
+   "name": "SCREEN 30",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t030",
+   "name": "SCREEN 31",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t031",
+   "name": "SCREEN 32",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t032",
+   "name": "SCREEN 33",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t033",
+   "name": "SCREEN 34",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t034",
+   "name": "SCREEN 35",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t035",
+   "name": "SCREEN 36",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t036",
+   "name": "SCREEN 37",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t037",
+   "name": "SCREEN 38",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t038",
+   "name": "SCREEN 39",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t039",
+   "name": "SCREEN 40",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t040",
+   "name": "SCREEN 41",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t041",
+   "name": "SCREEN 42",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t042",
+   "name": "SCREEN 43",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t043",
+   "name": "SCREEN 44",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t044",
+   "name": "SCREEN 45",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t045",
+   "name": "SCREEN 46",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t046",
+   "name": "SCREEN 47",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t047",
+   "name": "SCREEN 48",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t048",
+   "name": "SCREEN 49",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t049",
+   "name": "SCREEN 50",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t050",
+   "name": "SCREEN 51",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t051",
+   "name": "SCREEN 52",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t052",
+   "name": "SCREEN 53",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t053",
+   "name": "SCREEN 54",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t054",
+   "name": "SCREEN 55",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t055",
+   "name": "SCREEN 56",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t056",
+   "name": "SCREEN 57",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t057",
+   "name": "SCREEN 58",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t058",
+   "name": "SCREEN 59",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t059",
+   "name": "SCREEN 60",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t060",
+   "name": "SCREEN 61",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t061",
+   "name": "SCREEN 62",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t062",
+   "name": "SCREEN 63",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t063",
+   "name": "SCREEN 64",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t064",
+   "name": "SCREEN 65",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t065",
+   "name": "SCREEN 66",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t066",
+   "name": "SCREEN 67",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t067",
+   "name": "SCREEN 68",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t068",
+   "name": "SCREEN 69",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t069",
+   "name": "SCREEN 70",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t070",
+   "name": "SCREEN 71",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t071",
+   "name": "SCREEN 72",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t072",
+   "name": "SCREEN 73",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t073",
+   "name": "SCREEN 74",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t074",
+   "name": "SCREEN 75",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t075",
+   "name": "SCREEN 76",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t076",
+   "name": "SCREEN 77",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t077",
+   "name": "SCREEN 78",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t078",
+   "name": "SCREEN 79",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t079",
+   "name": "SCREEN 80",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t080",
+   "name": "SCREEN 81",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t081",
+   "name": "SCREEN 82",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t082",
+   "name": "SCREEN 83",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t083",
+   "name": "SCREEN 84",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t084",
+   "name": "SCREEN 85",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t085",
+   "name": "SCREEN 86",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t086",
+   "name": "SCREEN 87",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t087",
+   "name": "SCREEN 88",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t088",
+   "name": "SCREEN 89",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t089",
+   "name": "SCREEN 90",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t090",
+   "name": "SCREEN 91",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t091",
+   "name": "SCREEN 92",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t092",
+   "name": "SCREEN 93",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t093",
+   "name": "SCREEN 94",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t094",
+   "name": "SCREEN 95",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t095",
+   "name": "SCREEN 96",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t096",
+   "name": "SCREEN 97",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t097",
+   "name": "SCREEN 98",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t098",
+   "name": "SCREEN 99",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t099",
+   "name": "SCREEN 100",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t100",
+   "name": "SCREEN 101",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t101",
+   "name": "SCREEN 102",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t102",
+   "name": "SCREEN 103",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t103",
+   "name": "SCREEN 104",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t104",
+   "name": "SCREEN 105",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t105",
+   "name": "SCREEN 106",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t106",
+   "name": "SCREEN 107",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t107",
+   "name": "SCREEN 108",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t108",
+   "name": "SCREEN 109",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t109",
+   "name": "SCREEN 110",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t110",
+   "name": "SCREEN 111",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t111",
+   "name": "SCREEN 112",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t112",
+   "name": "SCREEN 113",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t113",
+   "name": "SCREEN 114",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t114",
+   "name": "SCREEN 115",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t115",
+   "name": "SCREEN 116",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t116",
+   "name": "SCREEN 117",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t117",
+   "name": "SCREEN 118",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t118",
+   "name": "SCREEN 119",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t119",
+   "name": "SCREEN 120",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t120",
+   "name": "SCREEN 121",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t121",
+   "name": "SCREEN 122",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t122",
+   "name": "SCREEN 123",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t123",
+   "name": "SCREEN 124",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t124",
+   "name": "SCREEN 125",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t125",
+   "name": "SCREEN 126",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t126",
+   "name": "SCREEN 127",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t127",
+   "name": "SCREEN 128",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t128",
+   "name": "SCREEN 129",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t129",
+   "name": "SCREEN 130",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t130",
+   "name": "SCREEN 131",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t131",
+   "name": "SCREEN 132",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t132",
+   "name": "SCREEN 133",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t133",
+   "name": "SCREEN 134",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t134",
+   "name": "SCREEN 135",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t135",
+   "name": "SCREEN 136",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t136",
+   "name": "SCREEN 137",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t137",
+   "name": "SCREEN 138",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t138",
+   "name": "SCREEN 139",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t139",
+   "name": "SCREEN 140",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t140",
+   "name": "SCREEN 141",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t141",
+   "name": "SCREEN 142",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t142",
+   "name": "SCREEN 143",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t143",
+   "name": "SCREEN 144",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t144",
+   "name": "SCREEN 145",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t145",
+   "name": "SCREEN 146",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t146",
+   "name": "SCREEN 147",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t147",
+   "name": "SCREEN 148",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t148",
+   "name": "SCREEN 149",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t149",
+   "name": "SCREEN 150",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t150",
+   "name": "SCREEN 151",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t151",
+   "name": "SCREEN 152",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t152",
+   "name": "SCREEN 153",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t153",
+   "name": "SCREEN 154",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t154",
+   "name": "SCREEN 155",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t155",
+   "name": "SCREEN 156",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t156",
+   "name": "SCREEN 157",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t157",
+   "name": "SCREEN 158",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t158",
+   "name": "SCREEN 159",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t159",
+   "name": "SCREEN 160",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t160",
+   "name": "SCREEN 161",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t161",
+   "name": "SCREEN 162",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t162",
+   "name": "SCREEN 163",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t163",
+   "name": "SCREEN 164",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t164",
+   "name": "SCREEN 165",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t165",
+   "name": "SCREEN 166",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t166",
+   "name": "SCREEN 167",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t167",
+   "name": "SCREEN 168",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t168",
+   "name": "SCREEN 169",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t169",
+   "name": "SCREEN 170",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t170",
+   "name": "SCREEN 171",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t171",
+   "name": "SCREEN 172",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t172",
+   "name": "SCREEN 173",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t173",
+   "name": "SCREEN 174",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t174",
+   "name": "SCREEN 175",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t175",
+   "name": "SCREEN 176",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t176",
+   "name": "SCREEN 177",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t177",
+   "name": "SCREEN 178",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t178",
+   "name": "SCREEN 179",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t179",
+   "name": "SCREEN 180",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t180",
+   "name": "SCREEN 181",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t181",
+   "name": "SCREEN 182",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t182",
+   "name": "SCREEN 183",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t183",
+   "name": "SCREEN 184",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t184",
+   "name": "SCREEN 185",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t185",
+   "name": "SCREEN 186",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t186",
+   "name": "SCREEN 187",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t187",
+   "name": "SCREEN 188",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t188",
+   "name": "SCREEN 189",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t189",
+   "name": "SCREEN 190",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t190",
+   "name": "SCREEN 191",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t191",
+   "name": "SCREEN 192",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t192",
+   "name": "SCREEN 193",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t193",
+   "name": "SCREEN 194",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t194",
+   "name": "SCREEN 195",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t195",
+   "name": "SCREEN 196",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t196",
+   "name": "SCREEN 197",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t197",
+   "name": "SCREEN 198",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t198",
+   "name": "SCREEN 199",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t199",
+   "name": "SCREEN 200",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t200",
+   "name": "SCREEN 201",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t201",
+   "name": "SCREEN 202",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t202",
+   "name": "SCREEN 203",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t203",
+   "name": "SCREEN 204",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t204",
+   "name": "SCREEN 205",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t205",
+   "name": "SCREEN 206",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t206",
+   "name": "SCREEN 207",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t207",
+   "name": "SCREEN 208",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t208",
+   "name": "SCREEN 209",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t209",
+   "name": "SCREEN 210",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t210",
+   "name": "SCREEN 211",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t211",
+   "name": "SCREEN 212",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t212",
+   "name": "SCREEN 213",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t213",
+   "name": "SCREEN 214",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t214",
+   "name": "SCREEN 215",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t215",
+   "name": "SCREEN 216",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t216",
+   "name": "SCREEN 217",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t217",
+   "name": "SCREEN 218",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t218",
+   "name": "SCREEN 219",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t219",
+   "name": "SCREEN 220",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t220",
+   "name": "SCREEN 221",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t221",
+   "name": "SCREEN 222",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t222",
+   "name": "SCREEN 223",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t223",
+   "name": "SCREEN 224",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t224",
+   "name": "SCREEN 225",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t225",
+   "name": "SCREEN 226",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t226",
+   "name": "SCREEN 227",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t227",
+   "name": "SCREEN 228",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t228",
+   "name": "SCREEN 229",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t229",
+   "name": "SCREEN 230",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t230",
+   "name": "SCREEN 231",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t231",
+   "name": "SCREEN 232",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t232",
+   "name": "SCREEN 233",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t233",
+   "name": "SCREEN 234",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t234",
+   "name": "SCREEN 235",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t235",
+   "name": "SCREEN 236",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t236",
+   "name": "SCREEN 237",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t237",
+   "name": "SCREEN 238",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t238",
+   "name": "SCREEN 239",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t239",
+   "name": "SCREEN 240",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t240",
+   "name": "SCREEN 241",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t241",
+   "name": "SCREEN 242",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t242",
+   "name": "SCREEN 243",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t243",
+   "name": "SCREEN 244",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t244",
+   "name": "SCREEN 245",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t245",
+   "name": "SCREEN 246",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t246",
+   "name": "SCREEN 247",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t247",
+   "name": "SCREEN 248",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t248",
+   "name": "SCREEN 249",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t249",
+   "name": "SCREEN 250",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t250",
+   "name": "SCREEN 251",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t251",
+   "name": "SCREEN 252",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t252",
+   "name": "SCREEN 253",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t253",
+   "name": "SCREEN 254",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t254",
+   "name": "SCREEN 255",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t255",
+   "name": "SCREEN 256",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t256",
+   "name": "SCREEN 257",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t257",
+   "name": "SCREEN 258",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t258",
+   "name": "SCREEN 259",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t259",
+   "name": "SCREEN 260",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t260",
+   "name": "SCREEN 261",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t261",
+   "name": "SCREEN 262",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t262",
+   "name": "SCREEN 263",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t263",
+   "name": "SCREEN 264",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t264",
+   "name": "SCREEN 265",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t265",
+   "name": "SCREEN 266",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t266",
+   "name": "SCREEN 267",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t267",
+   "name": "SCREEN 268",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t268",
+   "name": "SCREEN 269",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t269",
+   "name": "SCREEN 270",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t270",
+   "name": "SCREEN 271",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t271",
+   "name": "SCREEN 272",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t272",
+   "name": "SCREEN 273",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t273",
+   "name": "SCREEN 274",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t274",
+   "name": "SCREEN 275",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t275",
+   "name": "SCREEN 276",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t276",
+   "name": "SCREEN 277",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t277",
+   "name": "SCREEN 278",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t278",
+   "name": "SCREEN 279",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t279",
+   "name": "SCREEN 280",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t280",
+   "name": "SCREEN 281",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t281",
+   "name": "SCREEN 282",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t282",
+   "name": "SCREEN 283",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t283",
+   "name": "SCREEN 284",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t284",
+   "name": "SCREEN 285",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t285",
+   "name": "SCREEN 286",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t286",
+   "name": "SCREEN 287",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t287",
+   "name": "SCREEN 288",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t288",
+   "name": "SCREEN 289",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t289",
+   "name": "SCREEN 290",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t290",
+   "name": "SCREEN 291",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t291",
+   "name": "SCREEN 292",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t292",
+   "name": "SCREEN 293",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t293",
+   "name": "SCREEN 294",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t294",
+   "name": "SCREEN 295",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t295",
+   "name": "SCREEN 296",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t296",
+   "name": "SCREEN 297",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t297",
+   "name": "SCREEN 298",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t298",
+   "name": "SCREEN 299",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t299",
+   "name": "SCREEN 300",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t300",
+   "name": "SCREEN 301",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t301",
+   "name": "SCREEN 302",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t302",
+   "name": "SCREEN 303",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t303",
+   "name": "SCREEN 304",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t304",
+   "name": "SCREEN 305",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t305",
+   "name": "SCREEN 306",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t306",
+   "name": "SCREEN 307",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t307",
+   "name": "SCREEN 308",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t308",
+   "name": "SCREEN 309",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t309",
+   "name": "SCREEN 310",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t310",
+   "name": "SCREEN 311",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t311",
+   "name": "SCREEN 312",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t312",
+   "name": "SCREEN 313",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t313",
+   "name": "SCREEN 314",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t314",
+   "name": "SCREEN 315",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t315",
+   "name": "SCREEN 316",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t316",
+   "name": "SCREEN 317",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t317",
+   "name": "SCREEN 318",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t318",
+   "name": "SCREEN 319",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t319",
+   "name": "SCREEN 320",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t320",
+   "name": "SCREEN 321",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t321",
+   "name": "SCREEN 322",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t322",
+   "name": "SCREEN 323",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t323",
+   "name": "SCREEN 324",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t324",
+   "name": "SCREEN 325",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t325",
+   "name": "SCREEN 326",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t326",
+   "name": "SCREEN 327",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t327",
+   "name": "SCREEN 328",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t328",
+   "name": "SCREEN 329",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t329",
+   "name": "SCREEN 330",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t330",
+   "name": "SCREEN 331",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t331",
+   "name": "SCREEN 332",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t332",
+   "name": "SCREEN 333",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t333",
+   "name": "SCREEN 334",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t334",
+   "name": "SCREEN 335",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t335",
+   "name": "SCREEN 336",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t336",
+   "name": "SCREEN 337",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t337",
+   "name": "SCREEN 338",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t338",
+   "name": "SCREEN 339",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t339",
+   "name": "SCREEN 340",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t340",
+   "name": "SCREEN 341",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t341",
+   "name": "SCREEN 342",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t342",
+   "name": "SCREEN 343",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t343",
+   "name": "SCREEN 344",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t344",
+   "name": "SCREEN 345",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t345",
+   "name": "SCREEN 346",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t346",
+   "name": "SCREEN 347",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t347",
+   "name": "SCREEN 348",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t348",
+   "name": "SCREEN 349",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t349",
+   "name": "SCREEN 350",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t350",
+   "name": "SCREEN 351",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t351",
+   "name": "SCREEN 352",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t352",
+   "name": "SCREEN 353",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t353",
+   "name": "SCREEN 354",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t354",
+   "name": "SCREEN 355",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t355",
+   "name": "SCREEN 356",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t356",
+   "name": "SCREEN 357",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t357",
+   "name": "SCREEN 358",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t358",
+   "name": "SCREEN 359",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t359",
+   "name": "SCREEN 360",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t360",
+   "name": "SCREEN 361",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t361",
+   "name": "SCREEN 362",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t362",
+   "name": "SCREEN 363",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t363",
+   "name": "SCREEN 364",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t364",
+   "name": "SCREEN 365",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t365",
+   "name": "SCREEN 366",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t366",
+   "name": "SCREEN 367",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t367",
+   "name": "SCREEN 368",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t368",
+   "name": "SCREEN 369",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t369",
+   "name": "SCREEN 370",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t370",
+   "name": "SCREEN 371",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t371",
+   "name": "SCREEN 372",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t372",
+   "name": "SCREEN 373",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t373",
+   "name": "SCREEN 374",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t374",
+   "name": "SCREEN 375",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t375",
+   "name": "SCREEN 376",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t376",
+   "name": "SCREEN 377",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t377",
+   "name": "SCREEN 378",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t378",
+   "name": "SCREEN 379",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t379",
+   "name": "SCREEN 380",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t380",
+   "name": "SCREEN 381",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t381",
+   "name": "SCREEN 382",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t382",
+   "name": "SCREEN 383",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t383",
+   "name": "SCREEN 384",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t384",
+   "name": "SCREEN 385",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t385",
+   "name": "SCREEN 386",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t386",
+   "name": "SCREEN 387",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t387",
+   "name": "SCREEN 388",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t388",
+   "name": "SCREEN 389",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t389",
+   "name": "SCREEN 390",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t390",
+   "name": "SCREEN 391",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t391",
+   "name": "SCREEN 392",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t392",
+   "name": "SCREEN 393",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t393",
+   "name": "SCREEN 394",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t394",
+   "name": "SCREEN 395",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t395",
+   "name": "SCREEN 396",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t396",
+   "name": "SCREEN 397",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t397",
+   "name": "SCREEN 398",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t398",
+   "name": "SCREEN 399",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t399",
+   "name": "SCREEN 400",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t400",
+   "name": "SCREEN 401",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t401",
+   "name": "SCREEN 402",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t402",
+   "name": "SCREEN 403",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t403",
+   "name": "SCREEN 404",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t404",
+   "name": "SCREEN 405",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t405",
+   "name": "SCREEN 406",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t406",
+   "name": "SCREEN 407",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t407",
+   "name": "SCREEN 408",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t408",
+   "name": "SCREEN 409",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t409",
+   "name": "SCREEN 410",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t410",
+   "name": "SCREEN 411",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t411",
+   "name": "SCREEN 412",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t412",
+   "name": "SCREEN 413",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t413",
+   "name": "SCREEN 414",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t414",
+   "name": "SCREEN 415",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t415",
+   "name": "SCREEN 416",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t416",
+   "name": "SCREEN 417",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t417",
+   "name": "SCREEN 418",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t418",
+   "name": "SCREEN 419",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t419",
+   "name": "SCREEN 420",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t420",
+   "name": "SCREEN 421",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t421",
+   "name": "SCREEN 422",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t422",
+   "name": "SCREEN 423",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t423",
+   "name": "SCREEN 424",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t424",
+   "name": "SCREEN 425",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t425",
+   "name": "SCREEN 426",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t426",
+   "name": "SCREEN 427",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t427",
+   "name": "SCREEN 428",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t428",
+   "name": "SCREEN 429",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t429",
+   "name": "SCREEN 430",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t430",
+   "name": "SCREEN 431",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t431",
+   "name": "SCREEN 432",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t432",
+   "name": "SCREEN 433",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t433",
+   "name": "SCREEN 434",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t434",
+   "name": "SCREEN 435",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t435",
+   "name": "SCREEN 436",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t436",
+   "name": "SCREEN 437",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t437",
+   "name": "SCREEN 438",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t438",
+   "name": "SCREEN 439",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t439",
+   "name": "SCREEN 440",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t440",
+   "name": "SCREEN 441",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t441",
+   "name": "SCREEN 442",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t442",
+   "name": "SCREEN 443",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t443",
+   "name": "SCREEN 444",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t444",
+   "name": "SCREEN 445",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t445",
+   "name": "SCREEN 446",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t446",
+   "name": "SCREEN 447",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t447",
+   "name": "SCREEN 448",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t448",
+   "name": "SCREEN 449",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t449",
+   "name": "SCREEN 450",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t450",
+   "name": "SCREEN 451",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t451",
+   "name": "SCREEN 452",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t452",
+   "name": "SCREEN 453",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t453",
+   "name": "SCREEN 454",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t454",
+   "name": "SCREEN 455",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t455",
+   "name": "SCREEN 456",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t456",
+   "name": "SCREEN 457",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t457",
+   "name": "SCREEN 458",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t458",
+   "name": "SCREEN 459",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t459",
+   "name": "SCREEN 460",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t460",
+   "name": "SCREEN 461",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t461",
+   "name": "SCREEN 462",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t462",
+   "name": "SCREEN 463",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t463",
+   "name": "SCREEN 464",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t464",
+   "name": "SCREEN 465",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t465",
+   "name": "SCREEN 466",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t466",
+   "name": "SCREEN 467",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t467",
+   "name": "SCREEN 468",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t468",
+   "name": "SCREEN 469",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t469",
+   "name": "SCREEN 470",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t470",
+   "name": "SCREEN 471",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t471",
+   "name": "SCREEN 472",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t472",
+   "name": "SCREEN 473",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t473",
+   "name": "SCREEN 474",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t474",
+   "name": "SCREEN 475",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t475",
+   "name": "SCREEN 476",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t476",
+   "name": "SCREEN 477",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t477",
+   "name": "SCREEN 478",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t478",
+   "name": "SCREEN 479",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t479",
+   "name": "SCREEN 480",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t480",
+   "name": "SCREEN 481",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t481",
+   "name": "SCREEN 482",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t482",
+   "name": "SCREEN 483",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t483",
+   "name": "SCREEN 484",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t484",
+   "name": "SCREEN 485",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t485",
+   "name": "SCREEN 486",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t486",
+   "name": "SCREEN 487",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t487",
+   "name": "SCREEN 488",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t488",
+   "name": "SCREEN 489",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t489",
+   "name": "SCREEN 490",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t490",
+   "name": "SCREEN 491",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t491",
+   "name": "SCREEN 492",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t492",
+   "name": "SCREEN 493",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t493",
+   "name": "SCREEN 494",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t494",
+   "name": "SCREEN 495",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t495",
+   "name": "SCREEN 496",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t496",
+   "name": "SCREEN 497",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t497",
+   "name": "SCREEN 498",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t498",
+   "name": "SCREEN 499",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t499",
+   "name": "SCREEN 500",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t500",
+   "name": "SCREEN 501",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t501",
+   "name": "SCREEN 502",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t502",
+   "name": "SCREEN 503",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t503",
+   "name": "SCREEN 504",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t504",
+   "name": "SCREEN 505",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t505",
+   "name": "SCREEN 506",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t506",
+   "name": "SCREEN 507",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t507",
+   "name": "SCREEN 508",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t508",
+   "name": "SCREEN 509",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t509",
+   "name": "SCREEN 510",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t510",
+   "name": "SCREEN 511",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "t511",
+   "name": "SCREEN 512",
+   "default": 0,
+   "min": 0,
+   "max": 10,
+   "display": "int"
+  },
+  {
+   "key": "shape__open",
+   "name": "shape list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "shape"
+  },
+  {
+   "key": "orb_div__open",
+   "name": "orb_div list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "orb_div"
+  },
+  {
+   "key": "arp_mode__open",
+   "name": "arp_mode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "arp_mode"
+  },
+  {
+   "key": "arp_rate__open",
+   "name": "arp_rate list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "arp_rate"
+  },
+  {
+   "key": "dly_div__open",
+   "name": "dly_div list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "dly_div"
+  },
+  {
+   "key": "a_mode__open",
+   "name": "a_mode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "a_mode"
+  },
+  {
+   "key": "a_ftype__open",
+   "name": "a_ftype list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "a_ftype"
+  },
+  {
+   "key": "b_mode__open",
+   "name": "b_mode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "b_mode"
+  },
+  {
+   "key": "b_ftype__open",
+   "name": "b_ftype list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "b_ftype"
+  },
+  {
+   "key": "c_mode__open",
+   "name": "c_mode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "c_mode"
+  },
+  {
+   "key": "c_ftype__open",
+   "name": "c_ftype list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "c_ftype"
+  },
+  {
+   "key": "d_mode__open",
+   "name": "d_mode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "d_mode"
+  },
+  {
+   "key": "d_ftype__open",
+   "name": "d_ftype list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "d_ftype"
+  }
+ ]
+}

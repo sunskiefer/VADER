@@ -1,0 +1,5 @@
+{ "id": "meowsynth", "name": "MeowSynth", "author": "mcardonaserrano", "repo": "mcardonaserrano/meowsynth-mpc",
+  "kind": "instrument", "style": "synth", "tags": ["cat", "meow", "novelty", "synthedit"], "license": "MIT",
+  "summary": "knobster's MeowSynth rebuilt natively from the original's SynthEdit patch: a ramp oscillator through an envelope-following resonant filter that meows, five cats, vibrato and chorus, with the original's look and a meowing cat on the touchscreen and Q-Links.",
+  "screenshot": "https://raw.githubusercontent.com/mcardonaserrano/meowsynth-mpc/main/previews/meow_page_meowing.png",
+  "homepage": "https://github.com/mcardonaserrano/meowsynth-mpc" }

@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-tovinyl4",
+  "name": "Airwindows ToVinyl4",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "utility",
+  "tags": [
+    "airwindows",
+    "vinyl",
+    "mastering",
+    "lo-fi"
+  ],
+  "license": "MIT",
+  "summary": "Vinyl mastering stage: mid and side highpass, high limiter and groove wear.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/ToVinyl4.jpg",
+  "asset_pattern": "ToVinyl4-*-mpc-armv7.zip"
+}

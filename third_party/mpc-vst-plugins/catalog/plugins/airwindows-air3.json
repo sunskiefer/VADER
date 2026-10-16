@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-air3",
+  "name": "Airwindows Air3",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "eq",
+  "tags": [
+    "airwindows",
+    "eq",
+    "air",
+    "treble"
+  ],
+  "license": "MIT",
+  "summary": "Air-band EQ that lifts or tames the very top and the low ground of a mix.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/Air3.jpg",
+  "asset_pattern": "Air3-*-mpc-armv7.zip"
+}

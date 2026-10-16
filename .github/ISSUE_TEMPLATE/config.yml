@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/sunskiefer/VADER/discussions
+    about: Ask how something works, share shapes and presets, or suggest a feature.
+  - name: User guide
+    url: https://github.com/sunskiefer/VADER/blob/main/docs/USER_GUIDE.md
+    about: "Every page, control and Q-Link."

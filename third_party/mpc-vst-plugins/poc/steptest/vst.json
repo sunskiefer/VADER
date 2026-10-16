@@ -1,0 +1,19 @@
+{
+ "name": "MPC Step Test",
+ "vendor": "sd88me",
+ "uid": "StpT",
+ "version": 1000,
+ "so": "steptest.so",
+ "params": "params.json",
+ "build": {
+  "root": "../..",
+  "sources": [
+   "poc/steptest/engine.c"
+  ],
+  "cflags": [],
+  "libs": []
+ },
+ "defines": {
+  "HAS_TRANSPORT": 1
+ }
+}

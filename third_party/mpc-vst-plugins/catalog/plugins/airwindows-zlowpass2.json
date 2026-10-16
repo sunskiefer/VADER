@@ -1,0 +1,17 @@
+{
+  "id": "airwindows-zlowpass2",
+  "name": "Airwindows ZLowpass2",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "filter",
+  "tags": [
+    "airwindows",
+    "filter",
+    "lowpass"
+  ],
+  "license": "MIT",
+  "summary": "Smooth lowpass filter with a choice of slopes.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/ZLowpass2.jpg",
+  "asset_pattern": "ZLowpass2-*-mpc-armv7.zip"
+}

@@ -1,0 +1,10 @@
+[Unit]
+Description=Drive exec - scoped executable mount
+After=edisksd.service
+Wants=edisksd.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /etc/drive-exec/drive-exec.sh apply
+TimeoutStartSec=15
+PrivateMounts=no

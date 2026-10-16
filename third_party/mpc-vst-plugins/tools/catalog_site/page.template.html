@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/*TITLE*/ - MPC OS Plugin Catalog</title>
+<meta name="description" content="/*DESC*/">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap">
+<style>
+/*SITE_CSS*/
+</style>
+</head>
+<body>
+<div class="bar"><div class="wrap nav">
+  <div class="brand"><span class="dot"></span><a href="index.html">MPC OS Plugin Catalog</a></div>
+  <nav aria-label="Site"><ul>/*NAV*/</ul></nav>
+</div></div>
+<main class="wrap doc">
+/*BODY*/
+</main>
+<script>
+/* a link to a collapsible section (page.html#its-title) opens it */
+function openFold() {
+  var h = decodeURIComponent(location.hash.slice(1)), e = h ? document.getElementById(h) : null;
+  if (!e) return;
+  for (var n = e; n; n = n.parentElement) if (n.tagName === "DETAILS") n.open = true;
+  e.scrollIntoView();
+}
+addEventListener("hashchange", openFold); openFold();
+</script>
+<footer class="wrap">Community-provided software. Installing runs a script as root on your device: check the source and the checksum first. Not affiliated with or endorsed by Akai Professional.</footer>
+</body>
+</html>

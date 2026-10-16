@@ -1,0 +1,70 @@
+[
+ {
+  "key": "cont",
+  "name": "Cont",
+  "min": 0,
+  "max": 1,
+  "default": 0
+ },
+ {
+  "key": "mode",
+  "name": "Mode",
+  "options": [
+   "A",
+   "B",
+   "C",
+   "D",
+   "E",
+   "F",
+   "G",
+   "H",
+   "I"
+  ],
+  "default": "A"
+ },
+ {
+  "key": "num",
+  "name": "Num",
+  "min": 1,
+  "max": 8,
+  "default": 1,
+  "display": "int"
+ },
+ {
+  "key": "chan",
+  "name": "Chan",
+  "min": 1,
+  "max": 16,
+  "default": 1,
+  "display": "int"
+ },
+ {
+  "key": "long",
+  "name": "Long",
+  "min": 0,
+  "max": 998,
+  "default": 0,
+  "display": "int",
+  "nudge_pct": 10
+ },
+ {
+  "key": "mode_prev",
+  "name": "Mode Prev",
+  "momentary": true,
+  "step_of": "mode",
+  "step_delta": -1
+ },
+ {
+  "key": "mode_next",
+  "name": "Mode Next",
+  "momentary": true,
+  "step_of": "mode",
+  "step_delta": 1
+ },
+ {
+  "key": "transport_log",
+  "name": "Transport",
+  "display": "string",
+  "poll": false
+ }
+]

@@ -1,0 +1,20 @@
+{
+  "id": "vibe-fx",
+  "name": "Vibe FX",
+  "author": "nachtaktiv303",
+  "repo": "nachtaktiv303/mpc-vst-vibe-fx",
+  "kind": "effect",
+  "style": "multi-fx",
+  "tags": [
+    "drive",
+    "chorus",
+    "reverb",
+    "delay",
+    "multi-fx",
+    "insert"
+  ],
+  "license": "MIT",
+  "summary": "Drive, chorus, FDN reverb and tape delay in one native MPC OS insert effect, with a touchscreen skin and Q-Links.",
+  "screenshot": "https://raw.githubusercontent.com/nachtaktiv303/mpc-vst-vibe-fx/main/preview_0.png",
+  "asset_pattern": "Vibe-FX-*-mpc-armv7.zip"
+}

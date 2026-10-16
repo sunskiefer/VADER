@@ -1,0 +1,17 @@
+{
+  "id": "airwindows-verbity2",
+  "name": "Airwindows Verbity2",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "reverb",
+  "tags": [
+    "airwindows",
+    "reverb",
+    "dense"
+  ],
+  "license": "MIT",
+  "summary": "Dense, smooth reverb with size, sustain and mulch controls.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/Verbity2.jpg",
+  "asset_pattern": "Verbity2-*-mpc-armv7.zip"
+}

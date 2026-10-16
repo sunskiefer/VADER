@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "patches": [
+    {
+      "id": "drum-pad-layout",
+      "title": "16-pad drum layout for selected plugins",
+      "summary": "Machinedrum Module / Machinemodule, 6W6, 8W8, CW-78, 9W9, TR-MPC and Lucky Dip get MPC's drum layout with all 16 pads lit.",
+      "author": "sd88me",
+      "license": "MIT",
+      "docs": "tools/mpc_patch/README.md",
+      "script": {
+        "url": "https://raw.githubusercontent.com/sd88me/mpc-vst-plugins/6ddf68cf92b3f1c0bdd322231ed133c0cc2eed48/tools/mpc_patch/mpc-drum-pad-patch.sh",
+        "sha256": "ec69edaaf5b1ce57d3937d2ec967d34bd5257d5faa15d1520b8cb51422dfefe7"
+      },
+      "supports": {"os": "MPC OS 3.9.1.2", "arch": "armv7l", "mpc_md5": ["592eebc8e1ce0797dc8c98e7002143b8"]},
+      "modifies": ["/usr/bin/MPC"],
+      "backup": "/sdcard/MPC-backup",
+      "restarts_mpc": true,
+      "reversible": true
+    },
+    {
+      "id": "drive-exec",
+      "title": "Drive exec: run plugins from a noexec drive (an MPC/Force's SSD)",
+      "summary": "UNTESTED on a device by this project (testers wanted, see issue #150). MPC cannot load a plugin from a drive mounted noexec: it is listed but only shows Load Plugin. This makes one folder of the drive (Synths) executable, through a small boot-time service; the drive itself stays noexec.",
+      "author": "timomacquis (adapted by sd88me)",
+      "license": "MIT",
+      "docs": "tools/mpc_patch/drive_exec/README.md",
+      "script": {
+        "url": "https://raw.githubusercontent.com/sd88me/mpc-vst-plugins/c581a9e5efb4f10562b03223f75b0fdd8fd231be/tools/mpc_patch/drive_exec/drive-exec-patch.sh",
+        "sha256": "f8cfa9732737aaa6867b806af6aa80dcc67fad77b4a92355b2dc26bd0cc61d8c"
+      },
+      "supports": {"os": "MPC OS Gen1 (tried on a Force, MPC OS 3.9.1)", "arch": "armv7l"},
+      "modifies": ["/etc/drive-exec", "/etc/systemd/system/drive-exec.timer", "/usr/lib/systemd/system/drive-exec-bootstrap.service", "/media/<your drive>/Synths (an executable bind mount of the folder)"],
+      "backup": "/data/mpc-vst-plugins/backups",
+      "restarts_mpc": false,
+      "reversible": true
+    },
+    {
+      "id": "button-remap",
+      "title": "Button remap: open screens from hardware buttons",
+      "summary": "Remap hardware buttons on a standalone MPC or Force (an LD_PRELOAD shim: a button can become other buttons, a pad or a screen tap). The author's hwremap was tried on an MPC Live (Hakai, MPC 3.9.1) and a Force (stock 3.9.0). This installer is untested on a device.",
+      "author": "mmiroshnikov",
+      "license": "MIT",
+      "docs": "tools/mpc_patch/hwremap/README.md",
+      "script": {
+        "url": "https://raw.githubusercontent.com/sd88me/mpc-vst-plugins/916fabfdf90316e1dd1fd232c6d93b1944f86181/tools/mpc_patch/hwremap/hwremap-patch.sh",
+        "sha256": "a989fac3000190a3c31911795fc0ed457ec6709a210bc6c170234549ab198cf9"
+      },
+      "supports": {"os": "MPC OS 3.9 (MPC Live with Hakai, and Force stock 3.9.0, as tried by the remap's author)", "arch": "armv7l"},
+      "modifies": ["/usr/bin/az01-launch-MPC", "/usr/lib/hwremap.so", "/data/hwremap/hwremap.so", "/etc/systemd/system/acvs.service.d/hwremap.conf", "/etc/systemd/system/inmusic-mpc.service.d/hwremap.conf", "/sdcard/hwremap.conf"],
+      "backup": "/data/mpc-vst-plugins/backups",
+      "restarts_mpc": true,
+      "reversible": true
+    }
+  ]
+}

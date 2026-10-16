@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-console7channel",
+  "name": "Airwindows Console7Channel",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "saturation",
+  "tags": [
+    "airwindows",
+    "console",
+    "saturation",
+    "summing"
+  ],
+  "license": "MIT",
+  "summary": "Console7 channel stage: analog-style console saturation behind a fader.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/Console7Channel.jpg",
+  "asset_pattern": "Console7Channel-*-mpc-armv7.zip"
+}

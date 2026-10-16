@@ -1,0 +1,6 @@
+# the launchers: Windows needs CRLF in .bat files, macOS and Linux need LF in shell scripts
+*.bat text eol=crlf
+*.command text eol=lf
+*.sh text eol=lf
+# the on-device patch script and its sources must keep LF
+tools/mpc_patch/* text eol=lf

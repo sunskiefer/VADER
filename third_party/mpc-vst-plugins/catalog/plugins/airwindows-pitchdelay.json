@@ -1,0 +1,18 @@
+{
+  "id": "airwindows-pitchdelay",
+  "name": "Airwindows PitchDelay",
+  "author": "mmiroshnikov",
+  "repo": "mmiroshnikov/mpc-airwindows",
+  "kind": "effect",
+  "style": "delay",
+  "tags": [
+    "airwindows",
+    "delay",
+    "pitch",
+    "filter"
+  ],
+  "license": "MIT",
+  "summary": "Delay with pitch shifting in the feedback path and a resonant filter.",
+  "screenshot": "https://raw.githubusercontent.com/mmiroshnikov/mpc-airwindows/main/docs/screenshots/PitchDelay.jpg",
+  "asset_pattern": "PitchDelay-*-mpc-armv7.zip"
+}
