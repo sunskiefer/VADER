@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 (2026-10-16)
+
+Not yet tested on a device.
+
+- **Stipple screen**: a layer of fine dots under the lines. They cloud around the shape, follow the orbiter as a
+  fading trail and gather at each corner as loud as that corner is heard. The shape and the trail are drawn as chains
+  of dots. The dot layer is 16 x 8 tiles whose density blends smoothly into its neighbours (no blocks).
+- **Black boxes, white text**: every field, list and button is black; names and captions are white.
+- **Bigger text**: no small help text on the pages; labels never drop below 17 px (short names on MAIN:
+  GEN 1, GEN 2, BLEND, CUTOFF, RESO, DLY TIME, FEEDBACK, CH SPEED, CH DEPTH, CH COLOUR).
+- Lighter glass over the screen, for more contrast.
+
 ## 0.2.1 (2026-10-16)
 
 - Packed under **L'Cronx**: the plugin folder is now `L'Cronx - VST - VADER` and MPC lists the maker as L'Cronx.

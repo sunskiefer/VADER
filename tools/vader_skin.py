@@ -28,14 +28,14 @@ BG_IMAGE = os.path.join(ROOT, "art", "background.png")
 
 ACCENT = (58, 160, 255)
 TRACK = (34, 68, 108)
-INK = (207, 227, 255)
-INK_DIM = (111, 143, 184)
+INK = (255, 255, 255)
+INK_DIM = (232, 236, 242)
 WHITE = (255, 255, 255)
 AMBER = (255, 176, 32)
 CYAN = (125, 252, 255)
 GROUND = (0, 0, 0)
-BTN_ON = (15, 42, 74)
-BTN_OFF = (11, 20, 36)
+BTN_ON = (0, 0, 0)
+BTN_OFF = (0, 0, 0)
 
 TABS = ["MAIN", "CORNERS", "ORBIT", "ARP", "FX"]
 HL = 50          # a line control's height: name row, then the line
@@ -84,7 +84,7 @@ def title(text, x, y, w):
     return {"kind": "title", "text": text, "x": x, "y": y, "w": w}
 
 
-def text(t, x, y, size=17, colour=INK_DIM, w=None):
+def text(t, x, y, size=18, colour=INK_DIM, w=None):
     return {"kind": "text", "text": t, "x": x, "y": y, "size": size, "colour": colour, "w": w}
 
 
@@ -111,24 +111,23 @@ def page_main():
     # centre: the screen
     c += [popup("shape", C, 68, 300, "SHAPE", list_at=(C + 8, 118), cols=4, ow=158, oh=44),
           {"kind": "screen"}, {"kind": "tiles"}, {"kind": "bars", "x": C, "y": 416}]
-    keys1 = [("f_og1", "OVERTONE GEN 1", "drive", "DRIVE AMOUNT"), ("f_og2", "OVERTONE GEN 2", "drive_col", "DRIVE COLOUR"),
-             ("f_blend", "OVERTONE BLEND", "rev_size", "REVERB SIZE"), ("f_cutoff", "FILTER CUTOFF", "rev_col", "REVERB COLOUR"),
-             ("f_reso", "FILTER RESO", "mres", "MASTER RESO")]
+    keys1 = [("f_og1", "GEN 1", "drive", "DRIVE"), ("f_og2", "GEN 2", "drive_col", "DRV COLOUR"),
+             ("f_blend", "BLEND", "rev_size", "REV SIZE"), ("f_cutoff", "CUTOFF", "rev_col", "REV COLOUR"),
+             ("f_reso", "RESO", "mres", "MSTR RESO")]
     for i, (k, l, k2, l2) in enumerate(keys1):
         c += [hl(k, C + i * 133, 446, 124, l, when="alt:OFF"), hl(k2, C + i * 133, 446, 124, l2, when="alt:ON")]
-    keys2 = [("dly_time", "DELAY TIME"), ("dly_fb", "DELAY FEEDBK"), ("ch_speed", "CHORUS SPEED"), ("ch_depth", "CHORUS DEPTH"),
-             ("ch_col", "CHORUS COLOUR")]
+    keys2 = [("dly_time", "DLY TIME"), ("dly_fb", "FEEDBACK"), ("ch_speed", "CH SPEED"), ("ch_depth", "CH DEPTH"),
+             ("ch_col", "CH COLOUR")]
     for i, (k, l) in enumerate(keys2):
         c += [hl(k, C + i * 133, 504, 124, l)]
-    c += [tog("alt", C, 566, 190, "ALT"), tog("motion", C + 206, 566, 190, "MOTION"),
-          text("ALT: the second function of each knob", C + 412, 576, 16, w=244)]
+    c += [tog("alt", C, 566, 190, "ALT"), tog("motion", C + 206, 566, 190, "MOTION")]
     # right: mixer, arpeggiator, sync
     c += mixer(R, 70)
     c += [title("ARPEGGIATOR", R, 286, 288), tog("arp_on", R, 308, 140, "ACTIVE"), tog("latch", R + 148, 308, 140, "LATCH"),
           popup("arp_mode", R, 356, 140, "DIR", list_at=(R - 330, 300)), popup("arp_rate", R + 148, 356, 140, "RATE", list_at=(R - 330, 300)),
           hl("note_len", R, 404, 288, "NOTE LENGTH")]
     c += [title("SYNC", R, 462, 288),
-          tog("retrig", R, 484, 92, "RETRIG"), tog("orb_sync", R + 98, 484, 92, "ORBITER"), tog("vt_sync", R + 196, 484, 92, "VIB/TREM"),
+          tog("retrig", R, 484, 92, "RETRIG"), tog("orb_sync", R + 98, 484, 92, "ORBITER"), tog("vt_sync", R + 196, 484, 92, "V/T"),
           btn("tap", R, 532, 92, "TAP"), tog("dly_sync", R + 98, 532, 92, "DELAY"), tog("ch_sync", R + 196, 532, 92, "CHORUS")]
     q = [("MAIN 1", ["f_og1", "f_og2", "f_blend", "f_cutoff", "f_reso", "orb_speed", "orb_size", "sub_size",
                      "attack", "decay", "sustain", "release", "sub_speed", "mix_rev", "mix_dly", "volume"]),
@@ -145,12 +144,12 @@ def page_corners():
         c += [hl(cl + "_og1", x, 96, 142, "GEN 1"), hl(cl + "_og2", x + 158, 96, 142, "GEN 2"),
               hl(cl + "_oct", x, 152, 142, "OCTAVE"), hl(cl + "_tune", x + 158, 152, 142, "GEN 2 TUNE"),
               hl(cl + "_fine", x, 208, 142, "GEN 2 FINE"), hl(cl + "_level", x + 158, 208, 142, "LEVEL")]
-        c += [text("BLEND", x, 266, 17), popup(cl + "_mode", x, 288, 142, "", list_at=(x if ci < 3 else x - 10, 334)),
+        c += [text("BLEND", x, 266, 18), popup(cl + "_mode", x, 288, 142, "", list_at=(x if ci < 3 else x - 10, 334)),
               hl(cl + "_blend", x + 158, 280, 142, "BLEND")]
-        c += [text("FILTER", x, 340, 17), popup(cl + "_ftype", x, 362, 142, "", list_at=(x if ci < 3 else x - 10, 408)),
+        c += [text("FILTER", x, 340, 18), popup(cl + "_ftype", x, 362, 142, "", list_at=(x if ci < 3 else x - 10, 408)),
               hl(cl + "_reso", x + 158, 354, 142, "RESONANCE")]
         c += [hl(cl + "_cutoff", x, 414, 300, "CUTOFF")]
-        c += [text("FILTER ON", x, 474, 17), radio(cl + "_fpos", x, 496, 300, h=42)]
+        c += [text("FILTER ON", x, 474, 18), radio(cl + "_fpos", x, 496, 300, h=42)]
         q.append(("CORNER " + cl.upper(), [cl + f for f in ("_og1", "_og2", "_blend", "_cutoff", "_reso", "_level", "_tune", "_fine",
                                                              "_oct", "_mode", "_ftype", "_fpos")]))
     return c, q
@@ -164,21 +163,16 @@ def page_orbit():
           hl("rotate", A, 254, 192, "ROTATE"), hl("orb_env", A + 208, 254, 192, "ORBIT ENV"),
           hl("spin", A, 308, 192, "3D SPIN"), hl("tilt", A + 208, 308, 192, "3D TILT")]
     c += [tog("retrig", A, 368, 192, "RETRIG"), tog("orb_sync", A + 208, 368, 192, "ORBITER SYNC"),
-          text("SYNC TO", A, 420, 17), popup("orb_div", A + 100, 414, 300, "", list_at=(A + 100, 460), cols=2, ow=150),
-          hl("shape_osc", A, 470, 400, "SHAPE SOUND"),
-          text("SHAPE SOUND: the shape itself played as audio (x left, y right)", A, 530, 16, w=400)]
+          text("SYNC TO", A, 420, 18), popup("orb_div", A + 100, 414, 300, "", list_at=(A + 100, 460), cols=2, ow=150),
+          hl("shape_osc", A, 470, 400, "SHAPE SOUND")]
     c += [title("SHAPE FILES", B, 70, 400), field("file", B, 92, 400, "FILE", h=56),
-          btn("load", B, 158, 192, "LOAD", h=48), btn("rescan", B + 208, 158, 192, "RESCAN", h=48),
-          text("SVG, OBJ, PNG or JPG files in the plugin's Shapes folder. Pick one, press LOAD: it becomes the USER shape.",
-               B, 216, 16, w=400)]
+          btn("load", B, 158, 192, "LOAD", h=48), btn("rescan", B + 208, 158, 192, "RESCAN", h=48)]
     c += [title("VOICE", B, 290, 400), hl("octave", B, 312, 192, "OCTAVE"), hl("t_volume", B + 208, 312, 192, "VOLUME"),
           hl("detune", B, 366, 192, "DETUNE"), hl("glide", B + 208, 366, 192, "GLIDE"),
-          hl("velocity", B, 420, 400, "VELOCITY"), text("UNISON", B, 480, 17), radio("unison", B, 502, 400, h=42)]
-    c += [title("TIMBRES", Cc, 70, 400), text("KEYS PLAY", Cc, 92, 17), radio("keys", Cc, 114, 400, h=42),
-          text("WITH KEYS ON AUTO", Cc, 166, 17), radio("tmode", Cc, 188, 400, h=42),
-          hl("split", Cc, 240, 400, "SPLIT NOTE"), text("VOICES", Cc, 300, 17), radio("voices", Cc, 322, 400, h=42),
-          text("LOWER plays timbre A, UPPER timbre B, AUTO both: layered (DUAL) or split at the SPLIT NOTE "
-               "(A below, B above). TIMBRE A/B in the top strip picks the one you edit.", Cc, 380, 16, w=400)]
+          hl("velocity", B, 420, 400, "VELOCITY"), text("UNISON", B, 480, 18), radio("unison", B, 502, 400, h=42)]
+    c += [title("TIMBRES", Cc, 70, 400), text("KEYS PLAY", Cc, 92, 18), radio("keys", Cc, 114, 400, h=42),
+          text("WITH KEYS ON AUTO", Cc, 166, 18), radio("tmode", Cc, 188, 400, h=42),
+          hl("split", Cc, 240, 400, "SPLIT NOTE"), text("VOICES", Cc, 300, 18), radio("voices", Cc, 322, 400, h=42)]
     c += [title("MY PRESETS", Cc, 470, 400), field("user_slot", Cc, 494, 400, "SLOT", h=52),
           btn("save_user", Cc, 556, 192, "SAVE", h=48), btn("load_user", Cc + 208, 556, 192, "LOAD", h=48)]
     q = [("ORBIT", ["orb_speed", "orb_size", "sub_size", "sub_speed", "rotate", "orb_env", "spin", "tilt",
@@ -189,15 +183,13 @@ def page_orbit():
 def page_arp():
     c = [title("ARPEGGIATOR", 16, 70, 1248), tog("arp_on", 16, 96, 170, "ACTIVE"), tog("latch", 202, 96, 170, "LATCH"),
          hl("arp_oct", 396, 92, 240, "OCTAVES"), hl("note_len", 660, 92, 300, "NOTE LENGTH"), hl("arp_steps", 984, 92, 280, "STEPS"),
-         text("DIRECTION", 16, 156, 17), radio("arp_mode", 16, 178, 600, h=42),
-         text("RATE", 648, 156, 17), radio("arp_rate", 648, 178, 616, h=42)]
+         text("DIRECTION", 16, 156, 18), radio("arp_mode", 16, 178, 600, h=42),
+         text("RATE", 648, 156, 18), radio("arp_rate", 648, 178, 616, h=42)]
     c += [title("STEP PATTERN", 16, 236, 1248)]
     for i in range(16):
         x = 16 + i * 78
         c += [text(str(i + 1), x + 26, 258, 18, INK), radio("step%d" % (i + 1), x, 282, 70, labels=["OFF", "ON", "ACC", "TIE"],
                                                          h=46, vertical=True, order=[2, 1, 3, 0])]
-    c += [text("Each arp step plays ON, plays with an ACCENT, holds the last note (TIE) or rests (OFF). "
-               "STEPS sets how many steps loop.", 16, 500, 17, w=1248)]
     q = [("ARP", ["arp_on", "latch", "arp_mode", "arp_rate", "arp_oct", "note_len", "arp_steps"]),
          ("STEPS 1-8", ["step%d" % (i + 1) for i in range(8)]), ("STEPS 9-16", ["step%d" % (i + 9) for i in range(8)])]
     return c, q
@@ -211,7 +203,7 @@ def page_fx():
           hl("ch_col", 332, 200, 300, "COLOUR"), tog("ch_sync", 332, 262, 300, "SYNC TO TEMPO")]
     c += [title("DELAY", 648, 70, 300), hl("dly_time", 648, 92, 300, "TIME"), hl("dly_fb", 648, 146, 300, "FEEDBACK"),
           tog("dly_sync", 648, 206, 142, "SYNC"), btn("tap", 806, 206, 142, "TAP"),
-          text("DIVISION", 648, 262, 17), popup("dly_div", 648, 284, 300, "", list_at=(648, 330), cols=2, ow=150)]
+          text("DIVISION", 648, 262, 18), popup("dly_div", 648, 284, 300, "", list_at=(648, 330), cols=2, ow=150)]
     c += mixer(980, 70)
     q = [("FX", ["drive", "drive_col", "ch_speed", "ch_depth", "ch_col", "dly_time", "dly_fb", "rev_size",
                  "rev_col", "mres", "mix_rev", "mix_ch", "mix_dly", "volume", "dly_div", "ch_sync"])]
@@ -266,7 +258,7 @@ def font(px, bold=True):
     return _fonts[k]
 
 
-def fit(text_, w, px, bold=True, minpx=14):
+def fit(text_, w, px, bold=True, minpx=17):
     """the biggest size up to px at which text fits w"""
     while px > minpx and font(px, bold).getlength(text_) > w:
         px -= 1
@@ -352,10 +344,15 @@ def _piece(fr, ang, k, A, step, colour, width, glow):
             t1 = min(t1, r)
     if t1 - t0 < 0.5:
         return
-    a, b = (px + ux * t0, py + uy * t0), (px + ux * t1, py + uy * t1)
     big = Image.new("RGBA", (w * SS, h * SS), colour + (0,))
     m = Image.new("L", (w * SS, h * SS), 0)
-    ImageDraw.Draw(m).line([(a[0] * SS, a[1] * SS), (b[0] * SS, b[1] * SS)], fill=255, width=int(width * SS))
+    dm = ImageDraw.Draw(m)
+    gap = 2.6   # dots along the line, counted from the point nearest the tile's middle
+    t = math.ceil(t0 / gap) * gap
+    while t <= t1:
+        X, Y, r = (px + ux * t) * SS, (py + uy * t) * SS, width * 0.62 * SS
+        dm.ellipse([X - r, Y - r, X + r, Y + r], fill=255)
+        t += gap
     halo = m.filter(ImageFilter.GaussianBlur(glow * SS)).point(lambda v: int(min(255, v * 1.6)))
     big.putalpha(Image.fromarray(__import__("numpy").maximum(__import__("numpy").asarray(m), __import__("numpy").asarray(halo) * 0.55).astype("uint8")))
     fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
@@ -401,6 +398,60 @@ def tile_strip():
     return strip
 
 
+def _blue_noise(w, h, md, seed=7, tries=40000):
+    """a tileable blue-noise point set (wrapping at the edges), each point with a random rank 0..1"""
+    import numpy as np, random
+    rnd = random.Random(seed)
+    pts = np.zeros((0, 2))
+    out = []
+    for _ in range(tries):
+        x, y = rnd.uniform(0, w), rnd.uniform(0, h)
+        if len(pts):
+            dx = np.abs(pts[:, 0] - x); dx = np.minimum(dx, w - dx)
+            dy = np.abs(pts[:, 1] - y); dy = np.minimum(dy, h - dy)
+            if (dx * dx + dy * dy).min() < md * md:
+                continue
+        pts = np.vstack([pts, [x, y]])
+        out.append((x, y, rnd.random()))
+    return out
+
+
+def fog_strip():
+    """the stipple layer's frames (src/screen.c screen_fog): frame = a + 4b + 16c + 64d for the levels (0..3) at the
+    tile's top-left, top-right, bottom-left and bottom-right corners. The dots shown are those whose rank is under the
+    density there (bilinear between the corners), all frames drawn from one point set, so tiles join without seams."""
+    Image, ImageDraw, ImageFilter, _ = _pil()
+    import numpy as np
+    w, h, L = G.FOG_W, G.FOG_H, G.FOG_LV
+    base = _blue_noise(w, h, 1.7)
+    strip = Image.new("RGBA", (w, h * G.FOG_FRAMES), (0, 0, 0, 0))
+    for f in range(G.FOG_FRAMES):
+        a, b, c, d_ = f % L, (f // L) % L, (f // (L * L)) % L, f // (L * L * L)
+        if f == 0:
+            continue
+        m = Image.new("L", (w * SS, h * SS), 0)
+        col = Image.new("L", (w * SS, h * SS), 0)
+        dm, dc = ImageDraw.Draw(m), ImageDraw.Draw(col)
+        for x, y, rk in base:
+            u, v = x / w, y / h
+            den = (a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d_ * u * v) / (L - 1)
+            if rk < den * 0.6:
+                r = (0.42 + 0.5 * den) * SS
+                for ox in (0, -w, w):   # dots crossing the edge show on the other side too (tileable)
+                    for oy in (0, -h, h):
+                        X, Y = (x + ox) * SS, (y + oy) * SS
+                        dm.ellipse([X - r, Y - r, X + r, Y + r], fill=255)
+                        dc.ellipse([X - r, Y - r, X + r, Y + r], fill=int(255 * den))
+        halo = m.filter(ImageFilter.GaussianBlur(1.2 * SS))
+        alpha = np.maximum(np.asarray(m, np.float32), np.asarray(halo, np.float32) * 0.45)
+        t = np.asarray(col, np.float32)[..., None] / 255.0     # denser: from deep blue to light cyan
+        lo, hi = np.array([30, 95, 230], np.float32), np.array([120, 215, 255], np.float32)
+        rgb = lo * (1 - t) + hi * t
+        fr = np.dstack([rgb, alpha]).clip(0, 255).astype("uint8")
+        strip.alpha_composite(Image.fromarray(fr, "RGBA").resize((w, h), Image.LANCZOS), (0, f * h))
+    return strip
+
+
 _paths = None
 
 
@@ -433,7 +484,15 @@ def shape_picture(idx, k, q):
     w, h = x1 - x0, y1 - y0
     m = Image.new("L", (w * SS, h * SS), 0)
     seq = [((px - x0) * SS, (py - y0) * SS) for px, py in pts]
-    ImageDraw.Draw(m).line(seq + [seq[0]], fill=255, width=int(2.4 * SS), joint="curve")
+    dm, acc, gap = ImageDraw.Draw(m), 0.0, 2.7 * SS   # dots every 2.7 px along the line
+    for (ax, ay), (bx, by) in zip(seq, seq[1:] + seq[:1]):
+        L_ = math.hypot(bx - ax, by - ay)
+        t = gap - acc
+        while t <= L_:
+            X, Y, r = ax + (bx - ax) * t / L_, ay + (by - ay) * t / L_, 1.25 * SS
+            dm.ellipse([X - r, Y - r, X + r, Y + r], fill=255)
+            t += gap
+        acc = (acc + L_) % gap
     halo = m.filter(ImageFilter.GaussianBlur(4 * SS))
     a = np.maximum(np.asarray(m, np.float32), np.minimum(255, np.asarray(halo, np.float32) * 2.2) * 0.5)
     big = Image.new("RGBA", (w * SS, h * SS), (58, 160, 255, 0))
@@ -447,10 +506,10 @@ def glass():
     import numpy as np
     w, h = G.TILE_COLS * TILE_W, G.TILE_ROWS * TILE_H
     a = np.zeros((h, w), np.float32)
-    a[::3, :] = 70
+    a[::3, :] = 28
     yy, xx = np.mgrid[0:h, 0:w]
-    v = np.clip(((xx - w / 2) / (w * 0.62)) ** 2 + ((yy - h / 2) / (h * 0.75)) ** 2 - 0.35, 0, 1) * 200
-    a = np.clip(a + v, 0, 200)
+    v = np.clip(((xx - w / 2) / (w * 0.62)) ** 2 + ((yy - h / 2) / (h * 0.75)) ** 2 - 0.45, 0, 1) * 110
+    a = np.clip(a + v, 0, 120)
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     im.putalpha(Image.fromarray(a.astype("uint8")))
     return im
@@ -695,7 +754,7 @@ def build_page(sk, page_no, comps):
             kids.append(placed(dk, key, sk.index[key], (x, y, w, HL), True, cond=cond))
         elif k == "fader":
             x, y, w, h = c["x"], c["y"], c["w"], c["h"]
-            limg = sk.save(label_img(c["label"], w, 16, INK, h=22), "vd_flab_%s.png" % key)
+            limg = sk.save(label_img(c["label"], w, 18, INK, h=24), "vd_flab_%s.png" % key)
             fh = 128
             strip = sk.save(fader_strip(28, fh), "vd_fader_%d.png" % fh)
             dk = define("vdFader_%s" % key, KNOB_ACTIONS,
@@ -797,6 +856,14 @@ def build_page(sk, page_no, comps):
                                        (sq[0] + sq[2], sq[1] + sq[3], -1, -1)):
                 d.line([(cx_, cy_), (cx_ + 14 * dx, cy_)], fill=(30, 60, 100, 255), width=2)
                 d.line([(cx_, cy_), (cx_, cy_ + 14 * dy)], fill=(30, 60, 100, 255), width=2)
+            # the stipple layer, under everything else on the screen
+            fname = sk.save(fog_strip(), "vd_dots.png")
+            fk = define("vdDots", [], [filmstrip(fname, G.FOG_FRAMES, G.FOG_W, G.FOG_H, "Vertical")], ignore=True)
+            for r in range(G.FOG_ROWS):
+                for q in range(G.FOG_COLS):
+                    i = r * G.FOG_COLS + q
+                    kids.append(placed(fk, "dots %d" % i, sk.index["f%03d" % i],
+                                       (TILES_XY[0] + q * G.FOG_W, TILES_XY[1] + r * G.FOG_H, G.FOG_W, G.FOG_H), False))
             # the built-in shapes' pictures, one shown at a time (the engine's "shape_pic")
             n = G.PIC_COUNT + 1
             for idx in range(G.PIC_SHAPES):

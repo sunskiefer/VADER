@@ -71,7 +71,10 @@ directly. So VADER's screen is built from pieces MPC can switch:
 - a grid of **32 × 16 fine tiles** for the rest: your own shapes, the 3D shapes, the orbiter's trail and the two dots.
   Each tile holds a straight piece of line at one of 24 angles and 19 positions, so a line stays straight across tiles,
   or a dot at one of 25 places, so the orbiter moves in small steps;
-- a **glass** layer on top (fine scanlines, darker edges), like a CRT;
+- a **stipple layer** under the lines: fine dots that cloud around the shape, trail behind the orbiter and gather at
+  each corner as loud as it is heard (16 x 8 tiles whose dot density blends smoothly into the next);
+- the shape and the trail drawn as **chains of dots**;
+- a light **glass** layer on top (fine scanlines, darker edges), like a CRT;
 - the **envelope**, drawn as 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE;
 - **four corner bars**, showing how much A, B, C and D you hear.
 
@@ -120,13 +123,13 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.2.1 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
+**0.3.0 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
 Force can show:
 - **CPU**: the worst case (16 voices, all four corners with ladder filters, every effect) should be measured with the
   framework's `tools/bench.sh`. The default is 8 voices.
-- **The screen**: the MAIN page has about 1050 parts (most of them the shape pictures, only one shown at a time), more
+- **The screen**: the MAIN page has about 1180 parts (most of them the shape pictures, only one shown at a time), more
   than any skin before it. If MPC finds that heavy, the grid can be made coarser.
 
 ## License

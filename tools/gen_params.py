@@ -48,6 +48,12 @@ PIC_COUNT = PIC_SHAPES * PIC_SIZES * PIC_ROTS
 SQUARE_X = 176            # the corners' square on the screen: x 176..464, y 0..288 (true proportions)
 SQUARE = 288
 ENV_COLS, ENV_ROWS = 32, 14
+# 0.3.0: the stipple layer under the lines: 16 x 8 tiles of 40 x 36 px. Each shows a cloud of dots whose density goes
+# smoothly between its 4 corners' levels (4 levels each: 256 frames), so neighbouring tiles join without seams.
+FOG_COLS, FOG_ROWS = 16, 8
+FOG_W, FOG_H = 40, 36
+FOG_LV = 4
+FOG_FRAMES = FOG_LV ** 4
 ENV_FRAMES = ENV_ROWS * (ENV_ROWS + 1) // 2
 
 # ---- per corner (x4, keys a_..d_): (field, name, default, min, max, options, int)
@@ -230,6 +236,8 @@ def build():
         add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), {"dynamic_display": True, "nudge_pct": 10})
     for k, name in TRIGGERS_LATE:
         add(k, name, 0, 0, 1, None, False, "TRIG", 0, {"momentary": True})
+    for i in range(FOG_COLS * FOG_ROWS):   # 0.3.0 (appended): the stipple layer
+        add("f%03d" % i, "DOTS %d" % (i + 1), 0, 0, FOG_FRAMES - 1, None, True, "DISP", 3000 + i)
     return params, rows, snd_slots, glob_slots
 
 
@@ -256,7 +264,8 @@ def write():
     L.append("#define NCF %d   /* fields per corner */" % len(CORNER))
     L.append("#define TILE_COLS %d\n#define TILE_ROWS %d\n#define TILE_FRAMES %d" % (TILE_COLS, TILE_ROWS, TILE_FRAMES))
     for k in ("TILE_W", "TILE_H", "SHAPE_ANG", "SHAPE_OFF", "TRAIL_ANG", "TRAIL_OFF", "DOT_NX", "DOT_NY", "PIC_SHAPES",
-              "PIC_SIZES", "PIC_ROTS", "PIC_COUNT", "SQUARE_X", "SQUARE"):
+              "PIC_SIZES", "PIC_ROTS", "PIC_COUNT", "SQUARE_X", "SQUARE", "FOG_COLS", "FOG_ROWS", "FOG_W", "FOG_H",
+              "FOG_LV", "FOG_FRAMES"):
         L.append("#define %s %d" % (k, globals()[k]))
     L.append("#define SHAPE_DSTEP %sf\n#define TRAIL_DSTEP %sf" % (SHAPE_DSTEP, TRAIL_DSTEP))
     L.append("#define ENV_COLS %d\n#define ENV_ROWS %d\n#define ENV_FRAMES %d" % (ENV_COLS, ENV_ROWS, ENV_FRAMES))

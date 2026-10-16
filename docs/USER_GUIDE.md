@@ -95,7 +95,7 @@ On every page:
 negative), **DETUNE** (unison spread), **GLIDE** (portamento).
 
 **VIBRATO / TREMOLO**: VIB SPEED and VIB DEPTH (pitch, up to a semitone; the mod wheel adds to it), TREM SPEED and
-TREM DEPTH (level). With VIB/TREM sync on (SYNC section), the speeds pick note values from 1 bar to 1/48.
+TREM DEPTH (level). With V/T sync on (SYNC section), the speeds pick note values from 1 bar to 1/48.
 
 **CORNER SELECT**: A, B, C, D or ALL: the corner the five corner knobs under the screen edit. ALL sets all four at
 once (and shows corner A's value).
@@ -103,13 +103,15 @@ once (and shows corner A's value).
 **SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in dim blue, the
 orbiter's recent path in bright cyan, the path point (amber) and the orbiter (cyan). A, B, C and D mark the corners;
 the four bars under it show how much of each you are hearing. It follows the newest note of the timbre you are editing.
-If you load a shape file, it is drawn there too.
+If you load a shape file, it is drawn there too. Under the lines, a cloud of fine dots: it gathers around the shape,
+trails behind the orbiter and fades, and grows at each corner as loud as that corner is heard.
 
-**The corner knobs** (ALT off): **OVERTONE GEN 1**, **OVERTONE GEN 2**, **OVERTONE BLEND**, **FILTER CUTOFF**,
-**FILTER RESO**, for the corner(s) picked with CORNER SELECT. With ALT on, the same knobs are **DRIVE AMOUNT**,
-**DRIVE COLOUR**, **REVERB SIZE**, **REVERB COLOUR** and **MASTER RESO** (resonance added to every corner's filter).
+**The corner knobs** (ALT off): **GEN 1**, **GEN 2** (the two overtone generators), **BLEND**, **CUTOFF**, **RESO**,
+for the corner(s) picked with CORNER SELECT. With ALT on, the same knobs are **DRIVE**, **DRV COLOUR**, **REV SIZE**,
+**REV COLOUR** and **MSTR RESO** (resonance added to every corner's filter).
 
-**DELAY TIME, DELAY FEEDBK, CHORUS SPEED, CHORUS DEPTH, CHORUS COLOUR**: see the [FX page](#fx-page).
+**DLY TIME, FEEDBACK, CH SPEED, CH DEPTH, CH COLOUR** (delay and chorus): see the [FX page](#fx-page). **V/T** under
+SYNC syncs vibrato and tremolo to the tempo.
 
 **ALT** switches the second functions. **MOTION** turns the screen's movement on or off (the sound doesn't change).
 
@@ -122,7 +124,7 @@ If you load a shape file, it is drawn there too.
   running).
 - **ORBITER**: the orbit follows MPC's tempo. While MPC plays, its position is locked to the song position, so it lands
   the same way every bar.
-- **VIB/TREM**: vibrato and tremolo speeds in note values.
+- **V/T** (vibrato / tremolo): vibrato and tremolo speeds in note values.
 - **TAP**: tap twice in time to set the delay time (with DELAY sync on, it picks the nearest note value).
 - **DELAY**, **CHORUS**: the delay time and chorus speed follow the tempo.
 

@@ -109,6 +109,7 @@ typedef struct {
     unsigned short sent_tiles[TILE_COLS * TILE_ROWS];
     unsigned char sent_env[ENV_COLS];
     int sent_pic;
+    unsigned short sent_fog[FOG_COLS * FOG_ROWS];
     unsigned char sent_w[4], sent_rd;
     int scr_wait;                /* frames until the next screen update */
     int shape_wait;
@@ -839,21 +840,40 @@ static void screen_update(vader_t *s, int force_shape) {
     if (pic != s->sent_pic) { s->sent_pic = pic; mark(s, P_SHAPE_PIC); force_shape = 1; }
     if (force_shape || s->shape_wait <= 0) {
         screen_shape(&s->scr, m->x2, m->y2, size, !pic);
+        {   /* the glow around the line, where it is drawn: the picture's size and quarter turn, or the knobs' */
+            static float gx[PATHN], gy[PATHN];
+            for (int i = 0; i < PATHN; i++) {
+                if (pic) {
+                    float c = q == 2 ? -1 : q == 0 ? 1 : 0, sn = q == 1 ? 1 : q == 3 ? -1 : 0;
+                    float bx = m->base.x[i], by = m->base.y[i];
+                    gx[i] = (bx * c - by * sn) * k / PIC_SIZES;
+                    gy[i] = (bx * sn + by * c) * k / PIC_SIZES;
+                } else {
+                    gx[i] = m->x2[i] * size;
+                    gy[i] = m->y2[i] * size;
+                }
+            }
+            screen_glow(&s->scr, gx, gy, PATHN, 1);
+        }
         s->shape_wait = m->base.is3d && P[S_SPIN] > 0.01f ? 4 : 1 << 30;   /* a turning 3D shape: redrawn 2.5 times a second */
     } else s->shape_wait--;
     screen_frame(&s->scr, fx, fy, ox, oy, motion);
     for (int i = 0; i < TILE_COLS * TILE_ROWS; i++)
         if (s->scr.tiles[i] != s->sent_tiles[i]) { s->sent_tiles[i] = s->scr.tiles[i]; mark(s, P_T000 + i); }
+    float wt[4] = {0, 0, 0, 0};
     if (motion) {
         /* the corner bars: what the sound really hears */
         float sx = best ? best->ox : ox, sy = best ? best->oy : oy;
         float u = (sx + 1) * 0.5f, w = (sy + 1) * 0.5f;
-        float wt[4] = {(1 - u) * (1 - w), u * (1 - w), (1 - u) * w, u * w};
+        wt[0] = (1 - u) * (1 - w); wt[1] = u * (1 - w); wt[2] = (1 - u) * w; wt[3] = u * w;
         for (int c = 0; c < 4; c++) {
             unsigned char qv = (unsigned char)lroundf(wt[c] * 100);
             if (qv != s->sent_w[c]) { s->sent_w[c] = qv; mark(s, P_WA + c); }
         }
     }
+    screen_fog(&s->scr, ox, oy, wt, motion);
+    for (int i = 0; i < FOG_COLS * FOG_ROWS; i++)
+        if (s->scr.fog[i] != s->sent_fog[i]) { s->sent_fog[i] = s->scr.fog[i]; mark(s, P_F000 + i); }
 }
 
 static void env_update(vader_t *s) {
@@ -929,6 +949,7 @@ static void *create(const char *data_dir) {
     for (int t = 0; t < 2; t++) timbre_shape(s, t);
     for (int t = 0; t < 2; t++) project(s, t, 0);
     memset(s->sent_tiles, 0xff, sizeof s->sent_tiles);
+    memset(s->sent_fog, 0xff, sizeof s->sent_fog);
     s->sent_pic = -1;
     memset(s->sent_env, 0xff, sizeof s->sent_env);
     memset(s->sent_w, 0xff, sizeof s->sent_w);
@@ -1198,6 +1219,8 @@ static int get_param(void *p, const char *key, char *buf, int len) {
             if (i >= P_WA && i <= P_WD) return snprintf(buf, (size_t)len, "%d", s->sent_w[i - P_WA] == 0xff ? 25 : s->sent_w[i - P_WA]);
             if (i >= P_E00 && i < P_E00 + ENV_COLS) return snprintf(buf, (size_t)len, "%d", s->sent_env[i - P_E00]);
             if (i >= P_T000 && i < P_T000 + TILE_COLS * TILE_ROWS) return snprintf(buf, (size_t)len, "%d", s->sent_tiles[i - P_T000]);
+            if (i >= P_F000 && i < P_F000 + FOG_COLS * FOG_ROWS)
+                return snprintf(buf, (size_t)len, "%d", s->sent_fog[i - P_F000] == 0xffff ? 0 : s->sent_fog[i - P_F000]);
             if (i == P_SHAPE_PIC) return snprintf(buf, (size_t)len, "%d", s->sent_pic < 0 ? 0 : s->sent_pic);
             return snprintf(buf, (size_t)len, "0");
         default: return 0;

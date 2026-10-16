@@ -5772,6 +5772,1030 @@
    "min": 0,
    "max": 1,
    "momentary": true
+  },
+  {
+   "key": "f000",
+   "name": "DOTS 1",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f001",
+   "name": "DOTS 2",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f002",
+   "name": "DOTS 3",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f003",
+   "name": "DOTS 4",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f004",
+   "name": "DOTS 5",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f005",
+   "name": "DOTS 6",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f006",
+   "name": "DOTS 7",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f007",
+   "name": "DOTS 8",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f008",
+   "name": "DOTS 9",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f009",
+   "name": "DOTS 10",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f010",
+   "name": "DOTS 11",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f011",
+   "name": "DOTS 12",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f012",
+   "name": "DOTS 13",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f013",
+   "name": "DOTS 14",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f014",
+   "name": "DOTS 15",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f015",
+   "name": "DOTS 16",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f016",
+   "name": "DOTS 17",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f017",
+   "name": "DOTS 18",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f018",
+   "name": "DOTS 19",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f019",
+   "name": "DOTS 20",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f020",
+   "name": "DOTS 21",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f021",
+   "name": "DOTS 22",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f022",
+   "name": "DOTS 23",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f023",
+   "name": "DOTS 24",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f024",
+   "name": "DOTS 25",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f025",
+   "name": "DOTS 26",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f026",
+   "name": "DOTS 27",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f027",
+   "name": "DOTS 28",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f028",
+   "name": "DOTS 29",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f029",
+   "name": "DOTS 30",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f030",
+   "name": "DOTS 31",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f031",
+   "name": "DOTS 32",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f032",
+   "name": "DOTS 33",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f033",
+   "name": "DOTS 34",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f034",
+   "name": "DOTS 35",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f035",
+   "name": "DOTS 36",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f036",
+   "name": "DOTS 37",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f037",
+   "name": "DOTS 38",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f038",
+   "name": "DOTS 39",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f039",
+   "name": "DOTS 40",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f040",
+   "name": "DOTS 41",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f041",
+   "name": "DOTS 42",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f042",
+   "name": "DOTS 43",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f043",
+   "name": "DOTS 44",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f044",
+   "name": "DOTS 45",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f045",
+   "name": "DOTS 46",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f046",
+   "name": "DOTS 47",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f047",
+   "name": "DOTS 48",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f048",
+   "name": "DOTS 49",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f049",
+   "name": "DOTS 50",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f050",
+   "name": "DOTS 51",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f051",
+   "name": "DOTS 52",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f052",
+   "name": "DOTS 53",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f053",
+   "name": "DOTS 54",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f054",
+   "name": "DOTS 55",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f055",
+   "name": "DOTS 56",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f056",
+   "name": "DOTS 57",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f057",
+   "name": "DOTS 58",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f058",
+   "name": "DOTS 59",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f059",
+   "name": "DOTS 60",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f060",
+   "name": "DOTS 61",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f061",
+   "name": "DOTS 62",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f062",
+   "name": "DOTS 63",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f063",
+   "name": "DOTS 64",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f064",
+   "name": "DOTS 65",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f065",
+   "name": "DOTS 66",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f066",
+   "name": "DOTS 67",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f067",
+   "name": "DOTS 68",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f068",
+   "name": "DOTS 69",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f069",
+   "name": "DOTS 70",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f070",
+   "name": "DOTS 71",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f071",
+   "name": "DOTS 72",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f072",
+   "name": "DOTS 73",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f073",
+   "name": "DOTS 74",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f074",
+   "name": "DOTS 75",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f075",
+   "name": "DOTS 76",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f076",
+   "name": "DOTS 77",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f077",
+   "name": "DOTS 78",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f078",
+   "name": "DOTS 79",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f079",
+   "name": "DOTS 80",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f080",
+   "name": "DOTS 81",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f081",
+   "name": "DOTS 82",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f082",
+   "name": "DOTS 83",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f083",
+   "name": "DOTS 84",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f084",
+   "name": "DOTS 85",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f085",
+   "name": "DOTS 86",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f086",
+   "name": "DOTS 87",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f087",
+   "name": "DOTS 88",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f088",
+   "name": "DOTS 89",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f089",
+   "name": "DOTS 90",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f090",
+   "name": "DOTS 91",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f091",
+   "name": "DOTS 92",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f092",
+   "name": "DOTS 93",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f093",
+   "name": "DOTS 94",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f094",
+   "name": "DOTS 95",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f095",
+   "name": "DOTS 96",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f096",
+   "name": "DOTS 97",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f097",
+   "name": "DOTS 98",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f098",
+   "name": "DOTS 99",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f099",
+   "name": "DOTS 100",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f100",
+   "name": "DOTS 101",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f101",
+   "name": "DOTS 102",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f102",
+   "name": "DOTS 103",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f103",
+   "name": "DOTS 104",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f104",
+   "name": "DOTS 105",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f105",
+   "name": "DOTS 106",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f106",
+   "name": "DOTS 107",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f107",
+   "name": "DOTS 108",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f108",
+   "name": "DOTS 109",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f109",
+   "name": "DOTS 110",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f110",
+   "name": "DOTS 111",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f111",
+   "name": "DOTS 112",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f112",
+   "name": "DOTS 113",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f113",
+   "name": "DOTS 114",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f114",
+   "name": "DOTS 115",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f115",
+   "name": "DOTS 116",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f116",
+   "name": "DOTS 117",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f117",
+   "name": "DOTS 118",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f118",
+   "name": "DOTS 119",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f119",
+   "name": "DOTS 120",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f120",
+   "name": "DOTS 121",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f121",
+   "name": "DOTS 122",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f122",
+   "name": "DOTS 123",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f123",
+   "name": "DOTS 124",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f124",
+   "name": "DOTS 125",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f125",
+   "name": "DOTS 126",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f126",
+   "name": "DOTS 127",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "f127",
+   "name": "DOTS 128",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
   }
  ]
 }
