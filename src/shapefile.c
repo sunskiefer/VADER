@@ -459,6 +459,22 @@ static int load_image(const unsigned char *buf, long len, pts_t *P, char *err, i
         }
         if (!found) break;   /* a single pixel */
     } while (!(cur == start && bd == 0) && ++steps < MAXPTS);
+    /* the traced pixels make a staircase: smooth it (three passes of a 1-2-1 average round the closed outline) */
+    if (P->n >= 8) {
+        float *tx = malloc(sizeof(float) * (size_t)P->n), *ty = malloc(sizeof(float) * (size_t)P->n);
+        if (tx && ty)
+            for (int pass = 0; pass < 3; pass++) {
+                for (int i = 0; i < P->n; i++) {
+                    int a = (i + P->n - 1) % P->n, b = (i + 1) % P->n;
+                    tx[i] = 0.25f * P->x[a] + 0.5f * P->x[i] + 0.25f * P->x[b];
+                    ty[i] = 0.25f * P->y[a] + 0.5f * P->y[i] + 0.25f * P->y[b];
+                }
+                memcpy(P->x, tx, sizeof(float) * (size_t)P->n);
+                memcpy(P->y, ty, sizeof(float) * (size_t)P->n);
+            }
+        free(tx);
+        free(ty);
+    }
     rc = P->n >= 4 ? 0 : -1;
     if (rc) snprintf(err, (size_t)errlen, "outline too short");
 out:

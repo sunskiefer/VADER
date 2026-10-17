@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1 (2026-10-17)
+
+- PNG and JPG outlines are smoothed (the traced pixels made a staircase), so a loaded picture draws as a clean line.
+- The page previews show your shape as MPC shows it once it has read the pictures VADER writes.
+
 ## 0.4.0 (2026-10-17)
 
 Not yet tested on a device.

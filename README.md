@@ -125,7 +125,7 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.4.0 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
+**0.4.1 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
 Force can show:

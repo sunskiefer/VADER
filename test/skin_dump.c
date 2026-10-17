@@ -12,7 +12,7 @@
 
 int main(int argc, char **argv) {
     const mpc_engine_t *E = mpc_engine();
-    void *s = E->create("shapes");
+    void *s = E->create(getenv("VADER_DATA") ? getenv("VADER_DATA") : "shapes");   /* VADER_DATA: a plugin folder's Shapes, to write your shape's pictures beside it */
     char b[256];
     E->set_param(s, "preset", argc > 1 ? argv[1] : "0");
     if (argc > 2 && atoi(argv[2]) >= 0) E->set_param(s, "shape", argv[2]);
@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
             if (!strcmp(b, argv[3])) break;
         }
         E->set_param(s, "load", "1");
-        for (int k = 0; k < 200; k++) {
+        for (int k = 0; k < 2000; k++) {   /* up to 10 s: writing the pictures takes a moment */
             usleep(5000);
             E->get_param(s, "file_display", b, sizeof b);
             if (strcmp(b, "LOADING...")) break;

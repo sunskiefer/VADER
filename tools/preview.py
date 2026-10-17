@@ -28,6 +28,14 @@ def dump(args):
 
 
 def main(skin, out_dir, args):
+    # a copy of the plugin folder, so a loaded shape's pictures (written by the engine, src/pictures.c) show as on MPC
+    # once it has read them again
+    import shutil, tempfile
+    tmp = tempfile.mkdtemp(prefix="vader_preview_")
+    shutil.copytree(skin, os.path.join(tmp, "Plugin Skins"))
+    shutil.copytree(os.path.join(ROOT, "shapes"), os.path.join(tmp, "Shapes"))
+    skin = os.path.join(tmp, "Plugin Skins")
+    os.environ["VADER_DATA"] = os.path.join(tmp, "Shapes")
     vals = dump(args)
     tui = json.load(open(os.path.join(skin, "TUI.json")))
     pd = tui["pageData"]
