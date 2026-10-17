@@ -69,6 +69,8 @@ typedef struct {
     float w[4];                  /* corner weights at the end of the last block */
     float ox, oy, fx, fy;        /* where its orbiter / path point is */
     float shown_t, shown_o;      /* the orbit and suborbit phases it last played (for the screen) */
+    float im[4], im_src[4];      /* the IMAGE mods: glided value; the source as last read (for the page's meters) */
+    int im_init;
     unsigned age;
 } voice_t;
 
@@ -123,6 +125,12 @@ typedef struct {
     int nfiles;
     path_t user;
     int has_user;
+    image_t img, load_img;        /* the picture under the shape (IMAGE page), from the last PNG/JPG loaded */
+    char skin_dir[600];           /* <plugin folder>/Plugin Skins: where your shape's screen pictures are written */
+    int upics;                    /* 1: the pictures of the loaded shape are written */
+    int load_upics;
+    int sent_r[3];
+    unsigned char sent_im[4];
     char user_file[1024];
     pthread_t loader;
     int loader_joinable;
@@ -273,7 +281,9 @@ static void rescan(vader_t *s) {
 
 static void *load_thread(void *arg) {
     vader_t *s = arg;
-    int rc = shape_load_file(s->load_name, &s->load_buf, s->load_err, sizeof s->load_err);
+    s->load_img.ok = 0;
+    int rc = shape_load_file(s->load_name, &s->load_buf, &s->load_img, s->load_err, sizeof s->load_err);
+    s->load_upics = !rc && !s->load_buf.is3d && s->skin_dir[0] ? write_user_pictures(s->skin_dir, &s->load_buf) : 0;
     __atomic_store_n(&s->load_state, rc ? 3 : 2, __ATOMIC_RELEASE);
     return NULL;
 }
@@ -298,6 +308,8 @@ static void collect_load(vader_t *s) {
     if (st == 2) {
         s->user = s->load_buf;
         s->has_user = 1;
+        if (s->load_img.ok) s->img = s->load_img;   /* a picture: it is the IMAGE too (an SVG or OBJ keeps the last one) */
+        s->upics = s->load_upics;
         snprintf(s->user_file, sizeof s->user_file, "%s", s->load_name);
         snprintf(s->status, sizeof s->status, "LOADED");
         for (int t = 0; t < 2; t++) {
@@ -472,6 +484,7 @@ static void voice_on(vader_t *s, int t, int note, int key, float vel) {
         (void)legato;
         if (!(int)T(t)[S_RETRIG]) memcpy(v->ph, ph, sizeof ph);   /* free-running phases: no click on a fast trill */
         for (int c = 0; c < 4; c++) v->w[c] = -1;   /* first block: no ramp from zero */
+        v->im_init = 0;
         s->last_voice = (int)(v - s->v);
     }
 }
@@ -643,6 +656,58 @@ static inline float corner_filter(voice_t *v, int c, const filt_t *f, float x) {
     }
 }
 
+/* ---- the IMAGE page: read the picture under the orbiter */
+static float img_at(const float *g, float x, float y) {   /* x, y: -1..1 over the picture (bilinear; 0 outside) */
+    float u = (x + 1) * 0.5f * IMG_N - 0.5f, w = (y + 1) * 0.5f * IMG_N - 0.5f;
+    if (u < -0.5f || w < -0.5f || u > IMG_N - 0.5f || w > IMG_N - 0.5f) return 0;
+    int i = (int)floorf(u), j = (int)floorf(w);
+    float fu = u - i, fw = w - j;
+    float a[4];
+    for (int k = 0; k < 4; k++) {
+        int ii = i + (k & 1), jj = j + (k >> 1);
+        if (ii < 0) ii = 0;
+        if (jj < 0) jj = 0;
+        if (ii > IMG_N - 1) ii = IMG_N - 1;
+        if (jj > IMG_N - 1) jj = IMG_N - 1;
+        a[k] = g[jj * IMG_N + ii];
+    }
+    return (a[0] * (1 - fu) + a[1] * fu) * (1 - fw) + (a[2] * (1 - fu) + a[3] * fu) * fw;
+}
+
+/* the six sources at the orbiter (ox, oy: on the square) for a voice: BRIGHT, HUE, COLOUR 0..1; DEPTH -1..1 (the slope
+ * it travels on); TURN 0..1 (how sharply the outline turns at the path point, t); HEADING -1..1 (up +1, down -1) */
+static void img_sources(vader_t *s, voice_t *v, timbre_t *m, float size, float rot, float ox, float oy, float t, float *src) {
+    float x = ox, y = oy;
+    if (!m->base.is3d) {   /* back onto the picture: undo ROTATE and ORBIT SIZE */
+        float c = cosf(-rot * TWO_PI), sn = sinf(-rot * TWO_PI);
+        float xx = x * c - y * sn, yy = x * sn + y * c;
+        x = xx; y = yy;
+    }
+    if (size > 0.02f) { x /= size; y /= size; }
+    int ok = s->img.ok;
+    src[0] = ok ? img_at(s->img.v, x, y) : 0;
+    src[1] = ok ? img_at(s->img.hue, x, y) : 0;
+    src[2] = ok ? img_at(s->img.sat, x, y) : 0;
+    /* DEPTH: the brightness as height, its slope along where the orbiter is going */
+    float dx = ox - v->ox, dy = oy - v->oy, d = sqrtf(dx * dx + dy * dy);
+    src[3] = 0;
+    if (ok && d > 1e-5f) {
+        float e = 2.0f / IMG_N, ux = dx / d, uy = dy / d;
+        if (!m->base.is3d) { float c = cosf(-rot * TWO_PI), sn = sinf(-rot * TWO_PI), a = ux * c - uy * sn; uy = ux * sn + uy * c; ux = a; }
+        float h1 = img_at(s->img.v, x + ux * e, y + uy * e), h0 = img_at(s->img.v, x - ux * e, y - uy * e);
+        src[3] = clampf((h1 - h0) * 3.0f, -1, 1);
+    }
+    /* the outline at the path point */
+    float ax, ay, bx, by, cx, cy;
+    path_at(m->x2, m->y2, t - 3.0f / PATHN, &ax, &ay);
+    path_at(m->x2, m->y2, t, &bx, &by);
+    path_at(m->x2, m->y2, t + 3.0f / PATHN, &cx, &cy);
+    float t1 = atan2f(by - ay, bx - ax), t2 = atan2f(cy - by, cx - bx), dt_ = fabsf(t2 - t1);
+    if (dt_ > 3.14159265f) dt_ = TWO_PI - dt_;
+    src[4] = clampf(dt_ / 3.14159265f * 1.5f, 0, 1);
+    src[5] = (fabsf(cx - ax) + fabsf(cy - ay)) > 1e-6f ? -sinf(atan2f(cy - ay, cx - ax)) : 0;
+}
+
 static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, float vib, float trem) {
     int t = v->timbre;
     const float *P = T(t);
@@ -681,6 +746,36 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     py *= size;
     float sr_ = m->sub_s * 0.6f;
     float ox = clampf(px + sr_ * cosf(TWO_PI * oo), -1, 1), oy = clampf(py + sr_ * sinf(TWO_PI * oo), -1, 1);
+    /* the IMAGE page: four MODs, each a source under the orbiter moving a sound control */
+    float im_cut = 0, im_res = 0, im_oct = 0, im_semi = 0, im_og1 = 0, im_og2 = 0, im_blend = 0, im_lvl = 1;
+    {
+        float src[6];
+        img_sources(s, v, m, size, m->rot_s, ox, oy, ot, src);
+        for (int k = 0; k < 4; k++) {
+            const float *Q = &P[S_IM1_SRC + k * 4];   /* SRC, TO, AMT, SMOOTH */
+            int si = (int)Q[0], to = (int)Q[1];
+            float amt = Q[2], target = amt * src[si < 0 ? 0 : si > 5 ? 5 : si];
+            v->im_src[k] = src[si < 0 ? 0 : si > 5 ? 5 : si];
+            float tau = 0.003f + 1.2f * Q[3] * Q[3];
+            if (!v->im_init) v->im[k] = target;
+            else v->im[k] += (1 - expf(-dt / tau)) * (target - v->im[k]);
+            float mv = v->im[k];
+            if (fabsf(amt) < 0.0005f) continue;
+            switch (to) {
+            case 0: im_cut += mv * 6; break;                        /* CUTOFF: up to 6 octaves */
+            case 1: im_res += mv; break;                            /* RESO */
+            case 2: im_oct += roundf(mv * 2); break;                /* OCTAVE: whole octaves, -2..+2 */
+            case 3: im_semi += roundf(mv * 12); break;              /* PITCH: semitones, -12..+12 */
+            case 4: im_og1 += mv; break;                            /* GEN 1 */
+            case 5: im_og2 += mv; break;                            /* GEN 2 */
+            case 6: im_blend += mv; break;                          /* BLEND */
+            default: im_lvl *= amt > 0 ? 1 - amt + mv : 1 + mv;     /* LEVEL: bright = loud (or quiet, AMOUNT below 0) */
+            }
+        }
+        v->im_init = 1;
+        if (im_lvl < 0) im_lvl = 0;
+        if (im_oct != 0 || im_semi != 0) base *= powf(2.0f, im_oct + im_semi / 12.0f);
+    }
     v->fx = px; v->fy = py; v->ox = ox; v->oy = oy;
     v->shown_t = ot; v->shown_o = oo;
     float u = (ox + 1) * 0.5f, w_ = (oy + 1) * 0.5f;
@@ -704,18 +799,18 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         inc[c][1] = f2 * INV_SR;
         mip[c][0] = tab_mip(f1);
         mip[c][1] = tab_mip(f2);
-        og[c][0] = C[CF_OG1];
-        og[c][1] = C[CF_OG2];
-        blend[c] = C[CF_BLEND];
+        og[c][0] = clampf(C[CF_OG1] + im_og1, 0, 1);
+        og[c][1] = clampf(C[CF_OG2] + im_og2, 0, 1);
+        blend[c] = clampf(C[CF_BLEND] + im_blend, 0, 1);
         mode[c] = (int)C[CF_MODE];
         fpos[c] = (int)C[CF_FPOS];
         level[c] = C[CF_LEVEL];
         on[c] = level[c] > 0.0005f && (w0[c] > 0.0005f || wt[c] > 0.0005f);
         /* filter: cutoff (with a little key tracking), resonance plus MASTER RESONANCE */
-        float hz = 20.0f * powf(2.0f, C[CF_CUTOFF] * 9.9f) * powf(base / 261.6f, 0.3f);
+        float hz = 20.0f * powf(2.0f, C[CF_CUTOFF] * 9.9f + im_cut) * powf(base / 261.6f, 0.3f);
         if (hz > 18000) hz = 18000;
         if (hz < 20) hz = 20;
-        float res = clampf(C[CF_RESO] + mres * (1 - C[CF_RESO]), 0, 1);
+        float res = clampf(C[CF_RESO] + im_res + mres * (1 - C[CF_RESO]), 0, 1);
         float g = tanf(3.14159265f * hz * INV_SR);
         F[c].type = (int)C[CF_FTYPE];
         F[c].k = 2 - 1.96f * res;
@@ -726,7 +821,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         F[c].kl = res * 3.9f;
     }
     float sh_lvl = P[S_SHAPE_OSC], sh_inc = base * INV_SR, sh_lp = clampf(base * 40 * INV_SR * TWO_PI, 0.05f, 1);
-    float amp = (1 - P[S_VELOCITY] * (1 - v->vel)) * P[S_T_VOLUME] * 0.6f * (1 - trem);
+    float amp = (1 - P[S_VELOCITY] * (1 - v->vel)) * P[S_T_VOLUME] * 0.6f * (1 - trem) * im_lvl;
     float gl = sqrtf(0.5f * (1 - v->pan)), gr = sqrtf(0.5f * (1 + v->pan));
     for (int i = 0; i < n; i++) {
         /* envelope */
@@ -796,19 +891,60 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
 }
 
 /* ------------------------------------------------------------------------------------------------ the screen */
-/* the built-in 2D shapes are ready-drawn pictures for 8 sizes and 4 quarter turns (tools/vader_skin.py): which one, or
- * 0 when the tiles draw the shape (your own file, the 3D shapes) */
-static int shape_picture(vader_t *s, int t, int *size_step, int *quarter) {
+/* The screen shows a ready-drawn picture of the shape when there is one (tools/vader_skin.py; your own 2D shape: the
+ * strips src/pictures.c wrote), else the tiles draw it. A picture is a strip per shape and size step, its frames the
+ * turns (over the shape's own symmetry) or, for CUBE and ICOSA, the spin. Returns the selector (0: none) and, through
+ * the pointers, the frame and its parameter, and the path as the picture draws it (x, y on the square) for the dots. */
+static int shape_picture(vader_t *s, int t, int *frame, int *fparam, float *px, float *py) {
     const float *P = T(t);
+    timbre_t *m = &s->tm[t];
     int idx = (int)P[S_SHAPE];
-    if (idx >= PIC_SHAPES || s->tm[t].base.is3d) return 0;
-    int k = (int)lroundf(P[S_ORB_SIZE] * PIC_SIZES);
-    if (k < 1) k = 1;
-    if (k > PIC_SIZES) k = PIC_SIZES;
-    int q = (int)lroundf(P[S_ROTATE] * PIC_ROTS) % PIC_ROTS;
-    *size_step = k;
-    *quarter = q;
-    return 1 + idx * PIC_SIZES * PIC_ROTS + (k - 1) * PIC_ROTS + q;
+    float size = P[S_ORB_SIZE], rot = m->rot_s;
+    rot -= floorf(rot);
+    *frame = 0;
+    *fparam = -1;
+    if (idx < PIC_SHAPES && !m->base.is3d) {
+        int k = (int)lroundf(size * PIC_SIZES);
+        if (k < 1) k = 1;
+        if (k > PIC_SIZES) k = PIC_SIZES;
+        int sym = PIC_SYM[idx], rots = PIC_ROT[idx];
+        float ang = rot;   /* a round shape: one frame; its path point still turns */
+        if (sym > 0) {
+            float stepw = 1.0f / sym / rots;
+            long q = lroundf(rot / stepw);
+            ang = q * stepw;
+            *frame = (int)(q % rots);
+            *fparam = rots == 6 ? 0 : rots == 8 ? 1 : 2;
+        }
+        path_project(&m->base, ang * TWO_PI, 0, 0, px, py);
+        for (int i = 0; i < PATHN; i++) { px[i] *= (float)k / PIC_SIZES; py[i] *= (float)k / PIC_SIZES; }
+        return SEL_2D + idx * PIC_SIZES + (k - 1);
+    }
+    if ((idx == 13 || idx == 14) && (rot < 0.01f || rot > 0.99f)) {   /* CUBE, ICOSA (not turned with ROTATE) */
+        int j = idx - 13, k = (int)lroundf(size * P3_SIZES), ti = (int)lroundf(P[S_TILT] * (P3_TILT - 1));
+        if (k < 1) k = 1;
+        if (k > P3_SIZES) k = P3_SIZES;
+        float yt = m->yaw / TWO_PI, stepw = 1.0f / P3_SYM[j] / P3_YAW;
+        yt -= floorf(yt);
+        long q = lroundf(yt / stepw);
+        *frame = (int)(q % P3_YAW);
+        *fparam = 2;
+        path_project(&m->base, 0, q * stepw * TWO_PI, (float)ti / (P3_TILT - 1) * 1.5707963f, px, py);
+        for (int i = 0; i < PATHN; i++) { px[i] *= (float)k / P3_SIZES; py[i] *= (float)k / P3_SIZES; }
+        return SEL_3D + (j * P3_SIZES + (k - 1)) * P3_TILT + ti;
+    }
+    if (idx == SHAPE_USER && s->has_user && s->upics && !m->base.is3d) {
+        int k = (int)lroundf(size * U_SIZES);
+        if (k < 1) k = 1;
+        if (k > U_SIZES) k = U_SIZES;
+        long q = lroundf(rot * U_ROT);
+        *frame = (int)(q % U_ROT);
+        *fparam = 1;
+        path_project(&m->base, q * TWO_PI / U_ROT, 0, 0, px, py);
+        for (int i = 0; i < PATHN; i++) { px[i] *= (float)k / U_SIZES; py[i] *= (float)k / U_SIZES; }
+        return SEL_USER + (k - 1);
+    }
+    return 0;
 }
 
 static void screen_update(vader_t *s, int force_shape) {
@@ -821,42 +957,44 @@ static void screen_update(vader_t *s, int force_shape) {
     for (int i = 0; i < MAXV; i++)
         if (s->v[i].active && s->v[i].timbre == t && (!best || s->v[i].age > best->age)) best = &s->v[i];
     float ot = best ? best->shown_t : m->orb_t, oo = best ? best->shown_o : m->orb_o;
-    float sr_ = P[S_SUB_SIZE] * 0.6f, size = P[S_ORB_SIZE];
-    int k = 0, q = 0, pic = shape_picture(s, t, &k, &q);
+    float sr_ = m->sub_s * 0.6f, size = P[S_ORB_SIZE];
+    static float qx[PATHN], qy[PATHN];
+    int frame = 0, fparam = -1, pic = shape_picture(s, t, &frame, &fparam, qx, qy);
     float fx, fy;
-    if (pic) {
-        /* on the picture: the path at the picture's size and quarter turn (the sound uses the knobs' exact values) */
-        float bx, by;
-        path_at(m->base.x, m->base.y, ot, &bx, &by);
-        float c = q == 1 ? 0 : q == 3 ? 0 : q == 2 ? -1 : 1, sn = q == 1 ? 1 : q == 3 ? -1 : 0;
-        fx = (bx * c - by * sn) * k / PIC_SIZES;
-        fy = (bx * sn + by * c) * k / PIC_SIZES;
-    } else {
+    if (pic) path_at(qx, qy, ot, &fx, &fy);   /* on the picture's path */
+    else {
         path_at(m->x2, m->y2, ot, &fx, &fy);
         fx *= size;
         fy *= size;
     }
     float ox = clampf(fx + sr_ * cosf(TWO_PI * oo), -1, 1), oy = clampf(fy + sr_ * sinf(TWO_PI * oo), -1, 1);
     if (pic != s->sent_pic) { s->sent_pic = pic; mark(s, P_SHAPE_PIC); force_shape = 1; }
+    if (fparam >= 0 && frame != s->sent_r[fparam]) { s->sent_r[fparam] = frame; mark(s, P_PIC_R6 + fparam); }
     if (force_shape || s->shape_wait <= 0) {
         screen_shape(&s->scr, m->x2, m->y2, size, !pic);
-        s->shape_wait = m->base.is3d && P[S_SPIN] > 0.01f ? 4 : 1 << 30;   /* a turning 3D shape: redrawn 2.5 times a second */
+        s->shape_wait = m->base.is3d && P[S_SPIN] > 0.01f && !pic ? 10 : 1 << 30;   /* a turning 3D shape the tiles draw: 2.5 times a second */
     } else s->shape_wait--;
     screen_frame(&s->scr, fx, fy, ox, oy, motion);
     for (int i = 0; i < TILE_COLS * TILE_ROWS; i++)
         if (s->scr.tiles[i] != s->sent_tiles[i]) { s->sent_tiles[i] = s->scr.tiles[i]; mark(s, P_T000 + i); }
-    float wt[4] = {0, 0, 0, 0};
     if (motion) {
         /* the corner bars: what the sound really hears */
         float sx = best ? best->ox : ox, sy = best ? best->oy : oy;
         float u = (sx + 1) * 0.5f, w = (sy + 1) * 0.5f;
-        wt[0] = (1 - u) * (1 - w); wt[1] = u * (1 - w); wt[2] = (1 - u) * w; wt[3] = u * w;
+        float wt[4] = {(1 - u) * (1 - w), u * (1 - w), (1 - u) * w, u * w};
         for (int c = 0; c < 4; c++) {
             unsigned char qv = (unsigned char)lroundf(wt[c] * 100);
             if (qv != s->sent_w[c]) { s->sent_w[c] = qv; mark(s, P_WA + c); }
         }
+        /* the IMAGE page's meters: each MOD's source as the newest voice reads it */
+        for (int k = 0; k < 4; k++) {
+            float v = best ? best->im_src[k] : 0;
+            int si = (int)P[S_IM1_SRC + k * 4];
+            if (si == 3 || si == 5) v = 0.5f + 0.5f * v;   /* DEPTH, HEADING: -1..1, 50 in the middle */
+            unsigned char qv = (unsigned char)lroundf(clampf(v, 0, 1) * 100);
+            if (qv != s->sent_im[k]) { s->sent_im[k] = qv; mark(s, P_IM_M1 + k); }
+        }
     }
-
 }
 
 static void env_update(vader_t *s) {
@@ -923,6 +1061,8 @@ static void *create(const char *data_dir) {
         if (bl > 7 && !strcmp(base + bl - 7, "/Shapes")) base[bl - 7] = 0;
         else if (!strcmp(base, "Shapes") || !strcmp(base, "shapes")) snprintf(base, sizeof base, ".");
         snprintf(s->pdir, sizeof s->pdir, "%s/User Presets", base);
+        snprintf(s->skin_dir, sizeof s->skin_dir, "%s/Plugin Skins", base);
+        if (access(s->skin_dir, W_OK) != 0) s->skin_dir[0] = 0;   /* no skin folder here (tests): don't write */
     }
     memcpy(s->g, GLOB_DEF, sizeof s->g);
     memcpy(T(0), SND_DEF, sizeof(float) * NSND);
@@ -938,6 +1078,8 @@ static void *create(const char *data_dir) {
     }
     memset(s->sent_tiles, 0xff, sizeof s->sent_tiles);
     s->sent_pic = -1;
+    for (int k = 0; k < 3; k++) s->sent_r[k] = -1;
+    memset(s->sent_im, 0xff, sizeof s->sent_im);
     memset(s->sent_env, 0xff, sizeof s->sent_env);
     memset(s->sent_w, 0xff, sizeof s->sent_w);
     s->sent_rd = 0xff;
@@ -1206,6 +1348,8 @@ static int get_param(void *p, const char *key, char *buf, int len) {
             if (i >= P_WA && i <= P_WD) return snprintf(buf, (size_t)len, "%d", s->sent_w[i - P_WA] == 0xff ? 25 : s->sent_w[i - P_WA]);
             if (i >= P_E00 && i < P_E00 + ENV_COLS) return snprintf(buf, (size_t)len, "%d", s->sent_env[i - P_E00]);
             if (i >= P_T000 && i < P_T000 + TILE_COLS * TILE_ROWS) return snprintf(buf, (size_t)len, "%d", s->sent_tiles[i - P_T000]);
+            if (i >= P_PIC_R6 && i <= P_PIC_R12) return snprintf(buf, (size_t)len, "%d", s->sent_r[i - P_PIC_R6] < 0 ? 0 : s->sent_r[i - P_PIC_R6]);
+            if (i >= P_IM_M1 && i <= P_IM_M4) return snprintf(buf, (size_t)len, "%d", s->sent_im[i - P_IM_M1] == 0xff ? 0 : s->sent_im[i - P_IM_M1]);
             if (i == P_SHAPE_PIC) return snprintf(buf, (size_t)len, "%d", s->sent_pic < 0 ? 0 : s->sent_pic);
             return snprintf(buf, (size_t)len, "0");
         default: return 0;
@@ -1351,10 +1495,10 @@ static void render(void *p, int16_t *out, int frames) {
         out[2 * i] = (int16_t)(l > 32767 ? 32767 : l < -32768 ? -32768 : l);
         out[2 * i + 1] = (int16_t)(r > 32767 ? 32767 : r < -32768 ? -32768 : r);
     }
-    /* ---- the screen, ten times a second */
+    /* ---- the screen, 25 times a second */
     s->scr_wait -= frames;
     if (s->scr_wait <= 0) {
-        s->scr_wait += 4410;
+        s->scr_wait += 1764;   /* 25 times a second (the wrapper reports changes as often) */
         screen_update(s, 0);
     }
 }

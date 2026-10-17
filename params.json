@@ -5744,7 +5744,7 @@
    "name": "SHAPE PICTURE",
    "default": 0,
    "min": 0,
-   "max": 416,
+   "max": 182,
    "display": "int"
   },
   {
@@ -5772,6 +5772,302 @@
    "min": 0,
    "max": 1,
    "momentary": true
+  },
+  {
+   "key": "pic_r6",
+   "name": "PICTURE TURN 6",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "display": "int"
+  },
+  {
+   "key": "pic_r8",
+   "name": "PICTURE TURN 8",
+   "default": 0,
+   "min": 0,
+   "max": 7,
+   "display": "int"
+  },
+  {
+   "key": "pic_r12",
+   "name": "PICTURE TURN 12",
+   "default": 0,
+   "min": 0,
+   "max": 11,
+   "display": "int"
+  },
+  {
+   "key": "im1_src",
+   "name": "MOD 1 SOURCE",
+   "options": [
+    "BRIGHT",
+    "HUE",
+    "COLOUR",
+    "DEPTH",
+    "TURN",
+    "HEADING"
+   ],
+   "default": "BRIGHT"
+  },
+  {
+   "key": "im1_to",
+   "name": "MOD 1 TO",
+   "options": [
+    "CUTOFF",
+    "RESO",
+    "OCTAVE",
+    "PITCH",
+    "GEN 1",
+    "GEN 2",
+    "BLEND",
+    "LEVEL"
+   ],
+   "default": "CUTOFF"
+  },
+  {
+   "key": "im1_amt",
+   "name": "MOD 1 AMOUNT",
+   "default": 0.0,
+   "min": -1,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "im1_smooth",
+   "name": "MOD 1 SMOOTH",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "im2_src",
+   "name": "MOD 2 SOURCE",
+   "options": [
+    "BRIGHT",
+    "HUE",
+    "COLOUR",
+    "DEPTH",
+    "TURN",
+    "HEADING"
+   ],
+   "default": "TURN"
+  },
+  {
+   "key": "im2_to",
+   "name": "MOD 2 TO",
+   "options": [
+    "CUTOFF",
+    "RESO",
+    "OCTAVE",
+    "PITCH",
+    "GEN 1",
+    "GEN 2",
+    "BLEND",
+    "LEVEL"
+   ],
+   "default": "CUTOFF"
+  },
+  {
+   "key": "im2_amt",
+   "name": "MOD 2 AMOUNT",
+   "default": 0.0,
+   "min": -1,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "im2_smooth",
+   "name": "MOD 2 SMOOTH",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "im3_src",
+   "name": "MOD 3 SOURCE",
+   "options": [
+    "BRIGHT",
+    "HUE",
+    "COLOUR",
+    "DEPTH",
+    "TURN",
+    "HEADING"
+   ],
+   "default": "HUE"
+  },
+  {
+   "key": "im3_to",
+   "name": "MOD 3 TO",
+   "options": [
+    "CUTOFF",
+    "RESO",
+    "OCTAVE",
+    "PITCH",
+    "GEN 1",
+    "GEN 2",
+    "BLEND",
+    "LEVEL"
+   ],
+   "default": "BLEND"
+  },
+  {
+   "key": "im3_amt",
+   "name": "MOD 3 AMOUNT",
+   "default": 0.0,
+   "min": -1,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "im3_smooth",
+   "name": "MOD 3 SMOOTH",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "im4_src",
+   "name": "MOD 4 SOURCE",
+   "options": [
+    "BRIGHT",
+    "HUE",
+    "COLOUR",
+    "DEPTH",
+    "TURN",
+    "HEADING"
+   ],
+   "default": "DEPTH"
+  },
+  {
+   "key": "im4_to",
+   "name": "MOD 4 TO",
+   "options": [
+    "CUTOFF",
+    "RESO",
+    "OCTAVE",
+    "PITCH",
+    "GEN 1",
+    "GEN 2",
+    "BLEND",
+    "LEVEL"
+   ],
+   "default": "PITCH"
+  },
+  {
+   "key": "im4_amt",
+   "name": "MOD 4 AMOUNT",
+   "default": 0.0,
+   "min": -1,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "im4_smooth",
+   "name": "MOD 4 SMOOTH",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "im_m1",
+   "name": "MOD 1 NOW",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "im_m2",
+   "name": "MOD 2 NOW",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "im_m3",
+   "name": "MOD 3 NOW",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "im_m4",
+   "name": "MOD 4 NOW",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "im1_src__open",
+   "name": "im1_src list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "im1_src"
+  },
+  {
+   "key": "im1_to__open",
+   "name": "im1_to list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "im1_to"
+  },
+  {
+   "key": "im2_src__open",
+   "name": "im2_src list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "im2_src"
+  },
+  {
+   "key": "im2_to__open",
+   "name": "im2_to list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "im2_to"
+  },
+  {
+   "key": "im3_src__open",
+   "name": "im3_src list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "im3_src"
+  },
+  {
+   "key": "im3_to__open",
+   "name": "im3_to list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "im3_to"
+  },
+  {
+   "key": "im4_src__open",
+   "name": "im4_src list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "im4_src"
+  },
+  {
+   "key": "im4_to__open",
+   "name": "im4_to list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "im4_to"
   }
  ]
 }

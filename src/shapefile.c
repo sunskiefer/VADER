@@ -343,7 +343,29 @@ out:
 }
 
 /* ------------------------------------------------------------------------------------------------ PNG / JPG */
-static int load_image(const unsigned char *buf, long len, pts_t *P, char *err, int errlen) {
+/* the picture kept for the IMAGE page, until the outline is fitted (shape_load_file) */
+typedef struct { unsigned char *rgba; int w, h, sc; } picture_t;
+
+/* a colour's place (0..1) on a spectrogram's colour scale: black, deep blue, purple, red, orange, yellow, white.
+ * A grey picture reads as its brightness; a colourful one by where its colours sit on the scale. */
+static float spectro(float r, float g, float b) {
+    static const float C[7][3] = {{0, 0, 0}, {10, 20, 150}, {120, 10, 160}, {220, 30, 60}, {255, 140, 0}, {255, 230, 40}, {255, 255, 255}};
+    static const float T[7] = {0, 0.15f, 0.3f, 0.5f, 0.7f, 0.85f, 1};
+    float best = 1e30f, bt = 0;
+    for (int i = 0; i < 6; i++) {
+        float d[3], e[3], dd = 0, de = 0;
+        for (int k = 0; k < 3; k++) { d[k] = C[i + 1][k] - C[i][k]; e[k] = (k == 0 ? r : k == 1 ? g : b) - C[i][k]; dd += d[k] * d[k]; de += d[k] * e[k]; }
+        float u = dd > 0 ? de / dd : 0;
+        if (u < 0) u = 0;
+        if (u > 1) u = 1;
+        float q = 0;
+        for (int k = 0; k < 3; k++) { float x = e[k] - u * d[k]; q += x * x; }
+        if (q < best) { best = q; bt = T[i] + (T[i + 1] - T[i]) * u; }
+    }
+    return bt;
+}
+
+static int load_image(const unsigned char *buf, long len, pts_t *P, char *err, int errlen, picture_t *pic) {
     int w, h, ch;
     unsigned char *img = stbi_load_from_memory(buf, (int)len, &w, &h, &ch, 4);
     if (!img) { snprintf(err, (size_t)errlen, "can't read the picture"); return -1; }
@@ -413,20 +435,30 @@ static int load_image(const unsigned char *buf, long len, pts_t *P, char *err, i
     int start = -1;
     for (int i = 0; i < W2 * H2 && start < 0; i++)
         if (lab[i] == bestlab) start = i;
+    /* Moore-neighbour tracing, clockwise (on screen, y down), with Jacob's stop: done when the start is entered
+     * again from the same side. bd: the direction from the current pixel to the one checked just before it. */
     static const int dx[8] = {-1, -1, 0, 1, 1, 1, 0, -1}, dy[8] = {0, -1, -1, -1, 0, 1, 1, 1};
-    int cur = start, dir = 0, steps = 0;
+    int cur = start, bd = 0, steps = 0;   /* the start is the region's first pixel in reading order: west of it is empty */
     do {
         put(P, (float)(cur % W2), (float)(cur / W2), 0);
         int found = 0;
-        for (int k = 0; k < 8; k++) {
-            int d = (dir + 6 + k) % 8;   /* start looking back-left of where we came from */
+        for (int k = 1; k <= 8; k++) {
+            int d = (bd + k) % 8;
             int nx = cur % W2 + dx[d], ny = cur / W2 + dy[d];
             if (nx < 0 || ny < 0 || nx >= W2 || ny >= H2) continue;
             int ni = ny * W2 + nx;
-            if (lab[ni] == bestlab) { cur = ni; dir = d; found = 1; break; }
+            if (lab[ni] == bestlab) {
+                int pd = (d + 7) % 8;   /* the pixel checked before it, seen from the new one */
+                int bx = cur % W2 + dx[pd] - nx, by = cur / W2 + dy[pd] - ny;
+                for (int q = 0; q < 8; q++)
+                    if (dx[q] == bx && dy[q] == by) { bd = q; break; }
+                cur = ni;
+                found = 1;
+                break;
+            }
         }
-        if (!found) break;
-    } while (cur != start && ++steps < MAXPTS);
+        if (!found) break;   /* a single pixel */
+    } while (!(cur == start && bd == 0) && ++steps < MAXPTS);
     rc = P->n >= 4 ? 0 : -1;
     if (rc) snprintf(err, (size_t)errlen, "outline too short");
 out:
@@ -434,7 +466,8 @@ out:
     free(fg);
     free(lab);
     free(queue);
-    stbi_image_free(img);
+    if (!rc && pic) { pic->rgba = img; pic->w = w; pic->h = h; pic->sc = sc; }   /* kept for the IMAGE page */
+    else stbi_image_free(img);
     return rc;
 }
 
@@ -443,7 +476,7 @@ static int ends_with(const char *s, const char *ext) {
     return a >= b && !strcasecmp(s + a - b, ext);
 }
 
-int shape_load_file(const char *path, path_t *out, char *err, int errlen) {
+int shape_load_file(const char *path, path_t *out, image_t *imgout, char *err, int errlen) {
     long len = 0;
     char *buf = slurp(path, &len);
     err[0] = 0;
@@ -454,11 +487,12 @@ int shape_load_file(const char *path, path_t *out, char *err, int errlen) {
     P.z = malloc(sizeof(float) * MAXPTS);
     P.n = 0;
     int rc = -1, is3d = 0, closed = 1;
+    picture_t pic = {0};
     if (!P.x || !P.y || !P.z) goto out;
     if (ends_with(path, ".svg")) rc = load_svg(buf, len, &P);
     else if (ends_with(path, ".obj")) { rc = load_obj(buf, len, &P); is3d = 1; closed = 0; }
     else if (ends_with(path, ".png") || ends_with(path, ".jpg") || ends_with(path, ".jpeg"))
-        rc = load_image((const unsigned char *)buf, len, &P, err, errlen);
+        rc = load_image((const unsigned char *)buf, len, &P, err, errlen, &pic);
     else snprintf(err, (size_t)errlen, "not an SVG, OBJ, PNG or JPG");
     if (rc) {
         if (!err[0]) snprintf(err, (size_t)errlen, "no lines found in the file");
@@ -478,6 +512,30 @@ int shape_load_file(const char *path, path_t *out, char *err, int errlen) {
             P.x[i] = (P.x[i] - (x0 + x1) / 2) / s;
             P.y[i] = (P.y[i] - (y0 + y1) / 2) / s;
         }
+        if (pic.rgba && imgout) {   /* the picture, laid under the outline: IMG_N x IMG_N over -1..1 */
+            for (int gy = 0; gy < IMG_N; gy++)
+                for (int gx = 0; gx < IMG_N; gx++) {
+                    float u = -1 + (gx + 0.5f) * 2.0f / IMG_N, v = -1 + (gy + 0.5f) * 2.0f / IMG_N;
+                    float px = ((x0 + x1) / 2 + u * s - 1 + 0.5f) * pic.sc, py = ((y0 + y1) / 2 + v * s - 1 + 0.5f) * pic.sc;
+                    int ix = (int)px, iy = (int)py;
+                    float val = 0, hue = 0, sat = 0;
+                    if (ix >= 0 && iy >= 0 && ix < pic.w && iy < pic.h) {
+                        const unsigned char *q = pic.rgba + 4 * (iy * pic.w + ix);
+                        float al = q[3] / 255.0f, r = q[0] / 255.0f, g = q[1] / 255.0f, b = q[2] / 255.0f;
+                        val = spectro(q[0], q[1], q[2]) * al;
+                        float mx = fmaxf(r, fmaxf(g, b)), mn = fminf(r, fminf(g, b)), c = mx - mn;
+                        sat = mx > 0 ? c / mx * al : 0;   /* how colourful */
+                        if (c > 1e-4f) {                  /* where round the colour wheel: 0 red .. 1 back to red */
+                            float hh = mx == r ? fmodf((g - b) / c + 6, 6) : mx == g ? (b - r) / c + 2 : (r - g) / c + 4;
+                            hue = hh / 6;
+                        }
+                    }
+                    imgout->v[gy * IMG_N + gx] = val;
+                    imgout->hue[gy * IMG_N + gx] = hue;
+                    imgout->sat[gy * IMG_N + gx] = sat;
+                }
+            imgout->ok = 1;
+        }
     }
     path_resample(P.x, P.y, P.z, P.n, closed, is3d, out);
     {
@@ -485,6 +543,7 @@ int shape_load_file(const char *path, path_t *out, char *err, int errlen) {
         snprintf(out->name, sizeof out->name, "%s", b ? b + 1 : path);
     }
 out:
+    if (pic.rgba) stbi_image_free(pic.rgba);
     free(P.x);
     free(P.y);
     free(P.z);

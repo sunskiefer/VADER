@@ -1,13 +1,14 @@
 # VADER user guide
 
 VADER is an orbit-based vector synthesizer for MPC OS (Akai Force, MPC). This guide goes through how it makes sound,
-every page and control, the Q-Links, shapes of your own, and some recipes.
+every page and control, the Q-Links, shapes and pictures of your own, and some recipes.
 
 - [How VADER makes sound](#how-vader-makes-sound)
 - [The strip at the top](#the-strip-at-the-top)
 - [MAIN page](#main-page)
 - [CORNERS page](#corners-page)
 - [ORBIT page](#orbit-page)
+- [IMAGE page](#image-page)
 - [ARP page](#arp-page)
 - [FX page](#fx-page)
 - [Your own shapes](#your-own-shapes)
@@ -100,11 +101,19 @@ TREM DEPTH (level). With V/T sync on (SYNC section), the speeds pick note values
 **CORNER SELECT**: A, B, C, D or ALL: the corner the five corner knobs under the screen edit. ALL sets all four at
 once (and shows corner A's value).
 
-**SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in dim blue, the
-the path point (amber) and the orbiter (cyan). A, B, C and D mark the corners;
-the four bars under it show how much of each you are hearing. It follows the newest note of the timbre you are editing.
-If you load a shape file, it is drawn there too.
-The orbiter's recent path (the suborbit's trail) is the bright cyan line behind it.
+**SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in blue, the path
+point (amber) and the orbiter (cyan), with the suborbit's trail (the orbiter's recent path) as a bright cyan line behind
+it. A, B, C and D mark the corners; the four bars under it show how much of each you are hearing. It follows the newest
+note of the timbre you are editing, and moves 25 times a second.
+
+How the shape is drawn:
+- **Built-in 2D shapes** are ready-drawn pictures: 12 size steps and fine turn steps (a STAR every 12 degrees, a
+  SQUARE every 15, a HEART every 45), so ORBIT SIZE and ROTATE move the picture in small steps.
+- **CUBE and ICOSA** are ready-drawn while they spin (12 frames per repeat of the shape, 3 sizes, 3 tilt steps). Turn
+  ROTATE away from 0 and the tiles draw them instead.
+- **Your own 2D shape** is drawn by VADER into its skin folder when you load it. MPC may show these pictures only after
+  you close the plugin window and open it again (see [Your own shapes](#your-own-shapes)). Until then, and for OBJ
+  files, a grid of small line pieces draws it.
 
 **The corner knobs** (ALT off): **GEN 1**, **GEN 2** (the two overtone generators), **BLEND**, **CUTOFF**, **RESO**,
 for the corner(s) picked with CORNER SELECT. With ALT on, the same knobs are **DRIVE**, **DRV COLOUR**, **REV SIZE**,
@@ -114,6 +123,8 @@ for the corner(s) picked with CORNER SELECT. With ALT on, the same knobs are **D
 SYNC syncs vibrato and tremolo to the tempo.
 
 **ALT** switches the second functions. **MOTION** turns the screen's movement on or off (the sound doesn't change).
+
+ORBIT SIZE, SUBORBIT SIZE and ROTATE glide to a new value in about 40 ms, so turning them never clicks.
 
 **MIXER**: REVERB, CHORUS and DELAY levels, and VOLUME (the master).
 
@@ -160,6 +171,90 @@ pitch and stereo).
 [Two timbres](#two-timbres).
 
 **MY PRESETS**: SLOT, SAVE, LOAD: your own presets, 999 slots. See [Presets and saving](#presets-and-saving).
+
+## IMAGE page
+
+![IMAGE](img/image.png)
+
+The IMAGE page lets a **picture** play the sound. Load a PNG or JPG and the orbiter doesn't only follow its outline: as it
+moves, VADER reads the picture under it (how bright, which colour, how colourful, uphill or downhill) and the shape of
+the outline at that point (how sharply it turns, which way it runs). Four **MODs** turn those readings into movement of
+the sound: the filter, the pitch, the overtone generators, the blend or the level.
+
+Nothing happens until you raise a MOD's AMOUNT: every AMOUNT starts at 0, so the presets sound as before.
+
+### Loading a picture
+
+**PICTURE**: FILE, **LOAD**, **RESCAN**: the same file list as the ORBIT page. Load a PNG or JPG: its outline becomes the
+USER shape, and the picture itself becomes the **IMAGE** the MODs read. The picture stays the IMAGE when you pick another
+SHAPE (a STAR orbiting over your photo works) and until you load another PNG or JPG. Loading an SVG or OBJ changes the
+shape but keeps the last picture.
+
+The picture lies under its own outline: it is fitted to the square the same way, and it turns with ROTATE and grows with
+ORBIT SIZE together with the shape. Where the orbiter leaves the picture, it reads black (0).
+
+### The four MODs
+
+Each MOD has four controls:
+- **FROM**: what it reads (the source, below).
+- **TO**: what it changes (the destination, below).
+- **AMOUNT**: how much, from -100 to +100. Below 0 it works the other way round (brighter = lower cutoff, for example).
+- **SMOOTH**: how fast it follows. Low: every detail of the picture, quick and rhythmic. High: slow sweeps, up to about a
+  second. TURN and OCTAVE usually want a low SMOOTH; HUE and DEPTH sound best with some.
+
+**NOW** shows the source live, as the newest note reads it: watch it while you play to see what the picture is doing.
+DEPTH and HEADING sit in the middle (50) when flat or level.
+
+### FROM: the sources
+
+| Source | What it reads | Range | Use it for |
+|---|---|---|---|
+| **BRIGHT** | the picture's brightness under the orbiter, on a **spectrogram colour scale**: black 0, deep blue, purple, red, orange, yellow, white 100. A grey picture reads as its brightness; a coloured one by where its colours sit on that scale. | 0 to 100 | the filter opening in the light parts and closing in the dark; louder in bright areas |
+| **HUE** | where the colour sits round the colour wheel: red 0, yellow, green, cyan, blue, magenta, back to red at 100. Grey reads 0. | 0 to 100 | different colours, different notes or blends: a rainbow picture becomes a melody with TO PITCH |
+| **COLOUR** | how colourful: grey and black 0, a pure colour 100 | 0 to 100 | colourful parts of the picture pushing the sound further (more GEN 2, more resonance) |
+| **DEPTH** | the picture as a landscape (bright = high, dark = low): the slope the orbiter is travelling on. Going uphill reads above 50, downhill below. | -100 to +100 | sounds that climb and dive as the orbiter crosses the picture: TO PITCH or TO CUTOFF |
+| **TURN** | how sharply the outline turns at the path point: a straight line 0, a sharp corner 100 | 0 to 100 | a filter accent at every corner of the shape: a STAR gives five per orbit, in time with ORBITER sync |
+| **HEADING** | which way the outline is running: up +100, sideways 0 (50 on the meter), down -100 | -100 to +100 | a sound that rises on the way up the shape and falls on the way down |
+
+TURN and HEADING read the **outline**, so they work with every shape, built-in or your own, with or without a picture.
+BRIGHT, HUE, COLOUR and DEPTH need a picture (PNG or JPG) loaded.
+
+### TO: the destinations
+
+| Destination | What it changes | At AMOUNT 100 |
+|---|---|---|
+| **CUTOFF** | every corner's filter cutoff | up to 6 octaves higher |
+| **RESO** | every corner's filter resonance | up to full resonance added |
+| **OCTAVE** | the pitch, in **whole octaves** | up to 2 octaves (it jumps, it doesn't slide) |
+| **PITCH** | the pitch, in **semitones** | up to 12 semitones (it jumps from note to note) |
+| **GEN 1** | every corner's OVERTONE GEN 1 (which overtone pattern) | across the whole range |
+| **GEN 2** | every corner's OVERTONE GEN 2 | across the whole range |
+| **BLEND** | every corner's BLEND (how much GEN 2 mixes or modulates GEN 1) | across the whole range |
+| **LEVEL** | the volume | AMOUNT above 0: quiet where the source is low, full where it is high. Below 0: the opposite. |
+
+The MODs add to where the knobs are: set the knobs for the sound in the dark parts of the picture, and the MOD for how
+far the bright parts take it. Two MODs can go to the same place (their amounts add up).
+
+The MODs are part of the timbre: each timbre (A and B) has its own four, saved with the project and in MY PRESETS.
+
+### Starting points
+
+- **A picture plays the filter**: load `crescent.png`. MOD 1: FROM BRIGHT, TO CUTOFF, AMOUNT +60, SMOOTH 20. Set the
+  CUTOFF knobs (MAIN page) low. The sound opens wherever the orbiter crosses the white, and closes on the crescent.
+  Raise SUBORBIT SIZE: the suborbit dips in and out of the bright area, a rhythmic wah.
+- **Accents on the corners**: shape STAR, ORBITER sync on, SYNC TO 1 BAR. MOD 2: FROM TURN, TO CUTOFF, AMOUNT +70,
+  SMOOTH 10: five filter hits per bar. Try TO RESO, or TO LEVEL at AMOUNT -50 for a gated feel.
+- **A melody from colours**: load a colourful picture (stripes of colour work best). MOD 3: FROM HUE, TO PITCH, AMOUNT
+  +40, SMOOTH 0: each colour band is a different note. ORBIT SPEED sets the tempo of the melody.
+- **Hills and valleys**: load a photo with soft light and dark areas. MOD 4: FROM DEPTH, TO PITCH, AMOUNT +25, SMOOTH
+  40, or TO CUTOFF for a sweep that follows the landscape.
+- **Octave jumps**: FROM BRIGHT, TO OCTAVE, AMOUNT +50, SMOOTH 0: one octave up in the bright parts.
+- **The character of the sound from the picture**: FROM COLOUR, TO GEN 2, AMOUNT +50; FROM BRIGHT, TO RESO, AMOUNT +40:
+  vivid areas change the overtones, bright areas ring.
+- **Breathing level**: FROM BRIGHT, TO LEVEL, AMOUNT +80, SMOOTH 50: the sound swells in the light and fades in the dark.
+
+Pictures that work well: high contrast, big areas of light and dark or of colour, not too much fine detail (the picture is
+read at 64 x 64 points). Simple bold shapes still give the cleanest outline.
 
 ## ARP page
 
@@ -215,7 +310,23 @@ Tips:
   change which corners it visits.
 - The project saves the file's name. When it opens again, VADER loads the file again; if it has gone (or the card is
   out), the timbre plays a CIRCLE.
-- On the screen, your shapes and the 3D shapes are drawn with the fine tiles; the built-in 2D shapes as crisp pictures.
+- A PNG or JPG is also the IMAGE the [IMAGE page](#image-page) reads.
+
+### Your shape on the screen (an experiment)
+
+When you load a 2D shape (SVG, PNG, JPG), VADER draws its outline the way the built-in shapes are drawn (8 sizes, 8 turns)
+and writes those pictures into its own skin folder (`L'Cronx - VST - VADER/Plugin Skins/vd_user_1.png` to
+`vd_user_8.png`). Loading takes a moment longer (the field shows LOADING...).
+
+MPC reads a plugin's pictures when the plugin window opens, so:
+1. LOAD the file.
+2. Close the VADER window and open it again.
+3. If MPC read the new pictures, your shape is now drawn as crisply as the built-in ones.
+
+If it still shows the old pictures, MPC keeps what it loaded until something else makes it read them again (opening a
+project, restarting MPC). Please report what you see: it decides whether this stays.
+
+If the plugin's folder can't be written, VADER skips this and the screen draws your shape with line pieces as before.
 
 Examples included: `lightning.svg`, `infinity.svg`, `wave.svg`, `pyramid.obj`, `torus.obj`, `crescent.png`, `gear.png`.
 
@@ -280,6 +391,7 @@ Each page has its own Q-Links. On the Force, the knob row shows the first 8 of a
 | MAIN | MAIN 2 | DELAY TIME, DELAY FEEDBK, CHORUS SPEED, CHORUS DEPTH, CHORUS COLOUR, VIB SPEED, VIB DEPTH, TREM SPEED | TREM DEPTH, NOTE LENGTH, CHORUS, DRIVE AMOUNT, DRIVE COLOUR, REVERB SIZE, REVERB COLOUR, MASTER RESO |
 | CORNERS | CORNER A to D | GEN 1, GEN 2, BLEND, CUTOFF, RESONANCE, LEVEL, GEN 2 TUNE, GEN 2 FINE | OCTAVE, BLEND MODE, FILTER, FILTER ON |
 | ORBIT | ORBIT | ORBIT SPEED, ORBIT SIZE, SUBORBIT SIZE, SUBORBIT SPEED, ROTATE, ORBIT ENV, 3D SPIN, 3D TILT | SHAPE, SHAPE SOUND, DETUNE, GLIDE, OCTAVE, VOLUME, VELOCITY, FILE |
+| IMAGE | IMAGE | MOD 1-4 AMOUNT, MOD 1-4 SMOOTH | MOD 1-4 FROM, MOD 1-4 TO |
 | ARP | ARP | ACTIVE, LATCH, DIRECTION, RATE, OCTAVES, NOTE LENGTH, STEPS | |
 | ARP | STEPS 1-8, STEPS 9-16 | the steps | |
 | FX | FX | DRIVE AMOUNT, DRIVE COLOUR, CHORUS SPEED, CHORUS DEPTH, CHORUS COLOUR, DELAY TIME, DELAY FEEDBACK, REVERB SIZE | REVERB COLOUR, MASTER RESONANCE, REVERB, CHORUS, DELAY, VOLUME, DIVISION, CHORUS SYNC |
@@ -307,6 +419,7 @@ precisely (MPC's knob overlay).
   high: the figure-8 sweeps between them.
 - **Draw your sound**: draw a closed line in any vector editor, save as SVG, LOAD it, then SHAPE SOUND up: hear the
   drawing, and let it move the corners at the same time.
+- **Picture as a sequencer**: see the [IMAGE page's starting points](#starting-points).
 - **3D motion**: load `torus.obj`, 3D SPIN up, 3D TILT around 60: the projected path changes as it turns, so the orbit
   never quite repeats.
 
@@ -319,6 +432,8 @@ precisely (MPC's knob overlay).
 - **Clicks on fast orbits**: that's the mix changing very fast (ORBIT SPEED near the top is meant to buzz). Lower it, or
   raise SUBORBIT SIZE so the jumps are smoothed.
 - **"NO FILES IN Shapes/"**: put files in the plugin's Shapes folder or `VADER Shapes` on the card, and press RESCAN.
+- **A MOD does nothing**: its AMOUNT is 0, or (BRIGHT, HUE, COLOUR, DEPTH) no PNG or JPG has been loaded yet. Watch NOW
+  on the IMAGE page: if it doesn't move, the orbiter isn't crossing anything (try a bigger ORBIT SIZE or SUBORBIT SIZE).
 - **A file won't load**: the field says why (not an SVG/OBJ/PNG/JPG, no lines found, no shape found in the picture).
   Pictures: use a high-contrast silhouette.
 - **CPU**: lower VOICES to 8, UNISON to 1, and turn MOTION off in a heavy project (that saves MPC's screen CPU, not

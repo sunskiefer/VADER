@@ -57,7 +57,7 @@ jobs:
             --extra shapes:Shapes \
             --entry build/pluginlist-entry.xml \
             --version "$VERSION" \
-            --about "VADER by L'Cronx: an orbit-based vector synth for MPC OS, with shapes of your own" \
+            --about "VADER by L'Cronx: an orbit-based vector synth for MPC OS, with shapes and pictures of your own" \
             --id vader --repo sunskiefer/VADER --license MIT \
             -o dist
 

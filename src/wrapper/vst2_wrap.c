@@ -14,7 +14,7 @@
  *     the LXR sequencer can put its steps on MPC's grid (docs/MIDI_TIMING.md) instead of counting clock pulses;
  *   - the state chunk grows as needed (the engine's state is a whole LXR project, not a few presets).
  * VADER: taken from LXRXXL ZYNTH's copy, with one more addition, marked "VADER":
- *   - HAS_DIRTY: on the readout poll (every 100 ms) the engine answers "dirty" with the indices of the parameters it
+ *   - HAS_DIRTY: every 40 ms (0.4.0; was the 100 ms readout poll) the engine answers "dirty" with the indices of the parameters it
  *     changed by itself since the last poll (its screen, the corner bars, the values a corner or timbre switch shows),
  *     and only those are reported to the host. HAS_DISPLAY_REV would read every parameter back each time, and VADER has
  *     several hundred screen parameters.
@@ -140,7 +140,7 @@ typedef struct {
     float qacc[NPARAMS];     /* qlink_ticks: turn events counted toward the next step (see setParameter) */
     signed char last_on[NPARAMS];  /* last "<key>_on" value told to the host, +1 (0 = unknown, -1 = the engine has no such key) */
     unsigned last_text[NPARAMS];   /* hash of a text readout's last value (see housekeeping) */
-    int on_poll, text_poll;        /* frames until the next "<key>_on" poll / readout poll (see housekeeping) */
+    int on_poll, text_poll, dirty_poll;        /* frames until the next "<key>_on" poll / readout poll (see housekeeping) */
     int playing;             /* HAS_TRANSPORT: last transport state sent */
     double ppq;              /* HAS_TRANSPORT: song position at the last block, to spot a jump back */
     volatile char need_update_display;  /* deferred audioMasterUpdateDisplay -- see setParameter() */
@@ -506,7 +506,9 @@ static void housekeeping(AEffect *e, int32_t n) {
 #define HAS_DIRTY 0
 #endif
 #if HAS_DIRTY
-    if (poll_text) {   /* VADER: report only what the engine says it changed (see the header) */
+    int poll_dirty = (w->dirty_poll -= n) <= 0;   /* VADER 0.4.0: every 40 ms, so the screen moves 25 times a second */
+    if (poll_dirty && (w->dirty_poll += 1764) <= 0) w->dirty_poll = 1764;
+    if (poll_dirty) {   /* VADER: report only what the engine says it changed (see the header) */
         char db[4096];
         if (eng_get(w, "dirty", db, sizeof db) > 0) {
             char *s = db;

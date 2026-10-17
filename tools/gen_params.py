@@ -46,8 +46,21 @@ DOT_NX, DOT_NY = 5, 5
 ORB_NX, ORB_NY, ORB_X0, ORB_Y0, ORB_STEP = 10, 9, -3, -3, 3
 TILE_FRAMES = 1 + SHAPE_ANG * SHAPE_OFF + TRAIL_ANG * TRAIL_OFF + DOT_NX * DOT_NY + ORB_NX * ORB_NY
 # the built-in 2D shapes as ready-drawn pictures: one per shape, size step and quarter turn
-PIC_SHAPES, PIC_SIZES, PIC_ROTS = 13, 8, 4
-PIC_COUNT = PIC_SHAPES * PIC_SIZES * PIC_ROTS
+# 0.4.0: one filmstrip per shape and size step; its frames are the turns, over the shape's own symmetry (a STAR
+# repeats every 1/5 turn, so 6 frames cover it in 12-degree steps). PIC_SYM: how many times a shape repeats in one
+# turn (0: round, one frame); PIC_ROT: frames per repeat. Checked against the real paths by tools/vader_skin.py.
+PIC_SHAPES, PIC_SIZES = 13, 12
+PIC_SYM = [0, 2, 5, 4, 1, 1, 1, 3, 5, 1, 1, 2, 5]
+PIC_ROT = [1, 6, 6, 6, 8, 8, 8, 6, 6, 8, 8, 6, 6]
+# the 3D shapes (CUBE, ICOSA): frames = the spin (P3_YAW steps over its repeat), one strip per size and tilt step
+P3_SHAPES, P3_SIZES, P3_TILT, P3_YAW = 2, 3, 3, 12
+P3_SYM = [4, 2]
+# your own shape: VADER draws these strips itself when a file is loaded (the skin ships them empty)
+U_SIZES, U_ROT = 8, 8
+SEL_2D = 1                                   # the screen-picture selector: 0 none | 2D | 3D | your own
+SEL_3D = SEL_2D + PIC_SHAPES * PIC_SIZES
+SEL_USER = SEL_3D + P3_SHAPES * P3_SIZES * P3_TILT
+PIC_COUNT = SEL_USER + U_SIZES - 1
 SQUARE_X = 176            # the corners' square on the screen: x 176..464, y 0..288 (true proportions)
 SQUARE = 288
 ENV_COLS, ENV_ROWS = 32, 14
@@ -153,6 +166,22 @@ TRIGGERS = [("tap", "TAP"), ("load", "LOAD"), ("rescan", "RESCAN")]
 GLOBAL_LATE = [("user_slot", "MY PRESET", 1, 1, 999, None, True)]
 TRIGGERS_LATE = [("save_user", "SAVE"), ("load_user", "LOAD PRESET")]
 
+# 0.4.0, appended: the IMAGE page. A picture file loaded as the shape is also the IMAGE; four MODs each read a SOURCE
+# under the orbiter (BRIGHT: the picture's brightness on a spectrogram colour scale; HUE: its colour round the colour
+# wheel; COLOUR: how colourful; DEPTH: the slope the orbiter travels on, bright = high; TURN: how sharply the outline
+# turns there; HEADING: which way the outline runs) and move a sound control (TO) by AMOUNT, glided by SMOOTH.
+IMG_SRC = ["BRIGHT", "HUE", "COLOUR", "DEPTH", "TURN", "HEADING"]
+IMG_TO = ["CUTOFF", "RESO", "OCTAVE", "PITCH", "GEN 1", "GEN 2", "BLEND", "LEVEL"]
+IMG_DEF = [(0, 0), (4, 0), (1, 6), (3, 3)]   # (source, to) of MOD 1..4
+SOUND_LATE = []
+for i, (src, to) in enumerate(IMG_DEF):
+    n = i + 1
+    SOUND_LATE += [("im%d_src" % n, "MOD %d SOURCE" % n, src, 0, 0, IMG_SRC, False),
+                   ("im%d_to" % n, "MOD %d TO" % n, to, 0, 0, IMG_TO, False),
+                   ("im%d_amt" % n, "MOD %d AMOUNT" % n, 0.0, -1, 1, None, False),
+                   ("im%d_smooth" % n, "MOD %d SMOOTH" % n, 0.3, 0, 1, None, False)]
+POPUPS_LATE = ["im%d_%s" % (i + 1, f) for i in range(4) for f in ("src", "to")]
+
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
 POPUPS = ["shape", "orb_div", "arp_mode", "arp_rate", "dly_div"] + ["%s_%s" % (c, f) for c in "abcd" for f in ("mode", "ftype")]
 
@@ -185,7 +214,7 @@ def build():
     for c in "abcd":
         for f, *_ in CORNER:
             snd_slots.append("%s_%s" % (c, f))
-    for k, *_ in SOUND:
+    for k, *_ in SOUND + SOUND_LATE:
         snd_slots.append(k)
     glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE]
 
@@ -233,6 +262,17 @@ def build():
         add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), {"dynamic_display": True, "nudge_pct": 10})
     for k, name in TRIGGERS_LATE:
         add(k, name, 0, 0, 1, None, False, "TRIG", 0, {"momentary": True})
+    # 0.4.0 (appended): the screen pictures' turn frames; the IMAGE page
+    for n in (6, 8, 12):
+        add("pic_r%d" % n, "PICTURE TURN %d" % n, 0, 0, n - 1, None, True, "DISP", 2100 + n)
+    for k, name, d, lo, hi, opts, isint in SOUND_LATE:
+        extra = {"dynamic_display": True} if not opts else None
+        add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), extra)
+    for i in range(4):
+        add("im_m%d" % (i + 1), "MOD %d NOW" % (i + 1), 0, 0, 100, None, True, "DISP", 2200 + i)
+    for k in POPUPS_LATE:
+        params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
+        rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
     return params, rows, snd_slots, glob_slots
 
 
@@ -259,9 +299,13 @@ def write():
     L.append("#define NCF %d   /* fields per corner */" % len(CORNER))
     L.append("#define TILE_COLS %d\n#define TILE_ROWS %d\n#define TILE_FRAMES %d" % (TILE_COLS, TILE_ROWS, TILE_FRAMES))
     for k in ("TILE_W", "TILE_H", "SHAPE_ANG", "SHAPE_OFF", "TRAIL_ANG", "TRAIL_OFF", "DOT_NX", "DOT_NY", "ORB_NX", "ORB_NY", "ORB_X0", "ORB_Y0", "ORB_STEP", "PIC_SHAPES",
-              "PIC_SIZES", "PIC_ROTS", "PIC_COUNT", "SQUARE_X", "SQUARE"):
+              "PIC_SIZES", "PIC_COUNT", "SQUARE_X", "SQUARE", "P3_SHAPES", "P3_SIZES", "P3_TILT", "P3_YAW",
+              "U_SIZES", "U_ROT", "SEL_2D", "SEL_3D", "SEL_USER"):
         L.append("#define %s %d" % (k, globals()[k]))
     L.append("#define SHAPE_DSTEP %sf\n#define TRAIL_DSTEP %sf" % (SHAPE_DSTEP, TRAIL_DSTEP))
+    L.append("static const unsigned char PIC_SYM[%d] = {%s};" % (PIC_SHAPES, ", ".join(map(str, PIC_SYM))))
+    L.append("static const unsigned char PIC_ROT[%d] = {%s};" % (PIC_SHAPES, ", ".join(map(str, PIC_ROT))))
+    L.append("static const unsigned char P3_SYM[%d] = {%s};" % (P3_SHAPES, ", ".join(map(str, P3_SYM))))
     L.append("#define ENV_COLS %d\n#define ENV_ROWS %d\n#define ENV_FRAMES %d" % (ENV_COLS, ENV_ROWS, ENV_FRAMES))
     L.append("enum { " + ", ".join("P_%s" % c_name(r[0]) for r in rows) + " };")
     L.append("enum { " + ", ".join("S_%s" % c_name(k) for k in snd) + " };")

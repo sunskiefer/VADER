@@ -2,6 +2,7 @@
  * Shared declarations of the engine's parts. */
 #pragma once
 #include <stdint.h>
+#include <math.h>
 #include "vader_params.h"
 
 #define SR 44100.0f
@@ -65,8 +66,11 @@ static inline void path_at(const float *x2, const float *y2, float t, float *ox,
     *oy = y2[i] + (y2[j] - y2[i]) * f;
 }
 
-/* ---- shapefile.c: SVG, OBJ, PNG/JPG -> a path. 0 on success, else -1 with err filled */
-int shape_load_file(const char *path, path_t *out, char *err, int errlen);
+/* ---- shapefile.c: SVG, OBJ, PNG/JPG -> a path. 0 on success, else -1 with err filled. A PNG/JPG also fills img (when
+ * given): its colours as values 0..1 on a spectrogram's scale, IMG_N x IMG_N over the same -1..1 as the path */
+#define IMG_N 64
+typedef struct { int ok; float v[IMG_N * IMG_N], hue[IMG_N * IMG_N], sat[IMG_N * IMG_N]; } image_t;   /* v: spectrogram scale */
+int shape_load_file(const char *path, path_t *out, image_t *img, char *err, int errlen);
 
 /* ---- fx.c: the effects after the voices (stereo float) */
 typedef struct fx_s fx_t;
@@ -83,7 +87,7 @@ void fx_process(fx_t *f, const fx_params_t *p, float *l, float *r, int n);
 void fx_clear(fx_t *f);
 
 /* ---- screen.c: the line screen (tiles) and the envelope line */
-#define TRAIL_N 14
+#define TRAIL_N 30   /* 1.2 s at 25 updates a second */
 #define FR_SHAPE 1
 #define FR_TRAIL (FR_SHAPE + SHAPE_ANG * SHAPE_OFF)
 #define FR_PATHDOT (FR_TRAIL + TRAIL_ANG * TRAIL_OFF)
@@ -98,6 +102,13 @@ typedef struct {
 /* x, y in -1..1 (the corners' square) -> the screen's pixels (640 x 288: the square in the middle, true proportions) */
 static inline float scr_x(float x) { return SQUARE_X + (x + 1) * 0.5f * SQUARE; }
 static inline float scr_y(float y) { return (y + 1) * 0.5f * SQUARE; }
+/* your own shape's screen strips (src/pictures.c): size step k's frame, w x h, centred on the square */
+static inline void upic_frame(int k, int *w, int *h) {
+    float r = 1.4142f * k / U_SIZES * SQUARE * 0.5f + 12;
+    *w = 2 * (int)ceilf(r < SQUARE_X + SQUARE * 0.5f ? r : SQUARE_X + SQUARE * 0.5f);
+    *h = 2 * (int)ceilf(r < SQUARE * 0.5f ? r : SQUARE * 0.5f);
+}
+int write_user_pictures(const char *skin_dir, const path_t *p);   /* 1: written */
 void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int draw);
 void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, int motion);
 void screen_env(screen_t *s, float a, float d, float sus, float r);

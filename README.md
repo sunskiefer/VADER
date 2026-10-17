@@ -60,32 +60,36 @@ artwork; it is not affiliated with Beetlecrab Audio.
   (ON, ACCENT, TIE, OFF).
 - **Effects**: drive, chorus, ping-pong delay (synced, or free with TAP), reverb.
 - **16 presets** in MPC's PRESET menu, from INIT ORBIT to SHAPE SCOPE, and **999 slots for your own** (MY PRESETS).
-- **Five pages**: MAIN, CORNERS, ORBIT, ARP, FX. Q-Links are mapped on every page.
+- **The IMAGE page**: a picture plays the sound. Four MODs read the picture under the orbiter (BRIGHT on a spectrogram
+  colour scale, HUE, COLOUR, DEPTH as a landscape) or the outline (TURN, HEADING) and move CUTOFF, RESO, OCTAVE, PITCH,
+  GEN 1, GEN 2, BLEND or LEVEL.
+- **Six pages**: MAIN, CORNERS, ORBIT, IMAGE, ARP, FX. Q-Links are mapped on every page.
 
 ## The screen
 
 MPC draws a plugin's screen itself, from pictures and the plugin's values; a plugin cannot draw on the Force's display
 directly. So VADER's screen is built from pieces MPC can switch:
-- the **built-in 2D shapes** as ready-drawn, glowing pictures (13 shapes, 8 sizes, 4 quarter turns), so they stay crisp;
-  the picture follows ORBIT SIZE and ROTATE in steps;
-- a grid of **32 × 16 fine tiles** for the rest: your own shapes, the 3D shapes, the path point and the orbiter.
-  Each tile holds a straight piece of line at one of 24 angles and 19 positions, so a line stays straight across tiles,
-  or a dot at one of 25 places, so the orbiter moves in small steps;
-- the shape drawn as a **chain of dots**, the orbiter as a round dot moving in 2 px steps;
+- the **built-in shapes** as ready-drawn, glowing pictures: 12 size steps and fine turn steps over each shape's own
+  symmetry (a STAR every 12 degrees), and CUBE and ICOSA as spinning frames, so they stay crisp and move in small steps;
+- **your own 2D shapes** drawn by VADER itself into its skin folder when loaded (an experiment: MPC may show them only
+  after the plugin window is opened again);
+- a grid of **32 × 16 fine tiles** for the rest: the suborbit's trail, the path point, the orbiter (a round dot moving
+  in 3 px steps) and shapes without pictures. Each tile holds a straight piece of line at one of 24 angles, so a line
+  stays straight across tiles;
 - a light **glass** layer on top (fine scanlines, darker edges), like a CRT;
 - the **envelope**, drawn as 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE;
 - **four corner bars**, showing how much A, B, C and D you hear.
 
 The square of the corners is drawn square, at its true proportions.
 
-The engine works out what each piece shows, about ten times a second, and only tells MPC about the pieces that changed.
+The engine works out what each piece shows, 25 times a second, and only tells MPC about the pieces that changed.
 The shape is drawn in dim blue, the suborbit's trail in bright cyan, the path point in amber and the orbiter in cyan.
 **MOTION** off freezes the screen, which saves MPC's screen CPU in a heavy project.
 
 | | |
 |---|---|
-| ![a loaded SVG on the screen](docs/img/main_user_shape.png) | ![the CORNERS page](docs/img/corners.png) |
-| ![the ORBIT page](docs/img/orbit.png) | ![the ARP page](docs/img/arp.png) |
+| ![a loaded picture on the screen](docs/img/main_user_shape.png) | ![the CORNERS page](docs/img/corners.png) |
+| ![the ORBIT page](docs/img/orbit.png) | ![the IMAGE page](docs/img/image.png) |
 
 ## Install
 
@@ -121,14 +125,15 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.3.2 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
+**0.4.0 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
 Force can show:
 - **CPU**: the worst case (16 voices, all four corners with ladder filters, every effect) should be measured with the
   framework's `tools/bench.sh`. The default is 8 voices.
-- **The screen**: the MAIN page has about 1050 parts (most of them the shape pictures, only one shown at a time), more
-  than any skin before it. If MPC finds that heavy, the grid can be made coarser.
+- **The screen**: the MAIN page has about 820 parts, and the shape pictures take about 260 MB once MPC has loaded them
+  (more steps for size, turn and spin). If MPC is slow to open VADER or runs short, the steps can be made coarser.
+- **Your shape's pictures**: whether MPC shows the pictures VADER writes when a file is loaded (an experiment).
 
 ## License
 

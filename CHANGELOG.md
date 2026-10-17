@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.0 (2026-10-17)
+
+Not yet tested on a device.
+
+- **IMAGE page**: a picture plays the sound. A PNG or JPG loaded as the shape is also the IMAGE. Four MODs, each FROM a
+  source (BRIGHT on a spectrogram colour scale, HUE, COLOUR, DEPTH as a landscape slope, TURN of the outline, HEADING
+  of the outline) TO a destination (CUTOFF, RESO, OCTAVE in whole octaves, PITCH in semitones, GEN 1, GEN 2, BLEND,
+  LEVEL), with AMOUNT (-100..+100), SMOOTH and a live NOW meter. Per timbre; saved with projects and MY PRESETS.
+- **Finer screen pictures**: 12 size steps for the built-in shapes and fine turn steps over each shape's symmetry (a
+  STAR every 12 degrees); CUBE and ICOSA ready-drawn while they spin. Drawn as solid glowing lines again.
+- **25 screen updates a second** (was 10): the orbiter and the trail move more smoothly.
+- **Your own shape on the screen (experiment)**: loading a 2D shape writes its pictures into the plugin's skin folder;
+  close and reopen the VADER window to see whether MPC shows them.
+- Fixed: PNG and JPG outlines were traced wrongly (a picture could load as a tiny square); they now follow the shape.
+- Fixed: the fader strip was taller than MPC allows.
+
 ## 0.3.2 (2026-10-17)
 
 - **No more clicks when you turn ORBIT SIZE**: ORBIT SIZE, SUBORBIT SIZE and ROTATE now glide to their new value

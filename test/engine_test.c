@@ -49,6 +49,12 @@ static level_t run(void *s, int blocks) {
     return l;
 }
 
+static void upic_frame_test(int k, int *w, int *h) {   /* src/vader.h upic_frame */
+    float r = 1.4142f * k / U_SIZES * SQUARE * 0.5f + 12;
+    *w = 2 * (int)ceilf(r < SQUARE_X + SQUARE * 0.5f ? r : SQUARE_X + SQUARE * 0.5f);
+    *h = 2 * (int)ceilf(r < SQUARE * 0.5f ? r : SQUARE * 0.5f);
+}
+
 static void chord(void *s, int on) { note(s, on, 48, 100); note(s, on, 55, 100); note(s, on, 60, 100); note(s, on, 64, 100); }
 
 static void drain(void *s) {
@@ -248,6 +254,102 @@ int main(void) {
     setp(s, "timbre", 1);
     CHECK(empty && getp(s, "preset") == 3 && fabs(getp(s, "b_tune") - 7) < 1e-3, "slot 122 shows empty, slot 123 loads back (preset %.0f, B tune %.0f)", getp(s, "preset"), getp(s, "b_tune"));
     setp(s, "timbre", 0);
+    /* the screen's pictures: a STAR at full size shows strip 2D + its size, a turn frame in 0..5 */
+    setp(s, "preset", 0);
+    setp(s, "shape", 2); setp(s, "orb_size", 1.0); setp(s, "rotate", 0.1);
+    run(s, 200);
+    {
+        double sel = getp(s, "shape_pic"), fr = getp(s, "pic_r6");
+        CHECK(sel == SEL_2D + 2 * PIC_SIZES + PIC_SIZES - 1 && fr >= 0 && fr <= 5, "STAR, size 100, turned: picture %.0f, frame %.0f", sel, fr);
+    }
+    /* the IMAGE page: a picture under the orbiter moves the sound */
+    {
+        int fi = -1;
+        for (int i = 0; i < 40 && fi < 0; i++) {
+            setp(s, "file", i);
+            E->get_param(s, "file_display", d, sizeof d);
+            if (strstr(d, "crescent.png")) fi = i;
+        }
+        setp(s, "file", fi);
+        setp(s, "load", 1);
+        for (int k = 0; k < 400; k++) { usleep(5000); E->get_param(s, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) break; }
+        setp(s, "shape", 0); setp(s, "orb_size", 0.6); setp(s, "sub_size", 0.3); setp(s, "orb_speed", 0.6);
+        setp(s, "im1_amt", 0.0);
+        chord(s, 1);
+        level_t a0 = run(s, 400);
+        chord(s, 0); run(s, 400);
+        setp(s, "im1_src", 0); setp(s, "im1_to", 7); setp(s, "im1_amt", 1.0); setp(s, "im1_smooth", 0.1);   /* BRIGHT -> LEVEL */
+        chord(s, 1);
+        double mx = 0, mn = 100;
+        level_t a1 = {0, 0, 0};
+        for (int b = 0; b < 40; b++) {
+            level_t l = run(s, 10);
+            a1.rms += l.rms / 40;
+            double m = getp(s, "im_m1");
+            if (m > mx) mx = m;
+            if (m < mn) mn = m;
+        }
+        chord(s, 0); run(s, 400);
+        CHECK(fi >= 0 && fabs(a1.rms - a0.rms) > 0.002 && mx > mn, "IMAGE: crescent.png BRIGHT -> LEVEL changes the sound (rms %.3f -> %.3f), meter %.0f..%.0f", a0.rms, a1.rms, mn, mx);
+        setp(s, "im1_amt", 0.0);
+        /* every source and destination runs clean */
+        int bad = 0;
+        for (int src = 0; src < 6; src++)
+            for (int to = 0; to < 8; to++) {
+                setp(s, "im2_src", src); setp(s, "im2_to", to); setp(s, "im2_amt", to % 2 ? -1.0 : 1.0);
+                note(s, 1, 60, 100);
+                level_t l = run(s, 60);
+                note(s, 0, 60, 0);
+                run(s, 30);
+                if (l.nan || l.peak >= 1.0 || l.rms != l.rms) bad++;
+            }
+        setp(s, "im2_amt", 0.0);
+        CHECK(bad == 0, "IMAGE: all 6 sources x 8 destinations play clean (%d bad)", bad);
+    }
+    /* your own shape's pictures, written into the skin folder (the experiment) */
+    {
+        char root[] = "/tmp/vader_pics_XXXXXX";
+        if (mkdtemp(root)) {
+            char cmd[512], sk[300], f[400];
+            snprintf(cmd, sizeof cmd, "mkdir -p '%s/Plugin Skins' && cp -r shapes '%s/Shapes'", root, root);
+            if (system(cmd) != 0) printf("(could not set up %s)\n", root);
+            snprintf(sk, sizeof sk, "%s/Shapes", root);
+            void *s3 = E->create(sk);
+            int li = -1;
+            for (int i = 0; i < 40 && li < 0; i++) {
+                setp(s3, "file", i);
+                E->get_param(s3, "file_display", d, sizeof d);
+                if (strstr(d, "lightning.svg")) li = i;
+            }
+            setp(s3, "file", li);
+            struct timespec w0, w1;
+            clock_gettime(CLOCK_MONOTONIC, &w0);
+            setp(s3, "load", 1);
+            for (int k = 0; k < 6000; k++) { usleep(5000); E->get_param(s3, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) break; }
+            int ok = 0;
+            for (int k = 1; k <= U_SIZES; k++) {
+                snprintf(f, sizeof f, "%s/Plugin Skins/vd_user_%d.png", root, k);
+                FILE *fp = fopen(f, "rb");
+                unsigned char h[24] = {0};
+                if (fp) {
+                    if (fread(h, 1, 24, fp) == 24 && h[1] == 'P' && h[2] == 'N' && h[3] == 'G') {
+                        int w = h[16] << 24 | h[17] << 16 | h[18] << 8 | h[19], hh = h[20] << 24 | h[21] << 16 | h[22] << 8 | h[23], ew, eh;
+                        upic_frame_test(k, &ew, &eh);
+                        ok += w == ew && hh == eh * U_ROT;
+                    }
+                    fclose(fp);
+                }
+            }
+            clock_gettime(CLOCK_MONOTONIC, &w1);
+            printf("(your shape's pictures: loaded and written in %.2f s)\n", (w1.tv_sec - w0.tv_sec) + (w1.tv_nsec - w0.tv_nsec) / 1e9);
+            run(s3, 100);
+            double sel = getp(s3, "shape_pic");
+            CHECK(ok == U_SIZES && sel >= SEL_USER && sel < SEL_USER + U_SIZES, "your shape's pictures: %d of %d strips written at the skin's sizes, the screen shows picture %.0f", ok, U_SIZES, sel);
+            E->destroy(s3);
+            snprintf(cmd, sizeof cmd, "rm -rf '%s'", root);
+            if (system(cmd) != 0) printf("(could not remove %s)\n", root);
+        }
+    }
     /* CPU: the worst case */
     setp(s, "preset", 0);
     setp(s, "voices", 1);
