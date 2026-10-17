@@ -73,7 +73,9 @@ directly. So VADER's screen is built from pieces MPC can switch:
   symmetry (a STAR every 12 degrees), and CUBE and ICOSA as spinning frames, so they stay crisp and move in small steps;
 - **your own 2D shapes** drawn by VADER itself into its skin folder when loaded (an experiment: MPC may show them only
   after the plugin window is opened again);
-- a grid of **32 × 16 fine tiles** for the rest: the suborbit's trail, the path point, the orbiter (a round dot moving
+- the **orbit line**: the orbiter's whole path over one orbit as a faint thin line, lit up as a **light trail** where the
+  orbiter has just passed, on its own layer of tiles;
+- a grid of **32 × 16 fine tiles** for the rest: the path point, the orbiter (a round dot moving
   in 3 px steps) and shapes without pictures. Each tile holds a straight piece of line at one of 24 angles, so a line
   stays straight across tiles;
 - a light **glass** layer on top (fine scanlines, darker edges), like a CRT;
@@ -125,13 +127,13 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.4.1 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
+**0.4.2 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
 Force can show:
 - **CPU**: the worst case (16 voices, all four corners with ladder filters, every effect) should be measured with the
   framework's `tools/bench.sh`. The default is 8 voices.
-- **The screen**: the MAIN page has about 820 parts, and the shape pictures take about 260 MB once MPC has loaded them
+- **The screen**: the MAIN page has about 1330 parts, and the shape pictures take about 260 MB once MPC has loaded them
   (more steps for size, turn and spin). If MPC is slow to open VADER or runs short, the steps can be made coarser.
 - **Your shape's pictures**: whether MPC shows the pictures VADER writes when a file is loaded (an experiment).
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.2 (2026-10-17)
+
+- **The orbit line and the light trail**: the screen draws the orbiter's whole path over one orbit (with its suborbit
+  loops) as a faint thin line, and the part the orbiter has just passed lights up: bright and thick right behind it,
+  then a softer tail, then the faint line. It is worked out from the orbit and suborbit speeds, so it follows the real
+  curve and turns, grows, spins and tilts with the shape. It has its own layer, so it no longer cuts the shape's line.
+- **ROTATE, 3D SPIN, 3D TILT and ORBIT ENV on the MAIN page** (the SHAPE section). With ALT on, that section shows
+  VIBRATO / TREMOLO, and the ORBIT section DETUNE, GLIDE, VELOCITY and VOLUME. New Q-Link set MAIN 3.
+
 ## 0.4.1 (2026-10-17)
 
 - PNG and JPG outlines are smoothed (the traced pixels made a staircase), so a loaded picture draws as a clean line.

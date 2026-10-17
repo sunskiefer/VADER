@@ -81,6 +81,7 @@ typedef struct {
     int shape_built;
     float orb_t, orb_o;          /* the free-running orbit */
     float size_s, sub_s, rot_s;  /* ORBIT SIZE, SUBORBIT SIZE, ROTATE, glided (-1: not yet) */
+    float hz_now, sub_now;       /* orbit and suborbit turns per second, as last played (for the light trail) */
     float vib_ph, trem_ph;
 } timbre_t;
 
@@ -109,7 +110,7 @@ typedef struct {
     unsigned rng;
     /* screen */
     screen_t scr;
-    unsigned short sent_tiles[TILE_COLS * TILE_ROWS];
+    unsigned short sent_tiles[TILE_COLS * TILE_ROWS], sent_trail[TILE_COLS * TILE_ROWS];
     unsigned char sent_env[ENV_COLS];
     int sent_pic;
     unsigned char sent_w[4], sent_rd;
@@ -974,9 +975,40 @@ static void screen_update(vader_t *s, int force_shape) {
         screen_shape(&s->scr, m->x2, m->y2, size, !pic);
         s->shape_wait = m->base.is3d && P[S_SPIN] > 0.01f && !pic ? 10 : 1 << 30;   /* a turning 3D shape the tiles draw: 2.5 times a second */
     } else s->shape_wait--;
-    screen_frame(&s->scr, fx, fy, ox, oy, motion);
-    for (int i = 0; i < TILE_COLS * TILE_ROWS; i++)
+    /* the orbit line: the orbiter's whole path over one orbit (with its suborbit loops), worked out from the orbit and
+     * suborbit speeds, so it follows the real curve and turns, grows, spins and tilts with the shape. The part it has
+     * just passed is the bright light trail (about 3/4 of a suborbit turn, at least 1/10 of the line). */
+    static float tx[TRAIL_PTS], ty[TRAIL_PTS];
+    int npts;
+    float lit[2];
+    {
+        float sub = fabsf(m->sub_now), hz = fabsf(m->hz_now);
+        float T_ = hz > 0.05f ? 1.0f / hz : 20.0f;   /* one orbit */
+        if (sub > 0.01f && T_ > 12.0f / sub) T_ = 12.0f / sub;   /* at most 12 suborbit loops, or it fills the screen */
+        if (T_ > 20.0f) T_ = 20.0f;
+        float loops = sub * T_;
+        npts = (int)(96 + loops * 40);
+        if (npts > TRAIL_PTS) npts = TRAIL_PTS;
+        float tl = sub > 0.01f ? 0.75f / sub : 0.4f;
+        if (tl < 0.08f) tl = 0.08f;
+        lit[0] = fmaxf(tl / T_, 0.1f);
+        if (lit[0] > 0.5f) lit[0] = 0.5f;
+        lit[1] = fminf(lit[0] * 2.5f, 0.75f);
+        for (int k = 0; k < npts; k++) {
+            float tk = T_ * k / (npts - 1), a = ot - m->hz_now * tk, b = oo - m->sub_now * tk, px, py;
+            a -= floorf(a);
+            b -= floorf(b);
+            if (pic) path_at(qx, qy, a, &px, &py);
+            else { path_at(m->x2, m->y2, a, &px, &py); px *= size; py *= size; }
+            tx[k] = clampf(px + sr_ * cosf(TWO_PI * b), -1, 1);
+            ty[k] = clampf(py + sr_ * sinf(TWO_PI * b), -1, 1);
+        }
+    }
+    screen_frame(&s->scr, fx, fy, ox, oy, tx, ty, npts, lit, motion);
+    for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
         if (s->scr.tiles[i] != s->sent_tiles[i]) { s->sent_tiles[i] = s->scr.tiles[i]; mark(s, P_T000 + i); }
+        if (s->scr.trail[i] != s->sent_trail[i]) { s->sent_trail[i] = s->scr.trail[i]; mark(s, P_R000 + i); }
+    }
     if (motion) {
         /* the corner bars: what the sound really hears */
         float sx = best ? best->ox : ox, sy = best ? best->oy : oy;
@@ -1077,6 +1109,7 @@ static void *create(const char *data_dir) {
         project(s, t, 0);
     }
     memset(s->sent_tiles, 0xff, sizeof s->sent_tiles);
+    memset(s->sent_trail, 0xff, sizeof s->sent_trail);
     s->sent_pic = -1;
     for (int k = 0; k < 3; k++) s->sent_r[k] = -1;
     memset(s->sent_im, 0xff, sizeof s->sent_im);
@@ -1347,6 +1380,8 @@ static int get_param(void *p, const char *key, char *buf, int len) {
             if (i == P_RD_LINE) return snprintf(buf, (size_t)len, "%d", s->sent_rd == 0xff ? 0 : s->sent_rd);
             if (i >= P_WA && i <= P_WD) return snprintf(buf, (size_t)len, "%d", s->sent_w[i - P_WA] == 0xff ? 25 : s->sent_w[i - P_WA]);
             if (i >= P_E00 && i < P_E00 + ENV_COLS) return snprintf(buf, (size_t)len, "%d", s->sent_env[i - P_E00]);
+            if (i >= P_R000 && i < P_R000 + TILE_COLS * TILE_ROWS)
+                return snprintf(buf, (size_t)len, "%d", s->sent_trail[i - P_R000] == 0xffff ? 0 : s->sent_trail[i - P_R000]);
             if (i >= P_T000 && i < P_T000 + TILE_COLS * TILE_ROWS) return snprintf(buf, (size_t)len, "%d", s->sent_tiles[i - P_T000]);
             if (i >= P_PIC_R6 && i <= P_PIC_R12) return snprintf(buf, (size_t)len, "%d", s->sent_r[i - P_PIC_R6] < 0 ? 0 : s->sent_r[i - P_PIC_R6]);
             if (i >= P_IM_M1 && i <= P_IM_M4) return snprintf(buf, (size_t)len, "%d", s->sent_im[i - P_IM_M1] == 0xff ? 0 : s->sent_im[i - P_IM_M1]);
@@ -1437,6 +1472,8 @@ static void render(void *p, int16_t *out, int frames) {
             m->orb_t = fmodf(m->orb_t + hz * dt, 1.0f);
         }
         m->orb_o = fmodf(m->orb_o + sub * dt, 1.0f);
+        m->hz_now = hz;
+        m->sub_now = sub;
         float vr, tr;
         if ((int)P[S_VT_SYNC]) {
             static const float b[8] = {4, 2, 1, 0.5f, 0.25f, 0.125f, 1.0f / 6, 1.0f / 12};

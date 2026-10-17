@@ -84,7 +84,7 @@ On every page:
 - **ATTACK**: rise time, 1 ms to 6 s. **DECAY**: fall to the sustain level, 5 ms to 10 s.
 - **SUSTAIN**: the level held while the key is down. **RELEASE**: fade after the key is let go, 5 ms to 10 s.
 
-**MOD** (with ALT off):
+**ORBIT** (with ALT off):
 - **ORBIT SPEED**: how fast the path point goes round the shape, about one turn every 50 s up to 20 times a second
   (audio-ish buzz at the top). With ORBITER SYNC on, the speed comes from MPC's tempo instead (ORBIT SYNC on the ORBIT
   page).
@@ -92,18 +92,26 @@ On every page:
 - **SUBORBIT SIZE**: the radius of the circle the orbiter makes round the path point.
 - **SUBORB SPEED**: how fast it circles (0.05 to 30 times a second; synced: 1 to 16 times per orbit).
 
-**MOD** with ALT on: **ROTATE** (turns the shape), **ORBIT ENV** (the envelope grows the orbit, or shrinks it when
-negative), **DETUNE** (unison spread), **GLIDE** (portamento).
+**SHAPE** (with ALT off): how the shape itself moves. Every one changes which corners the orbiter visits, so the sound.
+- **ROTATE**: turns the shape in the square. A STAR turned a little visits the corners at different points of its orbit.
+- **3D SPIN**: how fast a 3D shape (CUBE, ICOSA, an OBJ file) spins. Its outline changes as it turns, so the orbit
+  never quite repeats.
+- **3D TILT**: how far a 3D shape leans towards you (its depth): flat-on at 0, seen from the edge at 100.
+- **ORBIT ENV**: the envelope grows the orbit with each note (above 0), or shrinks it (below 0).
 
-**VIBRATO / TREMOLO**: VIB SPEED and VIB DEPTH (pitch, up to a semitone; the mod wheel adds to it), TREM SPEED and
-TREM DEPTH (level). With V/T sync on (SYNC section), the speeds pick note values from 1 bar to 1/48.
+With **ALT on**, the same places show the voice and the vibrato:
+- ORBIT section: **DETUNE** (unison spread), **GLIDE** (portamento), **VELOCITY** (how much playing harder is louder),
+  **VOLUME** (the timbre's level).
+- SHAPE section: **VIB SPEED** and **VIB DEPTH** (pitch, up to a semitone; the mod wheel adds to it), **TREM SPEED**
+  and **TREM DEPTH** (level). With V/T sync on (SYNC section), the speeds pick note values from 1 bar to 1/48.
 
 **CORNER SELECT**: A, B, C, D or ALL: the corner the five corner knobs under the screen edit. ALL sets all four at
 once (and shows corner A's value).
 
 **SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in blue, the path
-point (amber) and the orbiter (cyan), with the suborbit's trail (the orbiter's recent path) as a bright cyan line behind
-it. A, B, C and D mark the corners; the four bars under it show how much of each you are hearing. It follows the newest
+point (amber) and the orbiter (cyan). Behind the orbiter, its **orbit line**: the whole path it takes over one orbit,
+suborbit loops included, as a faint thin line, with the part it has just passed lit up as a **light trail** (bright and
+thick right behind it, fading into the faint line). It turns, grows, spins and tilts with the shape. A, B, C and D mark the corners; the four bars under it show how much of each you are hearing. It follows the newest
 note of the timbre you are editing, and moves 25 times a second.
 
 How the shape is drawn:
@@ -388,6 +396,7 @@ Each page has its own Q-Links. On the Force, the knob row shows the first 8 of a
 | Page | Set | Q-Links 1-8 | Q-Links 9-16 |
 |---|---|---|---|
 | MAIN | MAIN 1 | GEN 1, GEN 2, BLEND, CUTOFF, RESO, ORBIT SPEED, ORBIT SIZE, SUBORBIT SIZE | ATTACK, DECAY, SUSTAIN, RELEASE, SUBORB SPEED, REVERB, DELAY, VOLUME |
+| MAIN | MAIN 3 | ROTATE, 3D SPIN, 3D TILT, ORBIT ENV, DETUNE, GLIDE, VELOCITY, VOLUME | |
 | MAIN | MAIN 2 | DELAY TIME, DELAY FEEDBK, CHORUS SPEED, CHORUS DEPTH, CHORUS COLOUR, VIB SPEED, VIB DEPTH, TREM SPEED | TREM DEPTH, NOTE LENGTH, CHORUS, DRIVE AMOUNT, DRIVE COLOUR, REVERB SIZE, REVERB COLOUR, MASTER RESO |
 | CORNERS | CORNER A to D | GEN 1, GEN 2, BLEND, CUTOFF, RESONANCE, LEVEL, GEN 2 TUNE, GEN 2 FINE | OCTAVE, BLEND MODE, FILTER, FILTER ON |
 | ORBIT | ORBIT | ORBIT SPEED, ORBIT SIZE, SUBORBIT SIZE, SUBORBIT SPEED, ROTATE, ORBIT ENV, 3D SPIN, 3D TILT | SHAPE, SHAPE SOUND, DETUNE, GLIDE, OCTAVE, VOLUME, VELOCITY, FILE |

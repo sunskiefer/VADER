@@ -99,14 +99,17 @@ def page_main():
     c = []
     c += [title("ENVELOPE", L, 70, 280), {"kind": "envwin"}]
     c += [hl("attack", L, 166, 132), hl("decay", L + 148, 166, 132), hl("sustain", L, 220, 132), hl("release", L + 148, 220, 132)]
-    c += [title("MOD", L, 278, 280)]
+    # ALT off: the orbit and the shape's own movement (size, turn, spin, depth); ALT on: the voice, vibrato, tremolo
+    c += [title("ORBIT  /  ALT: VOICE", L, 278, 280)]
     c += [hl("orb_speed", L, 300, 132, "ORBIT SPEED", when="alt:OFF"), hl("orb_size", L + 148, 300, 132, "ORBIT SIZE", when="alt:OFF"),
           hl("sub_size", L, 354, 132, "SUBORBIT SIZE", when="alt:OFF"), hl("sub_speed", L + 148, 354, 132, "SUBORB SPEED", when="alt:OFF"),
-          hl("rotate", L, 300, 132, "ROTATE", when="alt:ON"), hl("orb_env", L + 148, 300, 132, "ORBIT ENV", when="alt:ON"),
-          hl("detune", L, 354, 132, "DETUNE", when="alt:ON"), hl("glide", L + 148, 354, 132, "GLIDE", when="alt:ON")]
-    c += [title("VIBRATO / TREMOLO", L, 412, 280)]
-    c += [hl("vib_speed", L, 434, 132, "VIB SPEED"), hl("vib_depth", L + 148, 434, 132, "VIB DEPTH"),
-          hl("trem_speed", L, 488, 132, "TREM SPEED"), hl("trem_depth", L + 148, 488, 132, "TREM DEPTH")]
+          hl("detune", L, 300, 132, "DETUNE", when="alt:ON"), hl("glide", L + 148, 300, 132, "GLIDE", when="alt:ON"),
+          hl("velocity", L, 354, 132, "VELOCITY", when="alt:ON"), hl("t_volume", L + 148, 354, 132, "VOLUME", when="alt:ON")]
+    c += [title("SHAPE  /  ALT: VIB-TREM", L, 412, 280)]
+    c += [hl("rotate", L, 434, 132, "ROTATE", when="alt:OFF"), hl("spin", L + 148, 434, 132, "3D SPIN", when="alt:OFF"),
+          hl("tilt", L, 488, 132, "3D TILT", when="alt:OFF"), hl("orb_env", L + 148, 488, 132, "ORBIT ENV", when="alt:OFF"),
+          hl("vib_speed", L, 434, 132, "VIB SPEED", when="alt:ON"), hl("vib_depth", L + 148, 434, 132, "VIB DEPTH", when="alt:ON"),
+          hl("trem_speed", L, 488, 132, "TREM SPEED", when="alt:ON"), hl("trem_depth", L + 148, 488, 132, "TREM DEPTH", when="alt:ON")]
     c += [title("CORNER SELECT", L, 546, 280), radio("corner", L, 568, 280, h=42)]
     # centre: the screen
     c += [popup("shape", C, 68, 300, "SHAPE", list_at=(C + 8, 118), cols=4, ow=158, oh=44),
@@ -132,7 +135,8 @@ def page_main():
     q = [("MAIN 1", ["f_og1", "f_og2", "f_blend", "f_cutoff", "f_reso", "orb_speed", "orb_size", "sub_size",
                      "attack", "decay", "sustain", "release", "sub_speed", "mix_rev", "mix_dly", "volume"]),
          ("MAIN 2", ["dly_time", "dly_fb", "ch_speed", "ch_depth", "ch_col", "vib_speed", "vib_depth", "trem_speed",
-                     "trem_depth", "note_len", "mix_ch", "drive", "drive_col", "rev_size", "rev_col", "mres"])]
+                     "trem_depth", "note_len", "mix_ch", "drive", "drive_col", "rev_size", "rev_col", "mres"]),
+         ("MAIN 3", ["rotate", "spin", "tilt", "orb_env", "detune", "glide", "velocity", "t_volume"])]
     return c, q
 
 
@@ -339,7 +343,7 @@ def meter_strip(w, h, frames=101, colour=ACCENT):
 SS = 4   # drawn 4 times larger, then shrunk: smooth edges
 
 
-def _piece(fr, ang, k, A, step, colour, width, glow, dotted=False):
+def _piece(fr, ang, k, A, step, colour, width, glow, dotted=False, alpha=1.0):
     """a straight piece: angle ang of A steps, k steps of step px from the tile's middle (src/screen.c piece_frame)"""
     Image, ImageDraw, ImageFilter, _ = _pil()
     w, h = TILE_W, TILE_H
@@ -372,7 +376,8 @@ def _piece(fr, ang, k, A, step, colour, width, glow, dotted=False):
         dm.ellipse([X - r, Y - r, X + r, Y + r], fill=255)
         t += gap
     halo = m.filter(ImageFilter.GaussianBlur(glow * SS)).point(lambda v: int(min(255, v * 1.6)))
-    big.putalpha(Image.fromarray(__import__("numpy").maximum(__import__("numpy").asarray(m), __import__("numpy").asarray(halo) * 0.55).astype("uint8")))
+    np_ = __import__("numpy")
+    big.putalpha(Image.fromarray((np_.maximum(np_.asarray(m), np_.asarray(halo) * 0.55) * alpha).astype("uint8")))
     fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
 
 
@@ -396,9 +401,8 @@ def tile_strip():
     w, h = TILE_W, TILE_H
     strip = Image.new("RGBA", (w, h * G.TILE_FRAMES), (0, 0, 0, 0))
     frames = [None]
-    hs, ht = (G.SHAPE_OFF - 1) // 2, (G.TRAIL_OFF - 1) // 2
+    hs = (G.SHAPE_OFF - 1) // 2
     frames += [("s", a, k - hs) for a in range(G.SHAPE_ANG) for k in range(G.SHAPE_OFF)]
-    frames += [("t", a, k - ht) for a in range(G.TRAIL_ANG) for k in range(G.TRAIL_OFF)]
     frames += [("p", j % G.DOT_NX, j // G.DOT_NX) for j in range(G.DOT_NX * G.DOT_NY)]
     frames += [("o", j % G.ORB_NX, j // G.ORB_NX) for j in range(G.ORB_NX * G.ORB_NY)]
     assert len(frames) == G.TILE_FRAMES
@@ -408,13 +412,34 @@ def tile_strip():
         fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         if f[0] == "s":
             _piece(fr, f[1], f[2], G.SHAPE_ANG, G.SHAPE_DSTEP, (70, 160, 255), 1.7, 1.0)
-        elif f[0] == "t":
-            _piece(fr, f[1], f[2], G.TRAIL_ANG, G.TRAIL_DSTEP, CYAN, 2.2, 1.2)
         elif f[0] == "p":
             _dot(fr, (f[1] + 0.5) * w / G.DOT_NX, (f[2] + 0.5) * h / G.DOT_NY, AMBER, 2.4, 3.6)
         else:
             _dot(fr, G.ORB_X0 + f[1] * G.ORB_STEP, G.ORB_Y0 + f[2] * G.ORB_STEP, CYAN, 3.4, 5.0)
         strip.alpha_composite(fr, (0, i * h))
+    return strip
+
+
+# the light trail's brightnesses, newest to oldest: (colour, line width, glow, opacity)
+TRAIL_LOOK = [((170, 255, 255), 2.8, 1.6, 1.0), ((90, 220, 255), 2.0, 1.3, 0.62), ((50, 150, 255), 1.4, 1.0, 0.32)]
+
+
+def trail_strip():
+    """the light trail's layer (src/screen.c piece_frame): empty, then for each brightness every piece"""
+    Image, _, _, _ = _pil()
+    w, h = TILE_W, TILE_H
+    strip = Image.new("RGBA", (w, h * G.TRAIL_FRAMES), (0, 0, 0, 0))
+    ht = (G.TRAIL_OFF - 1) // 2
+    i = 1
+    for lv in range(G.TRAIL_LV):
+        col, width, glow, al = TRAIL_LOOK[lv]
+        for a in range(G.TRAIL_ANG):
+            for k in range(G.TRAIL_OFF):
+                fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+                _piece(fr, a, k - ht, G.TRAIL_ANG, G.TRAIL_DSTEP, col, width, glow, alpha=al)
+                strip.alpha_composite(fr, (0, i * h))
+                i += 1
+    assert i == G.TRAIL_FRAMES
     return strip
 
 
@@ -860,6 +885,14 @@ def build_page(sk, page_no, comps):
                 put(G.SEL_USER + k_ - 1, Image.new("RGBA", (w, h * G.U_ROT), (0, 0, 0, 0)), x0, y0, w, h, G.U_ROT,
                     "vd_user_%d.png" % k_)
         elif k == "tiles":
+            # the light trail's layer, under the main tiles (the dots stay on top of it)
+            tstrip = sk.save(trail_strip(), "vd_trail.png")
+            tk = define("vdTrail", [], [filmstrip(tstrip, G.TRAIL_FRAMES, TILE_W, TILE_H, "Vertical")], ignore=True)
+            for r in range(G.TILE_ROWS):
+                for q in range(G.TILE_COLS):
+                    i = r * G.TILE_COLS + q
+                    kids.append(placed(tk, "r%d" % i, sk.index["r%03d" % i],
+                                       (TILES_XY[0] + q * TILE_W, TILES_XY[1] + r * TILE_H, TILE_W, TILE_H), False))
             strip = sk.save(tile_strip(), "vd_tiles.png")
             dk = define("vdTile", [], [filmstrip(strip, G.TILE_FRAMES, TILE_W, TILE_H, "Vertical")], ignore=True)
             for r in range(G.TILE_ROWS):

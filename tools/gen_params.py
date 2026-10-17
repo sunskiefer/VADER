@@ -38,13 +38,16 @@ TILE_W, TILE_H = 20, 18
 # or one of the two dots at one of 5 x 5 places in the tile. Frames:
 #   0 empty | the shape's pieces: SHAPE_ANG angles x SHAPE_OFF offsets | the trail's: TRAIL_ANG x TRAIL_OFF |
 #   the path dot at 25 places | the orbiter dot at 25 places
-SHAPE_ANG, SHAPE_OFF, SHAPE_DSTEP = 24, 17, 1.6
-TRAIL_ANG, TRAIL_OFF, TRAIL_DSTEP = 12, 11, 2.6
+SHAPE_ANG, SHAPE_OFF, SHAPE_DSTEP = 24, 19, 1.4
+# 0.4.2: the light trail has its own layer of tiles (over the shape, under the dots): a piece at TRAIL_ANG angles x
+# TRAIL_OFF offsets, in TRAIL_LV brightnesses (newest: bright and thick .. oldest: faint and thin)
+TRAIL_ANG, TRAIL_OFF, TRAIL_DSTEP, TRAIL_LV = 24, 9, 2.8, 3
+TRAIL_FRAMES = 1 + TRAIL_LV * TRAIL_ANG * TRAIL_OFF
 DOT_NX, DOT_NY = 5, 5
 # the orbiter: a round dot at 2 px steps, its centre up to 3 px outside the tile, so the tiles around it draw their
 # parts of it and it is never cut at a tile's edge
 ORB_NX, ORB_NY, ORB_X0, ORB_Y0, ORB_STEP = 10, 9, -3, -3, 3
-TILE_FRAMES = 1 + SHAPE_ANG * SHAPE_OFF + TRAIL_ANG * TRAIL_OFF + DOT_NX * DOT_NY + ORB_NX * ORB_NY
+TILE_FRAMES = 1 + SHAPE_ANG * SHAPE_OFF + DOT_NX * DOT_NY + ORB_NX * ORB_NY
 # the built-in 2D shapes as ready-drawn pictures: one per shape, size step and quarter turn
 # 0.4.0: one filmstrip per shape and size step; its frames are the turns, over the shape's own symmetry (a STAR
 # repeats every 1/5 turn, so 6 frames cover it in 12-degree steps). PIC_SYM: how many times a shape repeats in one
@@ -270,6 +273,8 @@ def build():
         add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), extra)
     for i in range(4):
         add("im_m%d" % (i + 1), "MOD %d NOW" % (i + 1), 0, 0, 100, None, True, "DISP", 2200 + i)
+    for i in range(TILE_COLS * TILE_ROWS):   # 0.4.2 (appended): the light trail's layer
+        add("r%03d" % i, "TRAIL %d" % (i + 1), 0, 0, TRAIL_FRAMES - 1, None, True, "DISP", 4000 + i)
     for k in POPUPS_LATE:
         params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
         rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
@@ -298,7 +303,7 @@ def write():
     L.append("#define NGLOB %d" % len(glob))
     L.append("#define NCF %d   /* fields per corner */" % len(CORNER))
     L.append("#define TILE_COLS %d\n#define TILE_ROWS %d\n#define TILE_FRAMES %d" % (TILE_COLS, TILE_ROWS, TILE_FRAMES))
-    for k in ("TILE_W", "TILE_H", "SHAPE_ANG", "SHAPE_OFF", "TRAIL_ANG", "TRAIL_OFF", "DOT_NX", "DOT_NY", "ORB_NX", "ORB_NY", "ORB_X0", "ORB_Y0", "ORB_STEP", "PIC_SHAPES",
+    for k in ("TILE_W", "TILE_H", "SHAPE_ANG", "SHAPE_OFF", "TRAIL_ANG", "TRAIL_OFF", "TRAIL_LV", "TRAIL_FRAMES", "DOT_NX", "DOT_NY", "ORB_NX", "ORB_NY", "ORB_X0", "ORB_Y0", "ORB_STEP", "PIC_SHAPES",
               "PIC_SIZES", "PIC_COUNT", "SQUARE_X", "SQUARE", "P3_SHAPES", "P3_SIZES", "P3_TILT", "P3_YAW",
               "U_SIZES", "U_ROT", "SEL_2D", "SEL_3D", "SEL_USER"):
         L.append("#define %s %d" % (k, globals()[k]))

@@ -1,7 +1,7 @@
 /* The screen, made of pieces MPC can swap (it draws a plugin's screen from pictures; a plugin can't draw on it):
  *  - TILE_COLS x TILE_ROWS tiles. Each shows one straight piece of line, stored by its angle and its distance from the
- *    tile's middle, both rounded (SHAPE_ANG x SHAPE_OFF for the shape, dim; TRAIL_ANG x TRAIL_OFF for the orbiter's
- *    trail, bright), or a dot at one of DOT_NX x DOT_NY places in the tile (the path point, the orbiter). A straight
+ *    tile's middle, both rounded (SHAPE_ANG x SHAPE_OFF), or a dot (the path point, the orbiter). A second layer of
+ *    tiles draws the light trail the same way (TRAIL_ANG x TRAIL_OFF, in TRAIL_LV brightnesses). A straight
  *    line has the same angle in every tile it crosses, so it stays straight from tile to tile.
  *  - The built-in 2D shapes are ready-drawn pictures (tools/vader_skin.py); the tiles draw only your own shapes and
  *    the 3D ones, plus the trail and the dots.
@@ -13,10 +13,11 @@
 
 #define PI_F 3.14159265f
 
-/* one tile's piece, a to b (screen pixels): its frame, or 0 when it's too short to draw */
+/* one tile's piece, a to b (screen pixels): its frame, or 0 when it's too short to draw. The shape's pieces are frames of
+ * the main tiles; the trail's (trail 1..TRAIL_LV: its brightness) frames of the trail's own layer. */
 static int piece_frame(int cell, float ax, float ay, float bx, float by, int trail) {
     float dx = bx - ax, dy = by - ay;
-    if (dx * dx + dy * dy < 0.64f) return 0;
+    if (dx * dx + dy * dy < (trail ? 0.25f : 0.64f)) return 0;
     int A = trail ? TRAIL_ANG : SHAPE_ANG, OFF = trail ? TRAIL_OFF : SHAPE_OFF;
     float step = trail ? TRAIL_DSTEP : SHAPE_DSTEP;
     float th = atan2f(dy, dx);
@@ -29,7 +30,8 @@ static int piece_frame(int cell, float ax, float ay, float bx, float by, int tra
     int half = (OFF - 1) / 2, k = (int)lroundf(d / step);
     if (k < -half) k = -half;
     if (k > half) k = half;
-    return (trail ? FR_TRAIL : FR_SHAPE) + ai * OFF + (k + half);
+    if (trail) return 1 + ((trail - 1) * TRAIL_ANG + ai) * OFF + (k + half);
+    return FR_SHAPE + ai * OFF + (k + half);
 }
 
 static int dot_frame(float px, float py, int base, int *cell) {
@@ -101,27 +103,29 @@ void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int
     finish(&w);
 }
 
-void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, int motion) {
+void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const float *tx, const float *ty, int n,
+                  const float *lit, int motion) {
     memcpy(s->tiles, s->shape, sizeof s->tiles);
-    int cell;
-    if (!motion) {
-        s->trail_n = 0;
-        return;
-    }
-    if (s->trail_n < TRAIL_N) s->trail_n++;
-    memmove(s->trail_x + 1, s->trail_x, sizeof(float) * (TRAIL_N - 1));
-    memmove(s->trail_y + 1, s->trail_y, sizeof(float) * (TRAIL_N - 1));
-    s->trail_x[0] = scr_x(ox);
-    s->trail_y[0] = scr_y(oy);
-    if (s->trail_n > 1) {   /* the suborbit's trail: bright line pieces */
+    memset(s->trail, 0, sizeof s->trail);
+    if (!motion) return;
+    /* the light trail, newest first (a tile keeps the newest, brightest piece): bright and thick behind the orbiter,
+     * fading and thinning towards its end */
+    if (n > 1) {
         walk_t w;
         memset(&w, 0, sizeof w);
-        w.g = s->tiles;
-        w.trail = 1;
+        w.g = s->trail;
         w.cell = -1;
-        for (int i = s->trail_n - 1; i > 0; i--) segment(&w, s->trail_x[i], s->trail_y[i], s->trail_x[i - 1], s->trail_y[i - 1]);
+        for (int i = 0; i < n - 1; i++) {
+            /* the newest tenth bright, the next fifth softer, the rest the faint line of the whole orbit */
+            float u = (float)i / (n - 1);
+            int lv = u < lit[0] ? 1 : u < lit[1] ? 2 : 3;
+            if (lv > TRAIL_LV) lv = TRAIL_LV;
+            if (lv != w.trail) { finish(&w); w.cell = -1; w.trail = lv; }
+            segment(&w, scr_x(tx[i]), scr_y(ty[i]), scr_x(tx[i + 1]), scr_y(ty[i + 1]));
+        }
         finish(&w);
     }
+    int cell;
     int f = dot_frame(scr_x(fx), scr_y(fy), FR_PATHDOT, &cell);
     s->tiles[cell] = (unsigned short)f;
     /* the orbiter: every tile it reaches draws its part of the dot */
