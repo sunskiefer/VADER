@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.2 (2026-10-17)
+
+- **No more clicks when you turn ORBIT SIZE**: ORBIT SIZE, SUBORBIT SIZE and ROTATE now glide to their new value
+  (about 40 ms) instead of jumping in steps, in every patch.
+- The cloud of dots is gone; the suborbit's trail line is back (bright cyan line pieces behind the orbiter).
+- The orbiter stays a round dot.
+
 ## 0.3.1 (2026-10-16)
 
 - The orbiter's trail line is gone (it was drawn in coarse pieces and looked ragged); the trail is the fading cloud of

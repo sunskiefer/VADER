@@ -78,6 +78,7 @@ typedef struct {
     float yaw, last_rot, last_tilt;
     int shape_built;
     float orb_t, orb_o;          /* the free-running orbit */
+    float size_s, sub_s, rot_s;  /* ORBIT SIZE, SUBORBIT SIZE, ROTATE, glided (-1: not yet) */
     float vib_ph, trem_ph;
 } timbre_t;
 
@@ -109,7 +110,6 @@ typedef struct {
     unsigned short sent_tiles[TILE_COLS * TILE_ROWS];
     unsigned char sent_env[ENV_COLS];
     int sent_pic;
-    unsigned short sent_fog[FOG_COLS * FOG_ROWS];
     unsigned char sent_w[4], sent_rd;
     int scr_wait;                /* frames until the next screen update */
     int shape_wait;
@@ -186,13 +186,13 @@ static void timbre_shape(vader_t *s, int t) {
 
 static void project(vader_t *s, int t, float dt) {
     timbre_t *m = &s->tm[t];
-    float rot = T(t)[S_ROTATE] * TWO_PI, tilt = T(t)[S_TILT] * 1.5707963f;
+    float rot = m->rot_s * TWO_PI, tilt = T(t)[S_TILT] * 1.5707963f;
     if (m->base.is3d) {
         float spin = T(t)[S_SPIN];
         m->yaw += spin * spin * TWO_PI * 0.6f * dt;
         if (m->yaw > TWO_PI) m->yaw -= TWO_PI;
         path_project(&m->base, rot, m->yaw, tilt, m->x2, m->y2);
-    } else if (rot != m->last_rot) {
+    } else if (fabsf(rot - m->last_rot) > 1e-5f) {
         path_project(&m->base, rot, 0, 0, m->x2, m->y2);
     }
     m->last_rot = rot;
@@ -661,7 +661,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     float a_inc = 1.0f / (at * SR), d_k = expf(-6.9f / (dc * SR)), r_k = expf(-6.9f / (rl * SR)), sus = P[S_SUSTAIN];
     /* the orbiter */
     float env_now = v->env;
-    float size = P[S_ORB_SIZE];
+    float size = m->size_s;
     float oe = P[S_ORB_ENV];
     if (oe > 0) size *= 1 - oe + oe * env_now;
     else if (oe < 0) size *= 1 + oe * env_now;
@@ -679,7 +679,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     path_at(m->x2, m->y2, ot, &px, &py);
     px *= size;
     py *= size;
-    float sr_ = P[S_SUB_SIZE] * 0.6f;
+    float sr_ = m->sub_s * 0.6f;
     float ox = clampf(px + sr_ * cosf(TWO_PI * oo), -1, 1), oy = clampf(py + sr_ * sinf(TWO_PI * oo), -1, 1);
     v->fx = px; v->fy = py; v->ox = ox; v->oy = oy;
     v->shown_t = ot; v->shown_o = oo;
@@ -840,21 +840,6 @@ static void screen_update(vader_t *s, int force_shape) {
     if (pic != s->sent_pic) { s->sent_pic = pic; mark(s, P_SHAPE_PIC); force_shape = 1; }
     if (force_shape || s->shape_wait <= 0) {
         screen_shape(&s->scr, m->x2, m->y2, size, !pic);
-        {   /* the glow around the line, where it is drawn: the picture's size and quarter turn, or the knobs' */
-            static float gx[PATHN], gy[PATHN];
-            for (int i = 0; i < PATHN; i++) {
-                if (pic) {
-                    float c = q == 2 ? -1 : q == 0 ? 1 : 0, sn = q == 1 ? 1 : q == 3 ? -1 : 0;
-                    float bx = m->base.x[i], by = m->base.y[i];
-                    gx[i] = (bx * c - by * sn) * k / PIC_SIZES;
-                    gy[i] = (bx * sn + by * c) * k / PIC_SIZES;
-                } else {
-                    gx[i] = m->x2[i] * size;
-                    gy[i] = m->y2[i] * size;
-                }
-            }
-            screen_glow(&s->scr, gx, gy, PATHN, 1);
-        }
         s->shape_wait = m->base.is3d && P[S_SPIN] > 0.01f ? 4 : 1 << 30;   /* a turning 3D shape: redrawn 2.5 times a second */
     } else s->shape_wait--;
     screen_frame(&s->scr, fx, fy, ox, oy, motion);
@@ -871,9 +856,7 @@ static void screen_update(vader_t *s, int force_shape) {
             if (qv != s->sent_w[c]) { s->sent_w[c] = qv; mark(s, P_WA + c); }
         }
     }
-    screen_fog(&s->scr, ox, oy, wt, motion);
-    for (int i = 0; i < FOG_COLS * FOG_ROWS; i++)
-        if (s->scr.fog[i] != s->sent_fog[i]) { s->sent_fog[i] = s->scr.fog[i]; mark(s, P_F000 + i); }
+
 }
 
 static void env_update(vader_t *s) {
@@ -947,9 +930,13 @@ static void *create(const char *data_dir) {
     s->tempo = 120;
     s->rng = 0x1234567u;
     for (int t = 0; t < 2; t++) timbre_shape(s, t);
-    for (int t = 0; t < 2; t++) project(s, t, 0);
+    for (int t = 0; t < 2; t++) {
+        s->tm[t].size_s = T(t)[S_ORB_SIZE];
+        s->tm[t].sub_s = T(t)[S_SUB_SIZE];
+        s->tm[t].rot_s = T(t)[S_ROTATE];
+        project(s, t, 0);
+    }
     memset(s->sent_tiles, 0xff, sizeof s->sent_tiles);
-    memset(s->sent_fog, 0xff, sizeof s->sent_fog);
     s->sent_pic = -1;
     memset(s->sent_env, 0xff, sizeof s->sent_env);
     memset(s->sent_w, 0xff, sizeof s->sent_w);
@@ -1219,8 +1206,6 @@ static int get_param(void *p, const char *key, char *buf, int len) {
             if (i >= P_WA && i <= P_WD) return snprintf(buf, (size_t)len, "%d", s->sent_w[i - P_WA] == 0xff ? 25 : s->sent_w[i - P_WA]);
             if (i >= P_E00 && i < P_E00 + ENV_COLS) return snprintf(buf, (size_t)len, "%d", s->sent_env[i - P_E00]);
             if (i >= P_T000 && i < P_T000 + TILE_COLS * TILE_ROWS) return snprintf(buf, (size_t)len, "%d", s->sent_tiles[i - P_T000]);
-            if (i >= P_F000 && i < P_F000 + FOG_COLS * FOG_ROWS)
-                return snprintf(buf, (size_t)len, "%d", s->sent_fog[i - P_F000] == 0xffff ? 0 : s->sent_fog[i - P_F000]);
             if (i == P_SHAPE_PIC) return snprintf(buf, (size_t)len, "%d", s->sent_pic < 0 ? 0 : s->sent_pic);
             return snprintf(buf, (size_t)len, "0");
         default: return 0;
@@ -1322,6 +1307,20 @@ static void render(void *p, int16_t *out, int frames) {
         float vd = clampf(P[S_VIB_DEPTH] + s->modwheel * 0.5f, 0, 1);
         vib[t] = sinf(TWO_PI * m->vib_ph) * vd * vd * 1.0f;   /* semitones */
         trem[t] = (0.5f + 0.5f * sinf(TWO_PI * m->trem_ph)) * P[S_TREM_DEPTH];
+        /* ORBIT SIZE, SUBORBIT SIZE and ROTATE glide to their new values (about 40 ms): a knob or Q-Link moves them in
+         * steps, and a step would jump the orbiter and click */
+        {
+            float kz = 1 - expf(-dt / 0.04f);
+            if (m->size_s < 0) { m->size_s = P[S_ORB_SIZE]; m->sub_s = P[S_SUB_SIZE]; m->rot_s = P[S_ROTATE]; }
+            m->size_s += kz * (P[S_ORB_SIZE] - m->size_s);
+            m->sub_s += kz * (P[S_SUB_SIZE] - m->sub_s);
+            float dr = P[S_ROTATE] - m->rot_s;   /* ROTATE wraps: 0 and 1 are the same turn */
+            if (dr > 0.5f) dr -= 1;
+            if (dr < -0.5f) dr += 1;
+            m->rot_s += kz * dr;
+            if (m->rot_s < 0) m->rot_s += 1;
+            if (m->rot_s >= 1) m->rot_s -= 1;
+        }
         project(s, t, dt);
     }
     /* ---- the voices */

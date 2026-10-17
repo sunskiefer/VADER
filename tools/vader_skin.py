@@ -324,7 +324,7 @@ def meter_strip(w, h, frames=101, colour=ACCENT):
 SS = 4   # drawn 4 times larger, then shrunk: smooth edges
 
 
-def _piece(fr, ang, k, A, step, colour, width, glow):
+def _piece(fr, ang, k, A, step, colour, width, glow, dotted=True):
     """a straight piece: angle ang of A steps, k steps of step px from the tile's middle (src/screen.c piece_frame)"""
     Image, ImageDraw, ImageFilter, _ = _pil()
     w, h = TILE_W, TILE_H
@@ -347,9 +347,12 @@ def _piece(fr, ang, k, A, step, colour, width, glow):
     big = Image.new("RGBA", (w * SS, h * SS), colour + (0,))
     m = Image.new("L", (w * SS, h * SS), 0)
     dm = ImageDraw.Draw(m)
+    if not dotted:
+        dm.line([((px + ux * t0) * SS, (py + uy * t0) * SS), ((px + ux * t1) * SS, (py + uy * t1) * SS)], fill=255,
+                width=int(width * SS))
     gap = 2.6   # dots along the line, counted from the point nearest the tile's middle
     t = math.ceil(t0 / gap) * gap
-    while t <= t1:
+    while dotted and t <= t1:
         X, Y, r = (px + ux * t) * SS, (py + uy * t) * SS, width * 0.62 * SS
         dm.ellipse([X - r, Y - r, X + r, Y + r], fill=255)
         t += gap
@@ -391,66 +394,12 @@ def tile_strip():
         if f[0] == "s":
             _piece(fr, f[1], f[2], G.SHAPE_ANG, G.SHAPE_DSTEP, (70, 160, 255), 1.7, 1.0)
         elif f[0] == "t":
-            _piece(fr, f[1], f[2], G.TRAIL_ANG, G.TRAIL_DSTEP, CYAN, 2.2, 1.2)
+            _piece(fr, f[1], f[2], G.TRAIL_ANG, G.TRAIL_DSTEP, CYAN, 2.2, 1.2, dotted=False)
         elif f[0] == "p":
             _dot(fr, (f[1] + 0.5) * w / G.DOT_NX, (f[2] + 0.5) * h / G.DOT_NY, AMBER, 2.4, 3.6)
         else:
             _dot(fr, G.ORB_X0 + f[1] * G.ORB_STEP, G.ORB_Y0 + f[2] * G.ORB_STEP, CYAN, 3.4, 5.0)
         strip.alpha_composite(fr, (0, i * h))
-    return strip
-
-
-def _blue_noise(w, h, md, seed=7, tries=40000):
-    """a tileable blue-noise point set (wrapping at the edges), each point with a random rank 0..1"""
-    import numpy as np, random
-    rnd = random.Random(seed)
-    pts = np.zeros((0, 2))
-    out = []
-    for _ in range(tries):
-        x, y = rnd.uniform(0, w), rnd.uniform(0, h)
-        if len(pts):
-            dx = np.abs(pts[:, 0] - x); dx = np.minimum(dx, w - dx)
-            dy = np.abs(pts[:, 1] - y); dy = np.minimum(dy, h - dy)
-            if (dx * dx + dy * dy).min() < md * md:
-                continue
-        pts = np.vstack([pts, [x, y]])
-        out.append((x, y, rnd.random()))
-    return out
-
-
-def fog_strip():
-    """the stipple layer's frames (src/screen.c screen_fog): frame = a + 4b + 16c + 64d for the levels (0..3) at the
-    tile's top-left, top-right, bottom-left and bottom-right corners. The dots shown are those whose rank is under the
-    density there (bilinear between the corners), all frames drawn from one point set, so tiles join without seams."""
-    Image, ImageDraw, ImageFilter, _ = _pil()
-    import numpy as np
-    w, h, L = G.FOG_W, G.FOG_H, G.FOG_LV
-    base = _blue_noise(w, h, 1.7)
-    strip = Image.new("RGBA", (w, h * G.FOG_FRAMES), (0, 0, 0, 0))
-    for f in range(G.FOG_FRAMES):
-        a, b, c, d_ = f % L, (f // L) % L, (f // (L * L)) % L, f // (L * L * L)
-        if f == 0:
-            continue
-        m = Image.new("L", (w * SS, h * SS), 0)
-        col = Image.new("L", (w * SS, h * SS), 0)
-        dm, dc = ImageDraw.Draw(m), ImageDraw.Draw(col)
-        for x, y, rk in base:
-            u, v = x / w, y / h
-            den = (a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d_ * u * v) / (L - 1)
-            if rk < den * 0.6:
-                r = (0.42 + 0.5 * den) * SS
-                for ox in (0, -w, w):   # dots crossing the edge show on the other side too (tileable)
-                    for oy in (0, -h, h):
-                        X, Y = (x + ox) * SS, (y + oy) * SS
-                        dm.ellipse([X - r, Y - r, X + r, Y + r], fill=255)
-                        dc.ellipse([X - r, Y - r, X + r, Y + r], fill=int(255 * den))
-        halo = m.filter(ImageFilter.GaussianBlur(1.2 * SS))
-        alpha = np.maximum(np.asarray(m, np.float32), np.asarray(halo, np.float32) * 0.45)
-        t = np.asarray(col, np.float32)[..., None] / 255.0     # denser: from deep blue to light cyan
-        lo, hi = np.array([30, 95, 230], np.float32), np.array([120, 215, 255], np.float32)
-        rgb = lo * (1 - t) + hi * t
-        fr = np.dstack([rgb, alpha]).clip(0, 255).astype("uint8")
-        strip.alpha_composite(Image.fromarray(fr, "RGBA").resize((w, h), Image.LANCZOS), (0, f * h))
     return strip
 
 
@@ -858,14 +807,6 @@ def build_page(sk, page_no, comps):
                                        (sq[0] + sq[2], sq[1] + sq[3], -1, -1)):
                 d.line([(cx_, cy_), (cx_ + 14 * dx, cy_)], fill=(30, 60, 100, 255), width=2)
                 d.line([(cx_, cy_), (cx_, cy_ + 14 * dy)], fill=(30, 60, 100, 255), width=2)
-            # the stipple layer, under everything else on the screen
-            fname = sk.save(fog_strip(), "vd_dots.png")
-            fk = define("vdDots", [], [filmstrip(fname, G.FOG_FRAMES, G.FOG_W, G.FOG_H, "Vertical")], ignore=True)
-            for r in range(G.FOG_ROWS):
-                for q in range(G.FOG_COLS):
-                    i = r * G.FOG_COLS + q
-                    kids.append(placed(fk, "dots %d" % i, sk.index["f%03d" % i],
-                                       (TILES_XY[0] + q * G.FOG_W, TILES_XY[1] + r * G.FOG_H, G.FOG_W, G.FOG_H), False))
             # the built-in shapes' pictures, one shown at a time (the engine's "shape_pic")
             n = G.PIC_COUNT + 1
             for idx in range(G.PIC_SHAPES):

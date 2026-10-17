@@ -71,8 +71,6 @@ directly. So VADER's screen is built from pieces MPC can switch:
 - a grid of **32 × 16 fine tiles** for the rest: your own shapes, the 3D shapes, the path point and the orbiter.
   Each tile holds a straight piece of line at one of 24 angles and 19 positions, so a line stays straight across tiles,
   or a dot at one of 25 places, so the orbiter moves in small steps;
-- a **stipple layer** under the lines: fine dots that cloud around the shape, trail behind the orbiter and gather at
-  each corner as loud as it is heard (16 x 8 tiles whose dot density blends smoothly into the next);
 - the shape drawn as a **chain of dots**, the orbiter as a round dot moving in 2 px steps;
 - a light **glass** layer on top (fine scanlines, darker edges), like a CRT;
 - the **envelope**, drawn as 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE;
@@ -81,7 +79,7 @@ directly. So VADER's screen is built from pieces MPC can switch:
 The square of the corners is drawn square, at its true proportions.
 
 The engine works out what each piece shows, about ten times a second, and only tells MPC about the pieces that changed.
-The shape is drawn in dim blue, the path point in amber and the orbiter in cyan.
+The shape is drawn in dim blue, the suborbit's trail in bright cyan, the path point in amber and the orbiter in cyan.
 **MOTION** off freezes the screen, which saves MPC's screen CPU in a heavy project.
 
 | | |
@@ -123,13 +121,13 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.3.1 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
+**0.3.2 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
 Force can show:
 - **CPU**: the worst case (16 voices, all four corners with ladder filters, every effect) should be measured with the
   framework's `tools/bench.sh`. The default is 8 voices.
-- **The screen**: the MAIN page has about 1180 parts (most of them the shape pictures, only one shown at a time), more
+- **The screen**: the MAIN page has about 1050 parts (most of them the shape pictures, only one shown at a time), more
   than any skin before it. If MPC finds that heavy, the grid can be made coarser.
 
 ## License

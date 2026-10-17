@@ -103,8 +103,8 @@ once (and shows corner A's value).
 **SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in dim blue, the
 the path point (amber) and the orbiter (cyan). A, B, C and D mark the corners;
 the four bars under it show how much of each you are hearing. It follows the newest note of the timbre you are editing.
-If you load a shape file, it is drawn there too. Under the lines, a cloud of fine dots: it gathers around the shape,
-trails behind the orbiter and fades, and grows at each corner as loud as that corner is heard.
+If you load a shape file, it is drawn there too.
+The orbiter's recent path (the suborbit's trail) is the bright cyan line behind it.
 
 **The corner knobs** (ALT off): **GEN 1**, **GEN 2** (the two overtone generators), **BLEND**, **CUTOFF**, **RESO**,
 for the corner(s) picked with CORNER SELECT. With ALT on, the same knobs are **DRIVE**, **DRV COLOUR**, **REV SIZE**,

@@ -29,7 +29,7 @@ static int piece_frame(int cell, float ax, float ay, float bx, float by, int tra
     int half = (OFF - 1) / 2, k = (int)lroundf(d / step);
     if (k < -half) k = -half;
     if (k > half) k = half;
-    return FR_SHAPE + ai * OFF + (k + half);
+    return (trail ? FR_TRAIL : FR_SHAPE) + ai * OFF + (k + half);
 }
 
 static int dot_frame(float px, float py, int base, int *cell) {
@@ -113,6 +113,15 @@ void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, int motio
     memmove(s->trail_y + 1, s->trail_y, sizeof(float) * (TRAIL_N - 1));
     s->trail_x[0] = scr_x(ox);
     s->trail_y[0] = scr_y(oy);
+    if (s->trail_n > 1) {   /* the suborbit's trail: bright line pieces */
+        walk_t w;
+        memset(&w, 0, sizeof w);
+        w.g = s->tiles;
+        w.trail = 1;
+        w.cell = -1;
+        for (int i = s->trail_n - 1; i > 0; i--) segment(&w, s->trail_x[i], s->trail_y[i], s->trail_x[i - 1], s->trail_y[i - 1]);
+        finish(&w);
+    }
     int f = dot_frame(scr_x(fx), scr_y(fy), FR_PATHDOT, &cell);
     s->tiles[cell] = (unsigned short)f;
     /* the orbiter: every tile it reaches draws its part of the dot */
@@ -123,55 +132,6 @@ void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, int motio
             int ix = (int)lroundf((px - c * TILE_W - ORB_X0) / ORB_STEP), iy = (int)lroundf((py - r * TILE_H - ORB_Y0) / ORB_STEP);
             if (ix < 0 || ix >= ORB_NX || iy < 0 || iy >= ORB_NY) continue;
             s->tiles[r * TILE_COLS + c] = (unsigned short)(FR_ORBDOT + iy * ORB_NX + ix);
-        }
-}
-
-/* ---- the stipple layer */
-#define FV ((FOG_ROWS + 1) * (FOG_COLS + 1))
-
-void screen_glow(screen_t *s, const float *x, const float *y, int n, int draw) {
-    for (int v = 0; v < FV; v++) {
-        if (!draw || n < 2) { s->glow[v] = 0; continue; }
-        float gx = (float)(v % (FOG_COLS + 1)) * FOG_W, gy = (float)(v / (FOG_COLS + 1)) * FOG_H, best = 1e9f;
-        for (int i = 0; i < n; i++) {
-            int j = (i + 1) % n;
-            float ax = scr_x(x[i]), ay = scr_y(y[i]), bx = scr_x(x[j]), by = scr_y(y[j]);
-            float dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
-            float t = l2 > 1e-6f ? ((gx - ax) * dx + (gy - ay) * dy) / l2 : 0;
-            if (t < 0) t = 0;
-            if (t > 1) t = 1;
-            float ex = ax + dx * t - gx, ey = ay + dy * t - gy, d2 = ex * ex + ey * ey;
-            if (d2 < best) best = d2;
-        }
-        s->glow[v] = 0.62f * expf(-sqrtf(best) / 22.0f);
-    }
-}
-
-void screen_fog(screen_t *s, float ox, float oy, const float *wt, int motion) {
-    static const float CX[4] = {0, 1, 0, 1}, CY[4] = {0, 0, 1, 1};
-    float px = scr_x(ox), py = scr_y(oy);
-    unsigned char lv[FV];
-    for (int v = 0; v < FV; v++) {
-        float gx = (float)(v % (FOG_COLS + 1)) * FOG_W, gy = (float)(v / (FOG_COLS + 1)) * FOG_H;
-        float d = s->glow[v];
-        if (motion) {
-            float ex = gx - px, ey = gy - py, h = expf(-(ex * ex + ey * ey) / (2 * 24.0f * 24.0f));
-            s->heat[v] = fmaxf(s->heat[v] * 0.86f, h);
-            d = fmaxf(d, s->heat[v]);
-            for (int c = 0; c < 4; c++) {   /* the corners, as loud as they are heard */
-                float cx = SQUARE_X + CX[c] * SQUARE, cy = CY[c] * SQUARE, r = 26.0f + 70.0f * wt[c];
-                float qx = gx - cx, qy = gy - cy;
-                d += 0.55f * wt[c] * expf(-(qx * qx + qy * qy) / (2 * r * r));
-            }
-        } else s->heat[v] = 0;
-        int l = (int)(d * (FOG_LV - 1) + 0.5f);
-        lv[v] = (unsigned char)(l < 0 ? 0 : l > FOG_LV - 1 ? FOG_LV - 1 : l);
-    }
-    for (int r = 0; r < FOG_ROWS; r++)
-        for (int c = 0; c < FOG_COLS; c++) {
-            int v = r * (FOG_COLS + 1) + c;
-            s->fog[r * FOG_COLS + c] = (unsigned char)(lv[v] + FOG_LV * lv[v + 1] + FOG_LV * FOG_LV * lv[v + FOG_COLS + 1] +
-                                                       FOG_LV * FOG_LV * FOG_LV * lv[v + FOG_COLS + 2]);
         }
 }
 

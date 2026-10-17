@@ -85,7 +85,8 @@ void fx_clear(fx_t *f);
 /* ---- screen.c: the line screen (tiles) and the envelope line */
 #define TRAIL_N 14
 #define FR_SHAPE 1
-#define FR_PATHDOT (FR_SHAPE + SHAPE_ANG * SHAPE_OFF)
+#define FR_TRAIL (FR_SHAPE + SHAPE_ANG * SHAPE_OFF)
+#define FR_PATHDOT (FR_TRAIL + TRAIL_ANG * TRAIL_OFF)
 #define FR_ORBDOT (FR_PATHDOT + DOT_NX * DOT_NY)
 typedef struct {
     unsigned short tiles[TILE_COLS * TILE_ROWS];
@@ -93,10 +94,6 @@ typedef struct {
     float trail_x[TRAIL_N], trail_y[TRAIL_N];      /* screen pixels */
     int trail_n;
     unsigned char env[ENV_COLS];
-    /* the stipple layer: density at each corner of its tiles */
-    float glow[(FOG_ROWS + 1) * (FOG_COLS + 1)];   /* around the shape's line */
-    float heat[(FOG_ROWS + 1) * (FOG_COLS + 1)];   /* where the orbiter has just been, fading */
-    unsigned char fog[FOG_COLS * FOG_ROWS];        /* each tile's frame: its 4 corners' levels */
 } screen_t;
 /* x, y in -1..1 (the corners' square) -> the screen's pixels (640 x 288: the square in the middle, true proportions) */
 static inline float scr_x(float x) { return SQUARE_X + (x + 1) * 0.5f * SQUARE; }
@@ -105,7 +102,3 @@ void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int
 void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, int motion);
 void screen_env(screen_t *s, float a, float d, float sus, float r);
 int env_pair_index(int r0, int r1);
-/* the stipple layer: the glow around a path (x, y in -1..1, already sized and turned); then each frame: the fading
- * heat where the orbiter (ox, oy) passes and a cloud at each corner as loud as it is heard (wt[4]) */
-void screen_glow(screen_t *s, const float *x, const float *y, int n, int draw);
-void screen_fog(screen_t *s, float ox, float oy, const float *wt, int motion);
