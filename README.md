@@ -85,7 +85,7 @@ directly. So VADER's screen is built from pieces MPC can switch:
 The square of the corners is drawn square, at its true proportions.
 
 The engine works out what each piece shows, 25 times a second, and only tells MPC about the pieces that changed.
-The shape is drawn in dim blue, the suborbit's trail in bright cyan, the path point in amber and the orbiter in cyan.
+The shape is drawn in dim blue, the orbit line faint and its light trail bright cyan, the path point in amber and the orbiter in cyan.
 **MOTION** off freezes the screen, which saves MPC's screen CPU in a heavy project.
 
 | | |
