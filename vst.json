@@ -2,7 +2,7 @@
   "name": "VADER",
   "vendor": "L'Cronx",
   "uid": "AnVd",
-  "version": 4002,
+  "version": 4003,
   "so": "vader.so",
   "params": "params.json",
   "layout": "layout.conf",

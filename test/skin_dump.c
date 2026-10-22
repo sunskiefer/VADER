@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
     E->midi(s, on, 3);
     E->midi(s, on2, 3);
     int16_t out[256];
-    for (int i = 0; i < 345 * 2 + 37; i++) E->render(s, out, 128);
+    int nb = getenv("VADER_BLOCKS") ? atoi(getenv("VADER_BLOCKS")) : 345 * 2 + 37;   /* how long it plays first */
+    for (int i = 0; i < nb; i++) E->render(s, out, 128);
     for (int i = 0; i < NPARAMS; i++) {
         const param_t *p = &PARAMS[i];
         char v[256] = "", d[256] = "";

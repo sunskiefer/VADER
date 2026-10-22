@@ -103,22 +103,30 @@ void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int
     finish(&w);
 }
 
-void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const float *tx, const float *ty, int n,
-                  const float *lit, int motion) {
+void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const float *lx, const float *ly, int ln,
+                  const float *tx, const float *ty, int tn, int motion) {
     memcpy(s->tiles, s->shape, sizeof s->tiles);
     memset(s->trail, 0, sizeof s->trail);
     if (!motion) return;
-    /* the light trail, newest first (a tile keeps the newest, brightest piece): bright and thick behind the orbiter,
-     * fading and thinning towards its end */
-    if (n > 1) {
+    if (ln > 1) {   /* the orbit line: only into tiles the shape doesn't use */
+        static unsigned short line[TILE_COLS * TILE_ROWS];
+        walk_t w;
+        memset(line, 0, sizeof line);
+        memset(&w, 0, sizeof w);
+        w.g = line;
+        w.cell = -1;
+        for (int i = 0; i < ln - 1; i++) segment(&w, scr_x(lx[i]), scr_y(ly[i]), scr_x(lx[i + 1]), scr_y(ly[i + 1]));
+        finish(&w);
+        for (int i = 0; i < TILE_COLS * TILE_ROWS; i++)
+            if (!s->tiles[i]) s->tiles[i] = line[i];
+    }
+    if (tn > 1) {   /* the light trail, newest first: a tile keeps the newest, brightest piece */
         walk_t w;
         memset(&w, 0, sizeof w);
         w.g = s->trail;
         w.cell = -1;
-        for (int i = 0; i < n - 1; i++) {
-            /* the newest tenth bright, the next fifth softer, the rest the faint line of the whole orbit */
-            float u = (float)i / (n - 1);
-            int lv = u < lit[0] ? 1 : u < lit[1] ? 2 : 3;
+        for (int i = 0; i < tn - 1; i++) {
+            int lv = 1 + i * TRAIL_LV / (tn - 1);
             if (lv > TRAIL_LV) lv = TRAIL_LV;
             if (lv != w.trail) { finish(&w); w.cell = -1; w.trail = lv; }
             segment(&w, scr_x(tx[i]), scr_y(ty[i]), scr_x(tx[i + 1]), scr_y(ty[i + 1]));

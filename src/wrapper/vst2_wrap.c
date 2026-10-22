@@ -154,6 +154,7 @@ typedef struct {
     int nrpn_msb;
     volatile char cc_changed[NPARAMS];   /* set from MIDI CC/NRPN, reported to the host at most every 1024 frames */
     int cc_report;           /* frames until CC-driven changes are reported again */
+    int update_wait;         /* frames until another audioMasterUpdateDisplay may be sent (see housekeeping) */
     int program;             /* NPRESETS: the preset last picked (not in the engine's state; 0 after a reload) */
 #if SAMPLE_ACCURATE
     struct { int32_t frame; uint8_t msg[3]; } evq[WRAP_EVQ];   /* this block's MIDI, sorted by frame (see queue_midi) */
@@ -342,7 +343,11 @@ static void setParameter(AEffect *e, int32_t i, float n) {
     eng_set(w, PARAMS[i].key, buf);
     if (PARAMS[i].momentary && n > 0.5f) w->holdFrames[i] = PARAMS[i].hold_ms > 0 ? (int)(PARAMS[i].hold_ms * 44.1f) : 1;
     if (!nudge) popup_picked(w->open, w->holdFrames, i);   /* a list pick closes it; a Q-Link nudge doesn't */
-    w->need_update_display = 1;   /* deferred to processReplacing(), see the step_target branch above */
+    /* mpc-vst-plugins #486: no UpdateDisplay for a plain host write: the host knows the value it sent, and MPC answers every
+     * UpdateDisplay by rebuilding its parameter screen, so asking on each write (each automation step, each Q-Link event) left
+     * Q-Links unable to move a param on the track's automation screen. Polled readouts see the change within 100 ms
+     * (housekeeping); "refresh_display" opts a param back in for unpolled text that depends on it. */
+    if (p->refresh_display) w->need_update_display = 1;   /* deferred to processReplacing(), see the step_target branch above */
 }
 
 static float getParameter(AEffect *e, int32_t i) {
@@ -529,8 +534,12 @@ static void housekeeping(AEffect *e, int32_t n) {
         for (int i = 0; i < NPARAMS; i++)
             if (w->cc_changed[i]) { w->cc_changed[i] = 0; w->master(&w->fx, audioMasterAutomate, i, 0, 0, get_norm(w, i)); }
     }
-    if (w->need_update_display) {
+    /* mpc-vst-plugins #487: at most one UpdateDisplay per 50 ms (2205 frames); a request inside that window waits, it is not
+     * dropped. MPC rebuilds its parameter screen on each one, so a burst must not become a rebuild per block. */
+    if (w->update_wait > 0) w->update_wait -= n;
+    if (w->need_update_display && w->update_wait <= 0) {
         w->need_update_display = 0;
+        w->update_wait = 2205;
         w->master(&w->fx, audioMasterUpdateDisplay, 0, 0, 0, 0.0f);
     }
 }

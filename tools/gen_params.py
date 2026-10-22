@@ -39,9 +39,10 @@ TILE_W, TILE_H = 20, 18
 #   0 empty | the shape's pieces: SHAPE_ANG angles x SHAPE_OFF offsets | the trail's: TRAIL_ANG x TRAIL_OFF |
 #   the path dot at 25 places | the orbiter dot at 25 places
 SHAPE_ANG, SHAPE_OFF, SHAPE_DSTEP = 24, 19, 1.4
-# 0.4.2: the light trail has its own layer of tiles (over the shape, under the dots): a piece at TRAIL_ANG angles x
-# TRAIL_OFF offsets, in TRAIL_LV brightnesses (newest: bright and thick .. oldest: faint and thin)
-TRAIL_ANG, TRAIL_OFF, TRAIL_DSTEP, TRAIL_LV = 24, 9, 2.8, 3
+# the light trail has its own layer of tiles (over the shape, under the dots): a piece at TRAIL_ANG angles x TRAIL_OFF
+# offsets (0.4.3: 13 offsets 2 px apart, finer), in TRAIL_LV brightnesses (newest: bright and thick, then softer). The faint
+# line of the whole orbit is drawn with the shape's pieces on the main tiles, and stays still while nothing changes.
+TRAIL_ANG, TRAIL_OFF, TRAIL_DSTEP, TRAIL_LV = 24, 13, 2.0, 2
 TRAIL_FRAMES = 1 + TRAIL_LV * TRAIL_ANG * TRAIL_OFF
 DOT_NX, DOT_NY = 5, 5
 # the orbiter: a round dot at 2 px steps, its centre up to 3 px outside the tile, so the tiles around it draw their
@@ -243,6 +244,8 @@ def build():
             extra = {"dynamic_display": True, "nudge_pct": 10}
         if k == "preset":
             extra = {"dynamic_display": True}
+        if k in ("corner", "timbre"):   # the corner knobs' names ("GEN 1 [A]") follow them: ask MPC to redraw (wrapper #486)
+            extra = {"refresh_display": True}
         add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), extra)
     for k, name in TRIGGERS:
         add(k, name, 0, 0, 1, None, False, "TRIG", 0, {"momentary": True})

@@ -113,6 +113,7 @@ typedef struct {
     unsigned short sent_tiles[TILE_COLS * TILE_ROWS], sent_trail[TILE_COLS * TILE_ROWS];
     unsigned char sent_env[ENV_COLS];
     int sent_pic;
+    int grid_next;               /* where the screen's tile reports take their turn from */
     unsigned char sent_w[4], sent_rd;
     int scr_wait;                /* frames until the next screen update */
     int shape_wait;
@@ -157,6 +158,8 @@ static inline float norm_of(int p, float v) {
     const vp_t *q = &VP[p];
     return q->max > q->min ? (v - q->min) / (q->max - q->min) : 0;
 }
+#define SCREEN_BUDGET 48   /* screen tiles reported to MPC per poll (25 polls a second) */
+static int is_grid(int p) { return (p >= P_T000 && p < P_T000 + TILE_COLS * TILE_ROWS) || (p >= P_R000 && p < P_R000 + TILE_COLS * TILE_ROWS); }
 static void mark(vader_t *s, int p) {
     if (p >= 0 && p < NP) s->dirty[p] = 1;
 }
@@ -975,36 +978,38 @@ static void screen_update(vader_t *s, int force_shape) {
         screen_shape(&s->scr, m->x2, m->y2, size, !pic);
         s->shape_wait = m->base.is3d && P[S_SPIN] > 0.01f && !pic ? 10 : 1 << 30;   /* a turning 3D shape the tiles draw: 2.5 times a second */
     } else s->shape_wait--;
-    /* the orbit line: the orbiter's whole path over one orbit (with its suborbit loops), worked out from the orbit and
-     * suborbit speeds, so it follows the real curve and turns, grows, spins and tilts with the shape. The part it has
-     * just passed is the bright light trail (about 3/4 of a suborbit turn, at least 1/10 of the line). */
-    static float tx[TRAIL_PTS], ty[TRAIL_PTS];
-    int npts;
-    float lit[2];
-    {
-        float sub = fabsf(m->sub_now), hz = fabsf(m->hz_now);
-        float T_ = hz > 0.05f ? 1.0f / hz : 20.0f;   /* one orbit */
-        if (sub > 0.01f && T_ > 12.0f / sub) T_ = 12.0f / sub;   /* at most 12 suborbit loops, or it fills the screen */
-        if (T_ > 20.0f) T_ = 20.0f;
-        float loops = sub * T_;
-        npts = (int)(96 + loops * 40);
-        if (npts > TRAIL_PTS) npts = TRAIL_PTS;
-        float tl = sub > 0.01f ? 0.75f / sub : 0.4f;
-        if (tl < 0.08f) tl = 0.08f;
-        lit[0] = fmaxf(tl / T_, 0.1f);
-        if (lit[0] > 0.5f) lit[0] = 0.5f;
-        lit[1] = fminf(lit[0] * 2.5f, 0.75f);
-        for (int k = 0; k < npts; k++) {
-            float tk = T_ * k / (npts - 1), a = ot - m->hz_now * tk, b = oo - m->sub_now * tk, px, py;
-            a -= floorf(a);
-            b -= floorf(b);
-            if (pic) path_at(qx, qy, a, &px, &py);
-            else { path_at(m->x2, m->y2, a, &px, &py); px *= size; py *= size; }
-            tx[k] = clampf(px + sr_ * cosf(TWO_PI * b), -1, 1);
-            ty[k] = clampf(py + sr_ * sinf(TWO_PI * b), -1, 1);
+    /* the orbit line: the orbiter's whole path over one orbit (with its suborbit loops), from the orbit and suborbit
+     * speeds. Its start is tied to the orbit, not to now, so it stays still while nothing changes (no screen traffic),
+     * and turns, grows, spins and tilts with the shape. The light trail: the last moment of it, newest first. */
+    static float lx[LINE_PTS], ly[LINE_PTS], tx[TRAIL_PTS], ty[TRAIL_PTS];
+    int ln = 0;
+    float sub = m->sub_now, hz = m->hz_now;
+#define ORBIT_AT(a_, b_, X, Y) do { float px_, py_, aa_ = (a_) - floorf(a_), bb_ = (b_) - floorf(b_); \
+        if (pic) path_at(qx, qy, aa_, &px_, &py_); else { path_at(m->x2, m->y2, aa_, &px_, &py_); px_ *= size; py_ *= size; } \
+        X = clampf(px_ + sr_ * cosf(TWO_PI * bb_), -1, 1); Y = clampf(py_ + sr_ * sinf(TWO_PI * bb_), -1, 1); } while (0)
+    if (fabsf(hz) > 0.05f && sr_ > 0.004f) {
+        float ratio = sub / hz;                    /* suborbit turns per orbit */
+        float b0 = oo - ratio * ot;                /* the suborbit phase where the orbit starts */
+        b0 = roundf((b0 - floorf(b0)) * 64) / 64;  /* steady: tiny drifts don't redraw it */
+        float span = fabsf(ratio) > 12 ? 12 / fabsf(ratio) : 1;   /* at most 12 loops, or it fills the screen */
+        ln = (int)(96 + fabsf(ratio * span) * 40);
+        if (ln > LINE_PTS) ln = LINE_PTS;
+        for (int k = 0; k < ln; k++) {
+            float a = span * k / (ln - 1);
+            ORBIT_AT(a, b0 + ratio * a, lx[k], ly[k]);
         }
     }
-    screen_frame(&s->scr, fx, fy, ox, oy, tx, ty, npts, lit, motion);
+    {
+        float tl = fabsf(sub) > 0.01f ? 0.6f / fabsf(sub) : 0.35f;   /* about 3/5 of a suborbit turn */
+        if (tl > 0.6f) tl = 0.6f;
+        if (tl < 0.06f) tl = 0.06f;
+        for (int k = 0; k < TRAIL_PTS; k++) {
+            float tk = tl * k / (TRAIL_PTS - 1);
+            ORBIT_AT(ot - hz * tk, oo - sub * tk, tx[k], ty[k]);
+        }
+    }
+#undef ORBIT_AT
+    screen_frame(&s->scr, fx, fy, ox, oy, lx, ly, ln, tx, ty, TRAIL_PTS, motion);
     for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
         if (s->scr.tiles[i] != s->sent_tiles[i]) { s->sent_tiles[i] = s->scr.tiles[i]; mark(s, P_T000 + i); }
         if (s->scr.trail[i] != s->sent_trail[i]) { s->sent_trail[i] = s->scr.trail[i]; mark(s, P_R000 + i); }
@@ -1391,14 +1396,30 @@ static int get_param(void *p, const char *key, char *buf, int len) {
         }
     }
     if (!strcmp(key, "dirty")) {
+        /* What changed, for the wrapper to tell MPC (one host call each, on the audio thread). Everything but the screen's
+         * tiles goes out at once; the tiles at most SCREEN_BUDGET a poll, taking turns, so a big redraw (a new shape, a
+         * new size) spreads over a few polls instead of one burst MPC can't keep up with (crackles). */
         collect_load(s);
-        int n = 0;
+        int n = 0, budget = SCREEN_BUDGET;
         buf[0] = 0;
         for (int k = 0; k < NP && n < len - 8; k++)
-            if (s->dirty[k]) {
+            if (s->dirty[k] && !is_grid(k)) {
                 s->dirty[k] = 0;
                 n += snprintf(buf + n, (size_t)(len - n), "%d ", k);
             }
+        /* the orbiter's and the trail's tiles first (they move), then the rest in turn */
+        for (int pass = 0; pass < 2 && budget > 0; pass++)
+            for (int j = 0; j < 2 * TILE_COLS * TILE_ROWS && budget > 0 && n < len - 8; j++) {
+                int g = (s->grid_next + j) % (2 * TILE_COLS * TILE_ROWS);
+                int k = g < TILE_COLS * TILE_ROWS ? P_T000 + g : P_R000 + g - TILE_COLS * TILE_ROWS;
+                if (!s->dirty[k]) continue;
+                int moving = g >= TILE_COLS * TILE_ROWS || s->scr.tiles[g] >= FR_PATHDOT;
+                if (pass == 0 && !moving) continue;
+                s->dirty[k] = 0;
+                budget--;
+                n += snprintf(buf + n, (size_t)(len - n), "%d ", k);
+            }
+        s->grid_next = (s->grid_next + 97) % (2 * TILE_COLS * TILE_ROWS);
         return n > 0 ? n : snprintf(buf, (size_t)len, " ");
     }
     if (!strcmp(key, "state")) {

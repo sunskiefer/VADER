@@ -421,7 +421,7 @@ def tile_strip():
 
 
 # the light trail's brightnesses, newest to oldest: (colour, line width, glow, opacity)
-TRAIL_LOOK = [((170, 255, 255), 2.8, 1.6, 1.0), ((90, 220, 255), 2.0, 1.3, 0.62), ((50, 150, 255), 1.4, 1.0, 0.32)]
+TRAIL_LOOK = [((170, 255, 255), 2.6, 1.5, 1.0), ((80, 210, 255), 1.9, 1.2, 0.6)]
 
 
 def trail_strip():

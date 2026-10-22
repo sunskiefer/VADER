@@ -89,7 +89,8 @@ void fx_clear(fx_t *f);
 /* ---- screen.c: the line screen (tiles) and the envelope line */
 #define FR_SHAPE 1
 #define FR_PATHDOT (FR_SHAPE + SHAPE_ANG * SHAPE_OFF)
-#define TRAIL_PTS 640  /* most points of the orbit line, newest first */
+#define LINE_PTS 640   /* most points of the orbit line */
+#define TRAIL_PTS 48   /* points of the light trail, newest first */
 #define FR_ORBDOT (FR_PATHDOT + DOT_NX * DOT_NY)
 typedef struct {
     unsigned short tiles[TILE_COLS * TILE_ROWS];
@@ -108,10 +109,10 @@ static inline void upic_frame(int k, int *w, int *h) {
 }
 int write_user_pictures(const char *skin_dir, const path_t *p);   /* 1: written */
 void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int draw);
-/* the dots (path point fx, fy; orbiter ox, oy), and the orbit line through tx, ty (n points on the square, newest
- * first: the orbiter's whole path over one orbit). lit[0], lit[1]: where (0..1 along it) the bright light trail and its
- * softer tail end; the rest is drawn as a faint thin line. */
-void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const float *tx, const float *ty, int n,
-                  const float *lit, int motion);
+/* the dots (path point fx, fy; orbiter ox, oy); the orbit line through lx, ly (ln points on the square: the orbiter's
+ * whole path over one orbit, drawn faint and thin with the shape's pieces where the shape leaves room); the light trail
+ * through tx, ty (tn points, newest first: bright for the first half, softer after) */
+void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const float *lx, const float *ly, int ln,
+                  const float *tx, const float *ty, int tn, int motion);
 void screen_env(screen_t *s, float a, float d, float sus, float r);
 int env_pair_index(int r0, int r1);

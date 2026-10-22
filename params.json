@@ -736,7 +736,8 @@
     "A",
     "B"
    ],
-   "default": "A"
+   "default": "A",
+   "refresh_display": true
   },
   {
    "key": "keys",
@@ -784,7 +785,8 @@
     "D",
     "ALL"
    ],
-   "default": "ALL"
+   "default": "ALL",
+   "refresh_display": true
   },
   {
    "key": "alt",
@@ -6010,7 +6012,7 @@
    "name": "TRAIL 1",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6018,7 +6020,7 @@
    "name": "TRAIL 2",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6026,7 +6028,7 @@
    "name": "TRAIL 3",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6034,7 +6036,7 @@
    "name": "TRAIL 4",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6042,7 +6044,7 @@
    "name": "TRAIL 5",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6050,7 +6052,7 @@
    "name": "TRAIL 6",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6058,7 +6060,7 @@
    "name": "TRAIL 7",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6066,7 +6068,7 @@
    "name": "TRAIL 8",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6074,7 +6076,7 @@
    "name": "TRAIL 9",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6082,7 +6084,7 @@
    "name": "TRAIL 10",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6090,7 +6092,7 @@
    "name": "TRAIL 11",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6098,7 +6100,7 @@
    "name": "TRAIL 12",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6106,7 +6108,7 @@
    "name": "TRAIL 13",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6114,7 +6116,7 @@
    "name": "TRAIL 14",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6122,7 +6124,7 @@
    "name": "TRAIL 15",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6130,7 +6132,7 @@
    "name": "TRAIL 16",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6138,7 +6140,7 @@
    "name": "TRAIL 17",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6146,7 +6148,7 @@
    "name": "TRAIL 18",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6154,7 +6156,7 @@
    "name": "TRAIL 19",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6162,7 +6164,7 @@
    "name": "TRAIL 20",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6170,7 +6172,7 @@
    "name": "TRAIL 21",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6178,7 +6180,7 @@
    "name": "TRAIL 22",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6186,7 +6188,7 @@
    "name": "TRAIL 23",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6194,7 +6196,7 @@
    "name": "TRAIL 24",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6202,7 +6204,7 @@
    "name": "TRAIL 25",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6210,7 +6212,7 @@
    "name": "TRAIL 26",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6218,7 +6220,7 @@
    "name": "TRAIL 27",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6226,7 +6228,7 @@
    "name": "TRAIL 28",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6234,7 +6236,7 @@
    "name": "TRAIL 29",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6242,7 +6244,7 @@
    "name": "TRAIL 30",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6250,7 +6252,7 @@
    "name": "TRAIL 31",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6258,7 +6260,7 @@
    "name": "TRAIL 32",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6266,7 +6268,7 @@
    "name": "TRAIL 33",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6274,7 +6276,7 @@
    "name": "TRAIL 34",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6282,7 +6284,7 @@
    "name": "TRAIL 35",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6290,7 +6292,7 @@
    "name": "TRAIL 36",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6298,7 +6300,7 @@
    "name": "TRAIL 37",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6306,7 +6308,7 @@
    "name": "TRAIL 38",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6314,7 +6316,7 @@
    "name": "TRAIL 39",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6322,7 +6324,7 @@
    "name": "TRAIL 40",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6330,7 +6332,7 @@
    "name": "TRAIL 41",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6338,7 +6340,7 @@
    "name": "TRAIL 42",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6346,7 +6348,7 @@
    "name": "TRAIL 43",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6354,7 +6356,7 @@
    "name": "TRAIL 44",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6362,7 +6364,7 @@
    "name": "TRAIL 45",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6370,7 +6372,7 @@
    "name": "TRAIL 46",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6378,7 +6380,7 @@
    "name": "TRAIL 47",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6386,7 +6388,7 @@
    "name": "TRAIL 48",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6394,7 +6396,7 @@
    "name": "TRAIL 49",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6402,7 +6404,7 @@
    "name": "TRAIL 50",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6410,7 +6412,7 @@
    "name": "TRAIL 51",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6418,7 +6420,7 @@
    "name": "TRAIL 52",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6426,7 +6428,7 @@
    "name": "TRAIL 53",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6434,7 +6436,7 @@
    "name": "TRAIL 54",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6442,7 +6444,7 @@
    "name": "TRAIL 55",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6450,7 +6452,7 @@
    "name": "TRAIL 56",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6458,7 +6460,7 @@
    "name": "TRAIL 57",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6466,7 +6468,7 @@
    "name": "TRAIL 58",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6474,7 +6476,7 @@
    "name": "TRAIL 59",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6482,7 +6484,7 @@
    "name": "TRAIL 60",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6490,7 +6492,7 @@
    "name": "TRAIL 61",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6498,7 +6500,7 @@
    "name": "TRAIL 62",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6506,7 +6508,7 @@
    "name": "TRAIL 63",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6514,7 +6516,7 @@
    "name": "TRAIL 64",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6522,7 +6524,7 @@
    "name": "TRAIL 65",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6530,7 +6532,7 @@
    "name": "TRAIL 66",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6538,7 +6540,7 @@
    "name": "TRAIL 67",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6546,7 +6548,7 @@
    "name": "TRAIL 68",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6554,7 +6556,7 @@
    "name": "TRAIL 69",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6562,7 +6564,7 @@
    "name": "TRAIL 70",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6570,7 +6572,7 @@
    "name": "TRAIL 71",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6578,7 +6580,7 @@
    "name": "TRAIL 72",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6586,7 +6588,7 @@
    "name": "TRAIL 73",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6594,7 +6596,7 @@
    "name": "TRAIL 74",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6602,7 +6604,7 @@
    "name": "TRAIL 75",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6610,7 +6612,7 @@
    "name": "TRAIL 76",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6618,7 +6620,7 @@
    "name": "TRAIL 77",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6626,7 +6628,7 @@
    "name": "TRAIL 78",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6634,7 +6636,7 @@
    "name": "TRAIL 79",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6642,7 +6644,7 @@
    "name": "TRAIL 80",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6650,7 +6652,7 @@
    "name": "TRAIL 81",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6658,7 +6660,7 @@
    "name": "TRAIL 82",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6666,7 +6668,7 @@
    "name": "TRAIL 83",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6674,7 +6676,7 @@
    "name": "TRAIL 84",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6682,7 +6684,7 @@
    "name": "TRAIL 85",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6690,7 +6692,7 @@
    "name": "TRAIL 86",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6698,7 +6700,7 @@
    "name": "TRAIL 87",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6706,7 +6708,7 @@
    "name": "TRAIL 88",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6714,7 +6716,7 @@
    "name": "TRAIL 89",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6722,7 +6724,7 @@
    "name": "TRAIL 90",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6730,7 +6732,7 @@
    "name": "TRAIL 91",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6738,7 +6740,7 @@
    "name": "TRAIL 92",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6746,7 +6748,7 @@
    "name": "TRAIL 93",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6754,7 +6756,7 @@
    "name": "TRAIL 94",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6762,7 +6764,7 @@
    "name": "TRAIL 95",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6770,7 +6772,7 @@
    "name": "TRAIL 96",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6778,7 +6780,7 @@
    "name": "TRAIL 97",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6786,7 +6788,7 @@
    "name": "TRAIL 98",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6794,7 +6796,7 @@
    "name": "TRAIL 99",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6802,7 +6804,7 @@
    "name": "TRAIL 100",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6810,7 +6812,7 @@
    "name": "TRAIL 101",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6818,7 +6820,7 @@
    "name": "TRAIL 102",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6826,7 +6828,7 @@
    "name": "TRAIL 103",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6834,7 +6836,7 @@
    "name": "TRAIL 104",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6842,7 +6844,7 @@
    "name": "TRAIL 105",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6850,7 +6852,7 @@
    "name": "TRAIL 106",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6858,7 +6860,7 @@
    "name": "TRAIL 107",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6866,7 +6868,7 @@
    "name": "TRAIL 108",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6874,7 +6876,7 @@
    "name": "TRAIL 109",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6882,7 +6884,7 @@
    "name": "TRAIL 110",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6890,7 +6892,7 @@
    "name": "TRAIL 111",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6898,7 +6900,7 @@
    "name": "TRAIL 112",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6906,7 +6908,7 @@
    "name": "TRAIL 113",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6914,7 +6916,7 @@
    "name": "TRAIL 114",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6922,7 +6924,7 @@
    "name": "TRAIL 115",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6930,7 +6932,7 @@
    "name": "TRAIL 116",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6938,7 +6940,7 @@
    "name": "TRAIL 117",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6946,7 +6948,7 @@
    "name": "TRAIL 118",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6954,7 +6956,7 @@
    "name": "TRAIL 119",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6962,7 +6964,7 @@
    "name": "TRAIL 120",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6970,7 +6972,7 @@
    "name": "TRAIL 121",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6978,7 +6980,7 @@
    "name": "TRAIL 122",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6986,7 +6988,7 @@
    "name": "TRAIL 123",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -6994,7 +6996,7 @@
    "name": "TRAIL 124",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7002,7 +7004,7 @@
    "name": "TRAIL 125",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7010,7 +7012,7 @@
    "name": "TRAIL 126",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7018,7 +7020,7 @@
    "name": "TRAIL 127",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7026,7 +7028,7 @@
    "name": "TRAIL 128",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7034,7 +7036,7 @@
    "name": "TRAIL 129",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7042,7 +7044,7 @@
    "name": "TRAIL 130",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7050,7 +7052,7 @@
    "name": "TRAIL 131",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7058,7 +7060,7 @@
    "name": "TRAIL 132",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7066,7 +7068,7 @@
    "name": "TRAIL 133",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7074,7 +7076,7 @@
    "name": "TRAIL 134",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7082,7 +7084,7 @@
    "name": "TRAIL 135",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7090,7 +7092,7 @@
    "name": "TRAIL 136",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7098,7 +7100,7 @@
    "name": "TRAIL 137",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7106,7 +7108,7 @@
    "name": "TRAIL 138",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7114,7 +7116,7 @@
    "name": "TRAIL 139",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7122,7 +7124,7 @@
    "name": "TRAIL 140",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7130,7 +7132,7 @@
    "name": "TRAIL 141",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7138,7 +7140,7 @@
    "name": "TRAIL 142",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7146,7 +7148,7 @@
    "name": "TRAIL 143",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7154,7 +7156,7 @@
    "name": "TRAIL 144",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7162,7 +7164,7 @@
    "name": "TRAIL 145",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7170,7 +7172,7 @@
    "name": "TRAIL 146",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7178,7 +7180,7 @@
    "name": "TRAIL 147",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7186,7 +7188,7 @@
    "name": "TRAIL 148",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7194,7 +7196,7 @@
    "name": "TRAIL 149",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7202,7 +7204,7 @@
    "name": "TRAIL 150",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7210,7 +7212,7 @@
    "name": "TRAIL 151",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7218,7 +7220,7 @@
    "name": "TRAIL 152",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7226,7 +7228,7 @@
    "name": "TRAIL 153",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7234,7 +7236,7 @@
    "name": "TRAIL 154",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7242,7 +7244,7 @@
    "name": "TRAIL 155",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7250,7 +7252,7 @@
    "name": "TRAIL 156",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7258,7 +7260,7 @@
    "name": "TRAIL 157",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7266,7 +7268,7 @@
    "name": "TRAIL 158",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7274,7 +7276,7 @@
    "name": "TRAIL 159",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7282,7 +7284,7 @@
    "name": "TRAIL 160",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7290,7 +7292,7 @@
    "name": "TRAIL 161",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7298,7 +7300,7 @@
    "name": "TRAIL 162",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7306,7 +7308,7 @@
    "name": "TRAIL 163",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7314,7 +7316,7 @@
    "name": "TRAIL 164",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7322,7 +7324,7 @@
    "name": "TRAIL 165",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7330,7 +7332,7 @@
    "name": "TRAIL 166",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7338,7 +7340,7 @@
    "name": "TRAIL 167",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7346,7 +7348,7 @@
    "name": "TRAIL 168",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7354,7 +7356,7 @@
    "name": "TRAIL 169",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7362,7 +7364,7 @@
    "name": "TRAIL 170",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7370,7 +7372,7 @@
    "name": "TRAIL 171",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7378,7 +7380,7 @@
    "name": "TRAIL 172",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7386,7 +7388,7 @@
    "name": "TRAIL 173",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7394,7 +7396,7 @@
    "name": "TRAIL 174",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7402,7 +7404,7 @@
    "name": "TRAIL 175",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7410,7 +7412,7 @@
    "name": "TRAIL 176",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7418,7 +7420,7 @@
    "name": "TRAIL 177",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7426,7 +7428,7 @@
    "name": "TRAIL 178",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7434,7 +7436,7 @@
    "name": "TRAIL 179",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7442,7 +7444,7 @@
    "name": "TRAIL 180",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7450,7 +7452,7 @@
    "name": "TRAIL 181",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7458,7 +7460,7 @@
    "name": "TRAIL 182",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7466,7 +7468,7 @@
    "name": "TRAIL 183",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7474,7 +7476,7 @@
    "name": "TRAIL 184",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7482,7 +7484,7 @@
    "name": "TRAIL 185",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7490,7 +7492,7 @@
    "name": "TRAIL 186",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7498,7 +7500,7 @@
    "name": "TRAIL 187",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7506,7 +7508,7 @@
    "name": "TRAIL 188",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7514,7 +7516,7 @@
    "name": "TRAIL 189",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7522,7 +7524,7 @@
    "name": "TRAIL 190",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7530,7 +7532,7 @@
    "name": "TRAIL 191",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7538,7 +7540,7 @@
    "name": "TRAIL 192",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7546,7 +7548,7 @@
    "name": "TRAIL 193",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7554,7 +7556,7 @@
    "name": "TRAIL 194",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7562,7 +7564,7 @@
    "name": "TRAIL 195",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7570,7 +7572,7 @@
    "name": "TRAIL 196",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7578,7 +7580,7 @@
    "name": "TRAIL 197",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7586,7 +7588,7 @@
    "name": "TRAIL 198",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7594,7 +7596,7 @@
    "name": "TRAIL 199",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7602,7 +7604,7 @@
    "name": "TRAIL 200",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7610,7 +7612,7 @@
    "name": "TRAIL 201",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7618,7 +7620,7 @@
    "name": "TRAIL 202",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7626,7 +7628,7 @@
    "name": "TRAIL 203",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7634,7 +7636,7 @@
    "name": "TRAIL 204",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7642,7 +7644,7 @@
    "name": "TRAIL 205",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7650,7 +7652,7 @@
    "name": "TRAIL 206",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7658,7 +7660,7 @@
    "name": "TRAIL 207",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7666,7 +7668,7 @@
    "name": "TRAIL 208",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7674,7 +7676,7 @@
    "name": "TRAIL 209",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7682,7 +7684,7 @@
    "name": "TRAIL 210",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7690,7 +7692,7 @@
    "name": "TRAIL 211",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7698,7 +7700,7 @@
    "name": "TRAIL 212",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7706,7 +7708,7 @@
    "name": "TRAIL 213",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7714,7 +7716,7 @@
    "name": "TRAIL 214",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7722,7 +7724,7 @@
    "name": "TRAIL 215",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7730,7 +7732,7 @@
    "name": "TRAIL 216",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7738,7 +7740,7 @@
    "name": "TRAIL 217",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7746,7 +7748,7 @@
    "name": "TRAIL 218",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7754,7 +7756,7 @@
    "name": "TRAIL 219",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7762,7 +7764,7 @@
    "name": "TRAIL 220",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7770,7 +7772,7 @@
    "name": "TRAIL 221",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7778,7 +7780,7 @@
    "name": "TRAIL 222",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7786,7 +7788,7 @@
    "name": "TRAIL 223",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7794,7 +7796,7 @@
    "name": "TRAIL 224",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7802,7 +7804,7 @@
    "name": "TRAIL 225",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7810,7 +7812,7 @@
    "name": "TRAIL 226",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7818,7 +7820,7 @@
    "name": "TRAIL 227",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7826,7 +7828,7 @@
    "name": "TRAIL 228",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7834,7 +7836,7 @@
    "name": "TRAIL 229",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7842,7 +7844,7 @@
    "name": "TRAIL 230",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7850,7 +7852,7 @@
    "name": "TRAIL 231",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7858,7 +7860,7 @@
    "name": "TRAIL 232",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7866,7 +7868,7 @@
    "name": "TRAIL 233",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7874,7 +7876,7 @@
    "name": "TRAIL 234",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7882,7 +7884,7 @@
    "name": "TRAIL 235",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7890,7 +7892,7 @@
    "name": "TRAIL 236",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7898,7 +7900,7 @@
    "name": "TRAIL 237",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7906,7 +7908,7 @@
    "name": "TRAIL 238",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7914,7 +7916,7 @@
    "name": "TRAIL 239",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7922,7 +7924,7 @@
    "name": "TRAIL 240",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7930,7 +7932,7 @@
    "name": "TRAIL 241",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7938,7 +7940,7 @@
    "name": "TRAIL 242",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7946,7 +7948,7 @@
    "name": "TRAIL 243",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7954,7 +7956,7 @@
    "name": "TRAIL 244",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7962,7 +7964,7 @@
    "name": "TRAIL 245",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7970,7 +7972,7 @@
    "name": "TRAIL 246",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7978,7 +7980,7 @@
    "name": "TRAIL 247",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7986,7 +7988,7 @@
    "name": "TRAIL 248",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -7994,7 +7996,7 @@
    "name": "TRAIL 249",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8002,7 +8004,7 @@
    "name": "TRAIL 250",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8010,7 +8012,7 @@
    "name": "TRAIL 251",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8018,7 +8020,7 @@
    "name": "TRAIL 252",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8026,7 +8028,7 @@
    "name": "TRAIL 253",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8034,7 +8036,7 @@
    "name": "TRAIL 254",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8042,7 +8044,7 @@
    "name": "TRAIL 255",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8050,7 +8052,7 @@
    "name": "TRAIL 256",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8058,7 +8060,7 @@
    "name": "TRAIL 257",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8066,7 +8068,7 @@
    "name": "TRAIL 258",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8074,7 +8076,7 @@
    "name": "TRAIL 259",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8082,7 +8084,7 @@
    "name": "TRAIL 260",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8090,7 +8092,7 @@
    "name": "TRAIL 261",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8098,7 +8100,7 @@
    "name": "TRAIL 262",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8106,7 +8108,7 @@
    "name": "TRAIL 263",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8114,7 +8116,7 @@
    "name": "TRAIL 264",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8122,7 +8124,7 @@
    "name": "TRAIL 265",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8130,7 +8132,7 @@
    "name": "TRAIL 266",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8138,7 +8140,7 @@
    "name": "TRAIL 267",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8146,7 +8148,7 @@
    "name": "TRAIL 268",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8154,7 +8156,7 @@
    "name": "TRAIL 269",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8162,7 +8164,7 @@
    "name": "TRAIL 270",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8170,7 +8172,7 @@
    "name": "TRAIL 271",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8178,7 +8180,7 @@
    "name": "TRAIL 272",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8186,7 +8188,7 @@
    "name": "TRAIL 273",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8194,7 +8196,7 @@
    "name": "TRAIL 274",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8202,7 +8204,7 @@
    "name": "TRAIL 275",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8210,7 +8212,7 @@
    "name": "TRAIL 276",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8218,7 +8220,7 @@
    "name": "TRAIL 277",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8226,7 +8228,7 @@
    "name": "TRAIL 278",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8234,7 +8236,7 @@
    "name": "TRAIL 279",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8242,7 +8244,7 @@
    "name": "TRAIL 280",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8250,7 +8252,7 @@
    "name": "TRAIL 281",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8258,7 +8260,7 @@
    "name": "TRAIL 282",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8266,7 +8268,7 @@
    "name": "TRAIL 283",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8274,7 +8276,7 @@
    "name": "TRAIL 284",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8282,7 +8284,7 @@
    "name": "TRAIL 285",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8290,7 +8292,7 @@
    "name": "TRAIL 286",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8298,7 +8300,7 @@
    "name": "TRAIL 287",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8306,7 +8308,7 @@
    "name": "TRAIL 288",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8314,7 +8316,7 @@
    "name": "TRAIL 289",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8322,7 +8324,7 @@
    "name": "TRAIL 290",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8330,7 +8332,7 @@
    "name": "TRAIL 291",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8338,7 +8340,7 @@
    "name": "TRAIL 292",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8346,7 +8348,7 @@
    "name": "TRAIL 293",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8354,7 +8356,7 @@
    "name": "TRAIL 294",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8362,7 +8364,7 @@
    "name": "TRAIL 295",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8370,7 +8372,7 @@
    "name": "TRAIL 296",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8378,7 +8380,7 @@
    "name": "TRAIL 297",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8386,7 +8388,7 @@
    "name": "TRAIL 298",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8394,7 +8396,7 @@
    "name": "TRAIL 299",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8402,7 +8404,7 @@
    "name": "TRAIL 300",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8410,7 +8412,7 @@
    "name": "TRAIL 301",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8418,7 +8420,7 @@
    "name": "TRAIL 302",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8426,7 +8428,7 @@
    "name": "TRAIL 303",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8434,7 +8436,7 @@
    "name": "TRAIL 304",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8442,7 +8444,7 @@
    "name": "TRAIL 305",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8450,7 +8452,7 @@
    "name": "TRAIL 306",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8458,7 +8460,7 @@
    "name": "TRAIL 307",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8466,7 +8468,7 @@
    "name": "TRAIL 308",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8474,7 +8476,7 @@
    "name": "TRAIL 309",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8482,7 +8484,7 @@
    "name": "TRAIL 310",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8490,7 +8492,7 @@
    "name": "TRAIL 311",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8498,7 +8500,7 @@
    "name": "TRAIL 312",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8506,7 +8508,7 @@
    "name": "TRAIL 313",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8514,7 +8516,7 @@
    "name": "TRAIL 314",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8522,7 +8524,7 @@
    "name": "TRAIL 315",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8530,7 +8532,7 @@
    "name": "TRAIL 316",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8538,7 +8540,7 @@
    "name": "TRAIL 317",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8546,7 +8548,7 @@
    "name": "TRAIL 318",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8554,7 +8556,7 @@
    "name": "TRAIL 319",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8562,7 +8564,7 @@
    "name": "TRAIL 320",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8570,7 +8572,7 @@
    "name": "TRAIL 321",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8578,7 +8580,7 @@
    "name": "TRAIL 322",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8586,7 +8588,7 @@
    "name": "TRAIL 323",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8594,7 +8596,7 @@
    "name": "TRAIL 324",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8602,7 +8604,7 @@
    "name": "TRAIL 325",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8610,7 +8612,7 @@
    "name": "TRAIL 326",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8618,7 +8620,7 @@
    "name": "TRAIL 327",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8626,7 +8628,7 @@
    "name": "TRAIL 328",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8634,7 +8636,7 @@
    "name": "TRAIL 329",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8642,7 +8644,7 @@
    "name": "TRAIL 330",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8650,7 +8652,7 @@
    "name": "TRAIL 331",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8658,7 +8660,7 @@
    "name": "TRAIL 332",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8666,7 +8668,7 @@
    "name": "TRAIL 333",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8674,7 +8676,7 @@
    "name": "TRAIL 334",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8682,7 +8684,7 @@
    "name": "TRAIL 335",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8690,7 +8692,7 @@
    "name": "TRAIL 336",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8698,7 +8700,7 @@
    "name": "TRAIL 337",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8706,7 +8708,7 @@
    "name": "TRAIL 338",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8714,7 +8716,7 @@
    "name": "TRAIL 339",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8722,7 +8724,7 @@
    "name": "TRAIL 340",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8730,7 +8732,7 @@
    "name": "TRAIL 341",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8738,7 +8740,7 @@
    "name": "TRAIL 342",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8746,7 +8748,7 @@
    "name": "TRAIL 343",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8754,7 +8756,7 @@
    "name": "TRAIL 344",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8762,7 +8764,7 @@
    "name": "TRAIL 345",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8770,7 +8772,7 @@
    "name": "TRAIL 346",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8778,7 +8780,7 @@
    "name": "TRAIL 347",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8786,7 +8788,7 @@
    "name": "TRAIL 348",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8794,7 +8796,7 @@
    "name": "TRAIL 349",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8802,7 +8804,7 @@
    "name": "TRAIL 350",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8810,7 +8812,7 @@
    "name": "TRAIL 351",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8818,7 +8820,7 @@
    "name": "TRAIL 352",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8826,7 +8828,7 @@
    "name": "TRAIL 353",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8834,7 +8836,7 @@
    "name": "TRAIL 354",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8842,7 +8844,7 @@
    "name": "TRAIL 355",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8850,7 +8852,7 @@
    "name": "TRAIL 356",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8858,7 +8860,7 @@
    "name": "TRAIL 357",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8866,7 +8868,7 @@
    "name": "TRAIL 358",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8874,7 +8876,7 @@
    "name": "TRAIL 359",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8882,7 +8884,7 @@
    "name": "TRAIL 360",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8890,7 +8892,7 @@
    "name": "TRAIL 361",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8898,7 +8900,7 @@
    "name": "TRAIL 362",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8906,7 +8908,7 @@
    "name": "TRAIL 363",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8914,7 +8916,7 @@
    "name": "TRAIL 364",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8922,7 +8924,7 @@
    "name": "TRAIL 365",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8930,7 +8932,7 @@
    "name": "TRAIL 366",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8938,7 +8940,7 @@
    "name": "TRAIL 367",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8946,7 +8948,7 @@
    "name": "TRAIL 368",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8954,7 +8956,7 @@
    "name": "TRAIL 369",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8962,7 +8964,7 @@
    "name": "TRAIL 370",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8970,7 +8972,7 @@
    "name": "TRAIL 371",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8978,7 +8980,7 @@
    "name": "TRAIL 372",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8986,7 +8988,7 @@
    "name": "TRAIL 373",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -8994,7 +8996,7 @@
    "name": "TRAIL 374",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9002,7 +9004,7 @@
    "name": "TRAIL 375",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9010,7 +9012,7 @@
    "name": "TRAIL 376",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9018,7 +9020,7 @@
    "name": "TRAIL 377",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9026,7 +9028,7 @@
    "name": "TRAIL 378",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9034,7 +9036,7 @@
    "name": "TRAIL 379",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9042,7 +9044,7 @@
    "name": "TRAIL 380",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9050,7 +9052,7 @@
    "name": "TRAIL 381",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9058,7 +9060,7 @@
    "name": "TRAIL 382",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9066,7 +9068,7 @@
    "name": "TRAIL 383",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9074,7 +9076,7 @@
    "name": "TRAIL 384",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9082,7 +9084,7 @@
    "name": "TRAIL 385",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9090,7 +9092,7 @@
    "name": "TRAIL 386",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9098,7 +9100,7 @@
    "name": "TRAIL 387",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9106,7 +9108,7 @@
    "name": "TRAIL 388",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9114,7 +9116,7 @@
    "name": "TRAIL 389",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9122,7 +9124,7 @@
    "name": "TRAIL 390",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9130,7 +9132,7 @@
    "name": "TRAIL 391",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9138,7 +9140,7 @@
    "name": "TRAIL 392",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9146,7 +9148,7 @@
    "name": "TRAIL 393",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9154,7 +9156,7 @@
    "name": "TRAIL 394",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9162,7 +9164,7 @@
    "name": "TRAIL 395",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9170,7 +9172,7 @@
    "name": "TRAIL 396",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9178,7 +9180,7 @@
    "name": "TRAIL 397",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9186,7 +9188,7 @@
    "name": "TRAIL 398",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9194,7 +9196,7 @@
    "name": "TRAIL 399",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9202,7 +9204,7 @@
    "name": "TRAIL 400",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9210,7 +9212,7 @@
    "name": "TRAIL 401",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9218,7 +9220,7 @@
    "name": "TRAIL 402",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9226,7 +9228,7 @@
    "name": "TRAIL 403",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9234,7 +9236,7 @@
    "name": "TRAIL 404",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9242,7 +9244,7 @@
    "name": "TRAIL 405",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9250,7 +9252,7 @@
    "name": "TRAIL 406",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9258,7 +9260,7 @@
    "name": "TRAIL 407",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9266,7 +9268,7 @@
    "name": "TRAIL 408",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9274,7 +9276,7 @@
    "name": "TRAIL 409",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9282,7 +9284,7 @@
    "name": "TRAIL 410",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9290,7 +9292,7 @@
    "name": "TRAIL 411",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9298,7 +9300,7 @@
    "name": "TRAIL 412",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9306,7 +9308,7 @@
    "name": "TRAIL 413",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9314,7 +9316,7 @@
    "name": "TRAIL 414",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9322,7 +9324,7 @@
    "name": "TRAIL 415",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9330,7 +9332,7 @@
    "name": "TRAIL 416",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9338,7 +9340,7 @@
    "name": "TRAIL 417",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9346,7 +9348,7 @@
    "name": "TRAIL 418",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9354,7 +9356,7 @@
    "name": "TRAIL 419",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9362,7 +9364,7 @@
    "name": "TRAIL 420",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9370,7 +9372,7 @@
    "name": "TRAIL 421",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9378,7 +9380,7 @@
    "name": "TRAIL 422",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9386,7 +9388,7 @@
    "name": "TRAIL 423",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9394,7 +9396,7 @@
    "name": "TRAIL 424",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9402,7 +9404,7 @@
    "name": "TRAIL 425",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9410,7 +9412,7 @@
    "name": "TRAIL 426",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9418,7 +9420,7 @@
    "name": "TRAIL 427",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9426,7 +9428,7 @@
    "name": "TRAIL 428",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9434,7 +9436,7 @@
    "name": "TRAIL 429",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9442,7 +9444,7 @@
    "name": "TRAIL 430",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9450,7 +9452,7 @@
    "name": "TRAIL 431",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9458,7 +9460,7 @@
    "name": "TRAIL 432",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9466,7 +9468,7 @@
    "name": "TRAIL 433",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9474,7 +9476,7 @@
    "name": "TRAIL 434",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9482,7 +9484,7 @@
    "name": "TRAIL 435",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9490,7 +9492,7 @@
    "name": "TRAIL 436",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9498,7 +9500,7 @@
    "name": "TRAIL 437",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9506,7 +9508,7 @@
    "name": "TRAIL 438",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9514,7 +9516,7 @@
    "name": "TRAIL 439",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9522,7 +9524,7 @@
    "name": "TRAIL 440",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9530,7 +9532,7 @@
    "name": "TRAIL 441",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9538,7 +9540,7 @@
    "name": "TRAIL 442",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9546,7 +9548,7 @@
    "name": "TRAIL 443",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9554,7 +9556,7 @@
    "name": "TRAIL 444",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9562,7 +9564,7 @@
    "name": "TRAIL 445",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9570,7 +9572,7 @@
    "name": "TRAIL 446",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9578,7 +9580,7 @@
    "name": "TRAIL 447",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9586,7 +9588,7 @@
    "name": "TRAIL 448",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9594,7 +9596,7 @@
    "name": "TRAIL 449",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9602,7 +9604,7 @@
    "name": "TRAIL 450",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9610,7 +9612,7 @@
    "name": "TRAIL 451",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9618,7 +9620,7 @@
    "name": "TRAIL 452",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9626,7 +9628,7 @@
    "name": "TRAIL 453",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9634,7 +9636,7 @@
    "name": "TRAIL 454",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9642,7 +9644,7 @@
    "name": "TRAIL 455",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9650,7 +9652,7 @@
    "name": "TRAIL 456",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9658,7 +9660,7 @@
    "name": "TRAIL 457",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9666,7 +9668,7 @@
    "name": "TRAIL 458",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9674,7 +9676,7 @@
    "name": "TRAIL 459",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9682,7 +9684,7 @@
    "name": "TRAIL 460",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9690,7 +9692,7 @@
    "name": "TRAIL 461",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9698,7 +9700,7 @@
    "name": "TRAIL 462",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9706,7 +9708,7 @@
    "name": "TRAIL 463",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9714,7 +9716,7 @@
    "name": "TRAIL 464",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9722,7 +9724,7 @@
    "name": "TRAIL 465",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9730,7 +9732,7 @@
    "name": "TRAIL 466",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9738,7 +9740,7 @@
    "name": "TRAIL 467",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9746,7 +9748,7 @@
    "name": "TRAIL 468",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9754,7 +9756,7 @@
    "name": "TRAIL 469",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9762,7 +9764,7 @@
    "name": "TRAIL 470",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9770,7 +9772,7 @@
    "name": "TRAIL 471",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9778,7 +9780,7 @@
    "name": "TRAIL 472",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9786,7 +9788,7 @@
    "name": "TRAIL 473",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9794,7 +9796,7 @@
    "name": "TRAIL 474",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9802,7 +9804,7 @@
    "name": "TRAIL 475",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9810,7 +9812,7 @@
    "name": "TRAIL 476",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9818,7 +9820,7 @@
    "name": "TRAIL 477",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9826,7 +9828,7 @@
    "name": "TRAIL 478",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9834,7 +9836,7 @@
    "name": "TRAIL 479",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9842,7 +9844,7 @@
    "name": "TRAIL 480",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9850,7 +9852,7 @@
    "name": "TRAIL 481",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9858,7 +9860,7 @@
    "name": "TRAIL 482",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9866,7 +9868,7 @@
    "name": "TRAIL 483",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9874,7 +9876,7 @@
    "name": "TRAIL 484",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9882,7 +9884,7 @@
    "name": "TRAIL 485",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9890,7 +9892,7 @@
    "name": "TRAIL 486",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9898,7 +9900,7 @@
    "name": "TRAIL 487",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9906,7 +9908,7 @@
    "name": "TRAIL 488",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9914,7 +9916,7 @@
    "name": "TRAIL 489",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9922,7 +9924,7 @@
    "name": "TRAIL 490",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9930,7 +9932,7 @@
    "name": "TRAIL 491",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9938,7 +9940,7 @@
    "name": "TRAIL 492",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9946,7 +9948,7 @@
    "name": "TRAIL 493",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9954,7 +9956,7 @@
    "name": "TRAIL 494",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9962,7 +9964,7 @@
    "name": "TRAIL 495",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9970,7 +9972,7 @@
    "name": "TRAIL 496",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9978,7 +9980,7 @@
    "name": "TRAIL 497",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9986,7 +9988,7 @@
    "name": "TRAIL 498",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -9994,7 +9996,7 @@
    "name": "TRAIL 499",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10002,7 +10004,7 @@
    "name": "TRAIL 500",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10010,7 +10012,7 @@
    "name": "TRAIL 501",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10018,7 +10020,7 @@
    "name": "TRAIL 502",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10026,7 +10028,7 @@
    "name": "TRAIL 503",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10034,7 +10036,7 @@
    "name": "TRAIL 504",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10042,7 +10044,7 @@
    "name": "TRAIL 505",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10050,7 +10052,7 @@
    "name": "TRAIL 506",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10058,7 +10060,7 @@
    "name": "TRAIL 507",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10066,7 +10068,7 @@
    "name": "TRAIL 508",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10074,7 +10076,7 @@
    "name": "TRAIL 509",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10082,7 +10084,7 @@
    "name": "TRAIL 510",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10090,7 +10092,7 @@
    "name": "TRAIL 511",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
@@ -10098,7 +10100,7 @@
    "name": "TRAIL 512",
    "default": 0,
    "min": 0,
-   "max": 648,
+   "max": 624,
    "display": "int"
   },
   {
