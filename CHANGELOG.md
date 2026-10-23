@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.4 (2026-10-23)
+
+Not yet tested on a device.
+
+- **The orbit line is drawn as many small dots** and always closes on itself: its loops are counted as a whole number
+  per orbit, so it has no loose ends. Sharp points in it are the orbiter really turning back.
+
 ## 0.4.3 (2026-10-23)
 
 Not yet tested on a device.

@@ -359,6 +359,23 @@ def edge_xy(k, nx, ny):
     return (0.0, (ny - 1 - k + 0.5) * h / ny)
 
 
+def _dots(fr, p0, p1, colour, r, gap, alpha=1.0):
+    """a piece drawn as a row of small round dots (the orbit line), gap px apart, evenly spaced from its ends"""
+    Image, ImageDraw, _, _ = _pil()
+    w, h = TILE_W, TILE_H
+    L = math.hypot(p1[0] - p0[0], p1[1] - p0[1])
+    n = max(1, int(round(L / gap)))
+    m = Image.new("L", (w * SS, h * SS), 0)
+    d = ImageDraw.Draw(m)
+    for k in range(n):
+        t = (k + 0.5) / n
+        x, y = (p0[0] + (p1[0] - p0[0]) * t) * SS, (p0[1] + (p1[1] - p0[1]) * t) * SS
+        d.ellipse([x - r * SS, y - r * SS, x + r * SS, y + r * SS], fill=int(255 * alpha))
+    big = Image.new("RGBA", (w * SS, h * SS), colour + (0,))
+    big.putalpha(m)
+    fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
+
+
 def _seg(fr, p0, p1, colour, width, glow, alpha=1.0):
     """a straight piece from p0 to p1 (tile pixels, on its edges), drawn past both ends so the pieces of two tiles
     meet without a gap; the tile's edge cuts it"""
@@ -383,7 +400,7 @@ def _pairs(n):
 
 
 SHAPE_LOOK = ((70, 160, 255), 1.7, 1.0, 1.0)    # the shape's pieces: colour, width, glow, opacity
-ORBIT_LOOK = ((70, 140, 230), 1.2, 0.6, 0.55)   # the orbit line: faint and thin
+ORBIT_LOOK = ((90, 160, 245), "dots", 1.15, 4.0, 0.85)   # the orbit line: many small dots, 4 px apart
 
 
 def edge_strip(looks):
@@ -395,10 +412,14 @@ def edge_strip(looks):
     assert len(pairs) == G.EDGE_PAIRS
     strip = Image.new("RGBA", (w, h * (1 + len(looks) * len(pairs))), (0, 0, 0, 0))
     f = 1
-    for col, width, glow, al in looks:
+    for look in looks:
         for i, j in pairs:
             fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-            _seg(fr, edge_xy(i, G.EDGE_NX, G.EDGE_NY), edge_xy(j, G.EDGE_NX, G.EDGE_NY), col, width, glow, alpha=al)
+            p0, p1 = edge_xy(i, G.EDGE_NX, G.EDGE_NY), edge_xy(j, G.EDGE_NX, G.EDGE_NY)
+            if look[1] == "dots":
+                _dots(fr, p0, p1, look[0], look[2], look[3], alpha=look[4])
+            else:
+                _seg(fr, p0, p1, look[0], look[1], look[2], alpha=look[3])
             strip.alpha_composite(fr, (0, f * h))
             f += 1
     return strip

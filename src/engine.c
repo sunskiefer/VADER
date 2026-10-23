@@ -992,10 +992,14 @@ static void screen_update(vader_t *s, int force_shape) {
         if (pic) path_at(qx, qy, aa_, &px_, &py_); else { path_at(m->x2, m->y2, aa_, &px_, &py_); px_ *= size; py_ *= size; } \
         X = clampf(px_ + sr_ * cosf(TWO_PI * bb_), -1, 1); Y = clampf(py_ + sr_ * sinf(TWO_PI * bb_), -1, 1); } while (0)
     if (fabsf(hz) > 0.05f && sr_ > 0.004f) {
-        float ratio = sub / hz;                    /* suborbit turns per orbit */
+        /* suborbit turns per orbit, rounded to a whole number so the line closes on itself (no loose ends), at most
+         * 12 loops so it doesn't fill the screen */
+        float ratio = roundf(sub / hz);
+        if (ratio > 12) ratio = 12;
+        if (ratio < -12) ratio = -12;
         float b0 = oo - ratio * ot;                /* the suborbit phase where the orbit starts */
         b0 = roundf((b0 - floorf(b0)) * 64) / 64;  /* steady: tiny drifts don't redraw it */
-        float span = fabsf(ratio) > 12 ? 12 / fabsf(ratio) : 1;   /* at most 12 loops, or it fills the screen */
+        float span = 1;
         ln = (int)(96 + fabsf(ratio * span) * 40);
         if (ln > LINE_PTS) ln = LINE_PTS;
         for (int k = 0; k < ln; k++) {
