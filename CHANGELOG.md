@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1 (2026-10-23)
+
+- The live screen's thread runs at a low priority: MPC's own screen and touch come first on the core they share (the
+  audio has cores of its own), so a busy moment drops a frame of the live screen instead of making MPC lag. 25 frames a
+  second, a lighter bloom.
+
 ## 0.5.0 (2026-10-23)
 
 Not yet tested on a device: this build is the try.

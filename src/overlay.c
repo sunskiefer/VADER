@@ -30,12 +30,14 @@
 #include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/resource.h>
+#include <sys/syscall.h>
 #include <drm/drm.h>
 #include <drm/drm_mode.h>
 #include <drm/drm_fourcc.h>
 #include "overlay.h"
 
-#define OVL_FPS 30
+#define OVL_FPS 25
 #define TRAIL_PTS_OVL 28
 
 /* ------------------------------------------------------------------------------------------------ the log */
@@ -683,8 +685,8 @@ static void render_frame(overlay_t *o, const ovl_shape_t *sh, const ovl_view_t *
             float *q = g_lo + ((size_t)y * LW + x) * 3;
             q[0] = r * 0.25f; q[1] = g * 0.25f; q[2] = b * 0.25f;
         }
-    for (int pass = 0; pass < 3; pass++) {   /* a box blur, radius 3, three times (near enough a gaussian), by running sums */
-        const int R = 3;
+    for (int pass = 0; pass < 2; pass++) {   /* a box blur, radius 4, twice (near enough a gaussian), by running sums */
+        const int R = 4;
         const float inv = 1.0f / (2 * R + 1);
         for (int y = 0; y < LH; y++) {   /* rows: g_lo -> g_lo2 */
             const float *p = g_lo + (size_t)y * LW * 3;
@@ -836,7 +838,10 @@ static overlay_t *g_owner;   /* one VADER instance in this process draws the liv
 
 static void *ovl_thread(void *p) {
     overlay_t *o = p;
-    logf_(o, "VADER overlay starting (box %dx%d)", OVL_W, OVL_H);
+    /* 0.5.1: a low priority: MPC's own screen and touch come first on the core we share (the audio runs on cores of
+     * its own); when the device is busy this thread drops frames instead of making MPC lag */
+    if (setpriority(PRIO_PROCESS, (id_t)syscall(SYS_gettid), 12) == 0) logf_(o, "VADER overlay starting (box %dx%d), low priority", OVL_W, OVL_H);
+    else logf_(o, "VADER overlay starting (box %dx%d); priority: %s", OVL_W, OVL_H, strerror(errno));
     /* the owner: the first instance; another waits for it to go (its page can't be told apart on the display) */
     for (;;) {
         pthread_mutex_lock(&g_owner_lock);
@@ -874,7 +879,9 @@ static void *ovl_thread(void *p) {
         struct timespec t0, t1;
         clock_gettime(CLOCK_MONOTONIC, &t0);
         int on = 0;
-        if (frame % 3 == 0 || !o->box_found) on = locate(o), o->on_screen = on;   /* 10 times a second, or until found */
+        /* is the box on the display? 8 times a second while it is (8 pixels to read); 3 times a second while it
+         * isn't (a whole-picture search, so not every frame) */
+        if (o->box_found ? frame % 3 == 0 : frame % 8 == 0) on = locate(o), o->on_screen = on;
         else on = o->on_screen;
         if (on && !o->fmt_unknown) {
             read_locked(&o->seq, &o->view, &v, sizeof v);
