@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.3 (2026-10-23)
+
+- No tearing on the live screen: each frame is copied into the plane's buffer right after the display's vertical
+  blank (a plain wait, MPC is not involved), and only the rows that changed. 0.5.2 copied at any moment, so a spinning
+  shape showed two turns at once and seemed to fall apart.
+
 ## 0.5.2 (2026-10-23)
 
 - The live screen no longer calls the display for every frame: its plane is set once when it is shown, and each frame

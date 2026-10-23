@@ -1001,6 +1001,10 @@ static int shape_picture(vader_t *s, int t, int *frame, int *fparam, float *px, 
 }
 
 static void screen_update(vader_t *s, int force_shape) {
+#ifdef NOSCREEN
+    (void)s; (void)force_shape;   /* VADER_NOSCREEN=1: no screen at all, nothing drawn, nothing reported */
+    return;
+#endif
     int t = edit(s);
     const float *P = T(t);
     timbre_t *m = &s->tm[t];
@@ -1220,7 +1224,9 @@ static void *create(const char *data_dir) {
     rescan(s);
     screen_update(s, 1);
     env_update(s);
+#ifndef NOSCREEN
     overlay_start(&s->ovl, s->base_dir);   /* 0.5.0: the live screen, when the display allows it (overlay.log says) */
+#endif
     return s;
 }
 

@@ -876,8 +876,8 @@ static void *ovl_thread(void *p) {
     clock_gettime(CLOCK_MONOTONIC, &next);
     int frame = 0, shown = 0, fails = 0, shown_x = -1, shown_y = -1;
     double busy = 0;
-    uint8_t *frame_mem = malloc((size_t)OVL_W * OVL_H * 4);
-    if (!frame_mem) { logf_(o, "out of memory"); goto give_up; }
+    uint8_t *frame_mem = malloc((size_t)OVL_W * OVL_H * 4), *prev_mem = calloc((size_t)OVL_W * OVL_H, 4);
+    if (!frame_mem || !prev_mem) { logf_(o, "out of memory"); goto give_up; }
     static ovl_view_t v;
     static ovl_shape_t sh;
     unsigned shape_seen = ~0u;
@@ -898,8 +898,24 @@ static void *ovl_thread(void *p) {
              * own screen updates never wait on a call of ours */
             ovl_buf_t *b = &o->buf[0];
             render_frame(o, &sh, &v, frame_mem, OVL_W * 4);
-            for (int y = 0; y < OVL_H; y++) memcpy(b->map + (size_t)y * b->pitch, frame_mem + (size_t)y * OVL_W * 4, OVL_W * 4);
             clock_gettime(CLOCK_MONOTONIC, &t1);
+            /* into the plane's buffer right after the display's vertical blank (a plain wait: MPC is not involved), so
+             * the copy is done before the scan reaches the box: no tearing (0.5.2 copied any time, and a spinning
+             * shape showed two turns at once). Only the rows that changed are copied. */
+            if (!o->no_vblank) {
+                union drm_wait_vblank wv;
+                memset(&wv, 0, sizeof wv);
+                wv.request.type = _DRM_VBLANK_RELATIVE | (o->crtc_index ? (unsigned)(o->crtc_index << _DRM_VBLANK_HIGH_CRTC_SHIFT) & _DRM_VBLANK_HIGH_CRTC_MASK : 0);
+                wv.request.sequence = 1;
+                if (xioctl(o->fd, DRM_IOCTL_WAIT_VBLANK, &wv)) { o->no_vblank = 1; logf_(o, "WAIT_VBLANK: %s (copying without it)", strerror(errno)); }
+            }
+            for (int y = 0; y < OVL_H; y++) {
+                const uint8_t *src = frame_mem + (size_t)y * OVL_W * 4;
+                uint8_t *prev = prev_mem + (size_t)y * OVL_W * 4;
+                if (!memcmp(src, prev, OVL_W * 4)) continue;
+                memcpy(b->map + (size_t)y * b->pitch, src, OVL_W * 4);
+                memcpy(prev, src, OVL_W * 4);
+            }
             if (!shown || o->box_x != shown_x || o->box_y != shown_y) {
                 if (set_plane(o, b->fb_id, o->box_x, o->box_y)) {
                     if (++fails == 1 || fails % 300 == 0) logf_(o, "SETPLANE: %s (%d so far)", strerror(errno), fails);
@@ -935,6 +951,7 @@ static void *ovl_thread(void *p) {
     set_plane(o, 0, 0, 0);
     for (int i = 0; i < 2; i++) destroy_buffer(o, &o->buf[i]);
     free(frame_mem);
+    free(prev_mem);
     free(g_acc); free(g_lo); free(g_lo2); free(g_cov);
     g_acc = g_lo = g_lo2 = g_cov = NULL;
     __atomic_store_n(&o->live, 0, __ATOMIC_RELEASE);

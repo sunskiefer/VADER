@@ -24,6 +24,7 @@ python3 tools/check_skin.py "build/skin/$NAME"                    # touch boxes,
 
 TGT="-target arm-linux-gnueabihf.2.31 -mcpu=generic+v7a+vfp3d16-d32-neon+thumb2 -ffp-contract=off"
 COMMON="-O2 -fPIC -fvisibility=hidden -ffunction-sections -fdata-sections -DNDEBUG -w -std=gnu11"
+[ "${VADER_NOSCREEN:-}" = 1 ] && COMMON="$COMMON -DNOSCREEN=1"   # a test build with no screen at all
 OBJS=""
 for f in $PLUGIN_SRCS src/wrapper/vst2_wrap.c; do
   o="build/arm/$(echo "$f" | tr / _).o"
