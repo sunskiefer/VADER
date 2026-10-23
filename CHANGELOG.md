@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.2 (2026-10-23)
+
+- The live screen no longer calls the display for every frame: its plane is set once when it is shown, and each frame
+  is drawn in ordinary memory and copied into the plane's buffer in one pass. MPC's own screen updates never wait on
+  it (0.5.0's per-frame plane swaps waited for the display's refresh, and MPC's drawing queued behind them: laggy
+  readouts while the sound stayed in time). Thread priority as in 0.5.0 (0.5.1's low priority was worse).
+- Looking for the screen box on the display: MPC's picture is mapped for one look and released at once (a mapping
+  kept pinned MPC's buffer), and the whole-picture search runs at most twice a second (it reads a lot of display
+  memory: leaving the MAIN page lagged while it ran ten times a second); otherwise only the box's last place is
+  checked, eight pixels.
+
 ## 0.5.1 (2026-10-23)
 
 - The live screen's thread runs at a low priority: MPC's own screen and touch come first on the core they share (the

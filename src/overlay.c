@@ -37,7 +37,7 @@
 #include <drm/drm_fourcc.h>
 #include "overlay.h"
 
-#define OVL_FPS 25
+#define OVL_FPS 30
 #define TRAIL_PTS_OVL 28
 
 /* ------------------------------------------------------------------------------------------------ the log */
@@ -300,21 +300,22 @@ static int drm_setup_fd(overlay_t *o) {
         if (xioctl(o->fd, DRM_IOCTL_MODE_OBJ_SETPROPERTY, &sp)) logf_(o, "zpos %llu: %s", (unsigned long long)o->zpos_max, strerror(errno));
         else logf_(o, "zpos set to %llu", (unsigned long long)o->zpos_max);
     }
-    for (int i = 0; i < 2; i++) if (create_buffer(o, &o->buf[i])) return -1;
+    if (create_buffer(o, &o->buf[0])) return -1;
     return 0;
 }
 
 /* ------------------------------------------------------------------------------------------------ where the box is */
-/* MPC's picture, read back from the display (read-only), to find the skin's marker pixels. Cached per framebuffer. */
-typedef struct { uint32_t fb_id; uint8_t *map; size_t len; uint32_t pitch, w, h, fmt; } fbmap_t;
-static fbmap_t g_fbmaps[4];
+/* MPC's picture, read back from the display (read-only), to find the skin's marker pixels. Mapped for one look and
+ * released at once: a mapping kept would pin MPC's buffer, and MPC needs its buffers back when it rebuilds a page
+ * (0.5.1 froze the display on leaving the MAIN page). */
+typedef struct { uint32_t fb_id; uint8_t *map; uint8_t *base; size_t len; uint32_t pitch, w, h, fmt; } fbmap_t;
 
-static fbmap_t *scanout(overlay_t *o) {
+static int scanout_open(overlay_t *o, fbmap_t *m) {
+    memset(m, 0, sizeof *m);
     struct drm_mode_crtc c;
     memset(&c, 0, sizeof c);
     c.crtc_id = o->crtc_id;
-    if (xioctl(o->fd, DRM_IOCTL_MODE_GETCRTC, &c) || !c.fb_id) return NULL;
-    for (int i = 0; i < 4; i++) if (g_fbmaps[i].fb_id == c.fb_id && g_fbmaps[i].map) return &g_fbmaps[i];
+    if (xioctl(o->fd, DRM_IOCTL_MODE_GETCRTC, &c) || !c.fb_id) return -1;
     struct drm_mode_fb_cmd2 f;
     memset(&f, 0, sizeof f);
     f.fb_id = c.fb_id;
@@ -323,7 +324,7 @@ static fbmap_t *scanout(overlay_t *o) {
         struct drm_mode_fb_cmd f1;
         memset(&f1, 0, sizeof f1);
         f1.fb_id = c.fb_id;
-        if (xioctl(o->fd, DRM_IOCTL_MODE_GETFB, &f1)) { logf_(o, "GETFB2 and GETFB %u: %s", c.fb_id, strerror(errno)); return NULL; }
+        if (xioctl(o->fd, DRM_IOCTL_MODE_GETFB, &f1)) { if (!o->fb_err_logged++) logf_(o, "GETFB2 and GETFB %u: %s", c.fb_id, strerror(errno)); return -1; }
         memset(&f, 0, sizeof f);
         f.fb_id = f1.fb_id;
         f.width = f1.width;
@@ -331,30 +332,32 @@ static fbmap_t *scanout(overlay_t *o) {
         f.pitches[0] = f1.pitch;
         f.handles[0] = f1.handle;
         f.pixel_format = f1.bpp == 32 ? DRM_FORMAT_XRGB8888 : f1.bpp == 24 ? DRM_FORMAT_RGB888 : f1.bpp == 16 ? DRM_FORMAT_RGB565 : 0;
-        logf_(o, "GETFB %u: %ux%u bpp %u depth %u", c.fb_id, f1.width, f1.height, f1.bpp, f1.depth);
     }
-    if (!f.handles[0]) { logf_(o, "GETFB2 %u: no handle (not the master handle, and not root?)", c.fb_id); return NULL; }
-    struct drm_prime_handle p = {.handle = f.handles[0], .flags = DRM_CLOEXEC | DRM_RDWR};
+    if (!f.handles[0]) { if (!o->fb_err_logged++) logf_(o, "GETFB %u: no handle (not the master handle, and not root?)", c.fb_id); return -1; }
+    struct drm_prime_handle p = {.handle = f.handles[0], .flags = DRM_CLOEXEC};
     int rc = xioctl(o->fd, DRM_IOCTL_PRIME_HANDLE_TO_FD, &p);
-    if (rc) { p.flags = DRM_CLOEXEC; rc = xioctl(o->fd, DRM_IOCTL_PRIME_HANDLE_TO_FD, &p); }
     struct drm_gem_close gc = {.handle = f.handles[0]};
-    xioctl(o->fd, DRM_IOCTL_GEM_CLOSE, &gc);   /* GETFB2 gave us a handle of our own: drop it */
-    if (rc) { logf_(o, "PRIME export of fb %u: %s", c.fb_id, strerror(errno)); return NULL; }
+    xioctl(o->fd, DRM_IOCTL_GEM_CLOSE, &gc);   /* GETFB gave us a handle of our own: drop it at once */
+    if (rc) { if (!o->fb_err_logged++) logf_(o, "PRIME export of fb %u: %s", c.fb_id, strerror(errno)); return -1; }
     size_t len = (size_t)f.pitches[0] * f.height + f.offsets[0];
-    uint8_t *m = mmap(NULL, len, PROT_READ, MAP_SHARED, p.fd, 0);
+    uint8_t *mm = mmap(NULL, len, PROT_READ, MAP_SHARED, p.fd, 0);
     close(p.fd);
-    if (m == MAP_FAILED) { logf_(o, "mmap of fb %u: %s", c.fb_id, strerror(errno)); return NULL; }
-    /* a slot: an empty one, else the oldest */
-    int k = 0;
-    for (int i = 0; i < 4; i++) if (!g_fbmaps[i].map) { k = i; break; } else if (i == 3) k = o->fb_slot++ & 3;
-    if (g_fbmaps[k].map) munmap(g_fbmaps[k].map, g_fbmaps[k].len);
-    g_fbmaps[k] = (fbmap_t){c.fb_id, m + f.offsets[0], len, f.pitches[0], f.width, f.height, f.pixel_format};
-    logf_(o, "scanout fb %u: %ux%u %.4s pitch %u", c.fb_id, f.width, f.height, (char *)&f.pixel_format, f.pitches[0]);
-    return &g_fbmaps[k];
+    if (mm == MAP_FAILED) { if (!o->fb_err_logged++) logf_(o, "mmap of fb %u: %s", c.fb_id, strerror(errno)); return -1; }
+    m->fb_id = c.fb_id;
+    m->base = mm;
+    m->map = mm + f.offsets[0];
+    m->len = len;
+    m->pitch = f.pitches[0];
+    m->w = f.width;
+    m->h = f.height;
+    m->fmt = f.pixel_format;
+    if (!o->fb_logged) { o->fb_logged = 1; logf_(o, "MPC's picture: fb %u, %ux%u %.4s, pitch %u", c.fb_id, f.width, f.height, (char *)&f.pixel_format, f.pitches[0]); }
+    return 0;
 }
 
-static void unmap_scanouts(void) {
-    for (int i = 0; i < 4; i++) if (g_fbmaps[i].map) { munmap(g_fbmaps[i].map - 0, g_fbmaps[i].len); memset(&g_fbmaps[i], 0, sizeof g_fbmaps[i]); }
+static void scanout_close(fbmap_t *m) {
+    if (m->base) munmap(m->base, m->len);
+    memset(m, 0, sizeof *m);
 }
 
 /* the markers (tools/vader_skin.py glass()): 2 x 2 pixels at the tiles' top-left and bottom-right, in these colours */
@@ -386,7 +389,7 @@ static int find_box(const fbmap_t *m, int *bx, int *by);
 
 /* the box finder on a picture of the caller's (the offline test): 1 found, with the box's top-left */
 int overlay_find_test(uint8_t *xrgb, int w, int h, int pitch, int *bx, int *by) {
-    fbmap_t m = {0, xrgb, 0, (uint32_t)pitch, (uint32_t)w, (uint32_t)h, DRM_FORMAT_XRGB8888};
+    fbmap_t m = {.map = xrgb, .pitch = (uint32_t)pitch, .w = (uint32_t)w, .h = (uint32_t)h, .fmt = DRM_FORMAT_XRGB8888};
     return find_box(&m, bx, by);
 }
 
@@ -409,22 +412,24 @@ static int find_box(const fbmap_t *m, int *bx, int *by) {
     return 0;
 }
 
-/* 1: the box is on screen at (o->box_x, o->box_y) (display pixels); 0: not on screen (another page, a list over it) */
-static int locate(overlay_t *o) {
-    fbmap_t *m = scanout(o);
-    if (!m) { o->fmt_unknown = 1; return 0; }
-    if (o->box_found) {   /* still there? */
+/* 1: the box is on screen at (o->box_x, o->box_y) (display pixels); 0: not on screen (another page, a list over it).
+ * full: look for it over the whole picture when it isn't where it was (a few times a second: it reads a lot of display
+ * memory); else only its last place is checked. */
+static int locate(overlay_t *o, int full) {
+    fbmap_t m;
+    if (scanout_open(o, &m)) { o->fmt_unknown = o->fb_err_logged > 0; return 0; }
+    int on = 0;
+    if (o->box_found || o->box_x > 0) {   /* still there? (or back where it last was) */
         int tx = o->box_x + OVL_TILES_X, ty = o->box_y + OVL_TILES_Y;
-        if (marker_at(m, tx, ty, MARK_TL) && marker_at(m, tx + OVL_TILES_W - 2, ty + OVL_TILES_H - 2, MARK_BR)) return 1;
-        o->box_found = 0;
+        on = marker_at(&m, tx, ty, MARK_TL) && marker_at(&m, tx + OVL_TILES_W - 2, ty + OVL_TILES_H - 2, MARK_BR);
+        o->box_found = on;
     }
-    /* look for it: the top-left marker's first pixel, every row */
-    if (find_box(m, &o->box_x, &o->box_y)) {
-        o->box_found = 1;
-        if (!o->box_logged) { o->box_logged = 1; logf_(o, "the screen box is at %d,%d on the display (%ux%u %.4s)", o->box_x, o->box_y, m->w, m->h, (char *)&m->fmt); }
-        return 1;
+    if (!on && full && find_box(&m, &o->box_x, &o->box_y)) {
+        o->box_found = on = 1;
+        if (!o->box_logged) { o->box_logged = 1; logf_(o, "the screen box is at %d,%d on the display (%ux%u %.4s)", o->box_x, o->box_y, m.w, m.h, (char *)&m.fmt); }
     }
-    return 0;
+    scanout_close(&m);
+    return on;
 }
 
 /* ------------------------------------------------------------------------------------------------ drawing */
@@ -840,8 +845,7 @@ static void *ovl_thread(void *p) {
     overlay_t *o = p;
     /* 0.5.1: a low priority: MPC's own screen and touch come first on the core we share (the audio runs on cores of
      * its own); when the device is busy this thread drops frames instead of making MPC lag */
-    if (setpriority(PRIO_PROCESS, (id_t)syscall(SYS_gettid), 12) == 0) logf_(o, "VADER overlay starting (box %dx%d), low priority", OVL_W, OVL_H);
-    else logf_(o, "VADER overlay starting (box %dx%d); priority: %s", OVL_W, OVL_H, strerror(errno));
+    logf_(o, "VADER overlay starting (box %dx%d)", OVL_W, OVL_H);
     /* the owner: the first instance; another waits for it to go (its page can't be told apart on the display) */
     for (;;) {
         pthread_mutex_lock(&g_owner_lock);
@@ -870,8 +874,10 @@ static void *ovl_thread(void *p) {
     logf_(o, "live: drawing %d frames a second", OVL_FPS);
     struct timespec next;
     clock_gettime(CLOCK_MONOTONIC, &next);
-    int frame = 0, shown = 0, fails = 0;
+    int frame = 0, shown = 0, fails = 0, shown_x = -1, shown_y = -1;
     double busy = 0;
+    uint8_t *frame_mem = malloc((size_t)OVL_W * OVL_H * 4);
+    if (!frame_mem) { logf_(o, "out of memory"); goto give_up; }
     static ovl_view_t v;
     static ovl_shape_t sh;
     unsigned shape_seen = ~0u;
@@ -881,21 +887,27 @@ static void *ovl_thread(void *p) {
         int on = 0;
         /* is the box on the display? 8 times a second while it is (8 pixels to read); 3 times a second while it
          * isn't (a whole-picture search, so not every frame) */
-        if (o->box_found ? frame % 3 == 0 : frame % 8 == 0) on = locate(o), o->on_screen = on;
+        if (frame % 3 == 0) on = locate(o, frame % 15 == 0), o->on_screen = on;   /* 10 looks a second, 2 of them whole-picture searches */
         else on = o->on_screen;
         if (on && !o->fmt_unknown) {
             read_locked(&o->seq, &o->view, &v, sizeof v);
             unsigned s2 = __atomic_load_n(&o->seq2, __ATOMIC_ACQUIRE);
             if (s2 != shape_seen) { read_locked(&o->seq2, &o->shape, &sh, sizeof sh); shape_seen = __atomic_load_n(&o->seq2, __ATOMIC_ACQUIRE); }
-            ovl_buf_t *b = &o->buf[o->back];
-            render_frame(o, &sh, &v, b->map, b->pitch);
-            clock_gettime(CLOCK_MONOTONIC, &t1);   /* the drawing's time; SETPLANE may wait for the display */
-            if (set_plane(o, b->fb_id, o->box_x, o->box_y)) {
-                if (++fails == 1 || fails % 300 == 0) logf_(o, "SETPLANE: %s (%d so far)", strerror(errno), fails);
-                if (errno == EACCES || errno == EPERM) { logf_(o, "not the display's master: the tile screen stays"); __atomic_store_n(&o->live, 0, __ATOMIC_RELEASE); break; }
-            } else {
-                o->back ^= 1;
-                if (!shown) { shown = 1; logf_(o, "shown at %d,%d", o->box_x, o->box_y); }
+            /* 0.5.2: drawn in ordinary memory, then copied into the plane's buffer in one pass (display memory is slow
+             * to read back, and a copy tears less than drawing in place); the plane is set once, when shown, so MPC's
+             * own screen updates never wait on a call of ours */
+            ovl_buf_t *b = &o->buf[0];
+            render_frame(o, &sh, &v, frame_mem, OVL_W * 4);
+            for (int y = 0; y < OVL_H; y++) memcpy(b->map + (size_t)y * b->pitch, frame_mem + (size_t)y * OVL_W * 4, OVL_W * 4);
+            clock_gettime(CLOCK_MONOTONIC, &t1);
+            if (!shown || o->box_x != shown_x || o->box_y != shown_y) {
+                if (set_plane(o, b->fb_id, o->box_x, o->box_y)) {
+                    if (++fails == 1 || fails % 300 == 0) logf_(o, "SETPLANE: %s (%d so far)", strerror(errno), fails);
+                    if (errno == EACCES || errno == EPERM) { logf_(o, "not the display's master: the tile screen stays"); __atomic_store_n(&o->live, 0, __ATOMIC_RELEASE); break; }
+                } else {
+                    shown = 1; shown_x = o->box_x; shown_y = o->box_y;
+                    logf_(o, "shown at %d,%d", o->box_x, o->box_y);
+                }
             }
         } else if (shown) {
             set_plane(o, 0, 0, 0);
@@ -922,7 +934,7 @@ static void *ovl_thread(void *p) {
     }
     set_plane(o, 0, 0, 0);
     for (int i = 0; i < 2; i++) destroy_buffer(o, &o->buf[i]);
-    unmap_scanouts();
+    free(frame_mem);
     free(g_acc); free(g_lo); free(g_lo2); free(g_cov);
     g_acc = g_lo = g_lo2 = g_cov = NULL;
     __atomic_store_n(&o->live, 0, __ATOMIC_RELEASE);

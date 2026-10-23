@@ -46,7 +46,7 @@ typedef struct {
     ovl_buf_t buf[2];
     int back, fb_slot;
     /* the box on the display */
-    int box_found, box_logged, box_x, box_y, on_screen, fmt_unknown;
+    int box_found, box_logged, box_x, box_y, on_screen, fmt_unknown, fb_logged, fb_err_logged;
     double ms_avg;                                     /* a frame's drawing time, lately */
     /* the snapshots (seqlocks) */
     unsigned seq, seq2;
