@@ -89,7 +89,7 @@ void fx_clear(fx_t *f);
 /* ---- screen.c: the line screen (tiles) and the envelope line */
 #define LINE_PTS 640   /* most points of the orbit line */
 #define TRAIL_K 14     /* tiles the light trail is long (0.4.5: the last tiles the orbiter crossed) */
-#define TRAIL_STEP 4   /* most trail tiles taken up in one frame (a faster orbiter leaves a sparser trail) */
+#define TRAIL_STEP 3   /* most trail tiles taken up in one frame (a faster orbiter leaves a sparser trail) */
 #define TRAIL_BRIGHT 6 /* of them, the newest drawn bright; the rest softer */
 typedef struct { int cell; float ax, ay; unsigned short frame; } trail_piece_t;
 typedef struct {

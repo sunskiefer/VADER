@@ -120,6 +120,11 @@ typedef struct {
     int shape_wait;
     unsigned line_key;           /* what the orbit line was last worked out from (0.4.5) */
     int bar_wait;                /* screen frames until the corner bars and meters report again */
+    /* 0.4.6: pieces that just went empty are told to MPC a second time a few polls later (with budget to spare): a
+     * report MPC drops while busy would otherwise leave that piece on the screen for good (GLASS STAR: trail pieces
+     * piled up over the whole screen) */
+#define HEAL_N 48
+    int heal_p[HEAL_N], heal_at[HEAL_N], heal_n, poll_no;
     unsigned char dirty[NP];
     char readout[96];
     float rd_norm;
@@ -173,6 +178,12 @@ static int is_screen(int p) {
 }
 static void mark(vader_t *s, int p) {
     if (p >= 0 && p < NP) s->dirty[p] = 1;
+}
+static void heal_later(vader_t *s, int p) {
+    if (s->heal_n == HEAL_N) { memmove(s->heal_p, s->heal_p + 1, (HEAL_N - 1) * sizeof(int)); memmove(s->heal_at, s->heal_at + 1, (HEAL_N - 1) * sizeof(int)); s->heal_n--; }
+    s->heal_p[s->heal_n] = p;
+    s->heal_at[s->heal_n] = s->poll_no;
+    s->heal_n++;
 }
 static int edit(vader_t *s) { return (int)s->g[G_TIMBRE] & 1; }
 static float div_beats(int d) {
@@ -1055,14 +1066,14 @@ static void screen_update(vader_t *s, int force_shape) {
     screen_trail_step(&s->scr, scr_x(ox), scr_y(oy), motion);
     for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
         if (s->scr.tiles[i] != s->sent_tiles[i]) { s->sent_tiles[i] = s->scr.tiles[i]; mark(s, P_T000 + i); }
-        if (s->scr.trail[i] != s->sent_trail[i]) { s->sent_trail[i] = s->scr.trail[i]; mark(s, P_R000 + i); }
+        if (s->scr.trail[i] != s->sent_trail[i]) { s->sent_trail[i] = s->scr.trail[i]; mark(s, P_R000 + i); if (!s->scr.trail[i]) heal_later(s, P_R000 + i); }
         if (s->scr.orbit[i] != s->sent_orbit[i]) { s->sent_orbit[i] = s->scr.orbit[i]; mark(s, P_L000 + i); }
     }
     /* the balls: the orbiter passes behind the path point on the upper half of its suborbit */
     screen_balls(&s->scr, fx, fy, ox, oy, P[S_ORB_SIZE], P[S_SUB_SIZE], sinf(TWO_PI * oo) < 0, motion);
     for (int i = 0; i < BALL_N * BALL_N; i++) {
-        if (s->scr.bo[i] != s->sent_bo[i]) { s->sent_bo[i] = s->scr.bo[i]; mark(s, P_BO00 + i); }
-        if (s->scr.bp[i] != s->sent_bp[i]) { s->sent_bp[i] = s->scr.bp[i]; mark(s, P_BP00 + i); }
+        if (s->scr.bo[i] != s->sent_bo[i]) { s->sent_bo[i] = s->scr.bo[i]; mark(s, P_BO00 + i); if (!s->scr.bo[i]) heal_later(s, P_BO00 + i); }
+        if (s->scr.bp[i] != s->sent_bp[i]) { s->sent_bp[i] = s->scr.bp[i]; mark(s, P_BP00 + i); if (!s->scr.bp[i]) heal_later(s, P_BP00 + i); }
     }
     if (s->scr.ball_o != s->sent_ball_o) { s->sent_ball_o = s->scr.ball_o; mark(s, P_BALL_O); }
     if (s->scr.ball_p != s->sent_ball_p) { s->sent_ball_p = s->scr.ball_p; mark(s, P_BALL_P); }
@@ -1477,8 +1488,10 @@ static int get_param(void *p, const char *key, char *buf, int len) {
         for (int k = P_BO00; k < P_BO00 + 2 * BALL_N * BALL_N; k++) TAKE(k);
         TAKE(P_BALL_O);
         TAKE(P_BALL_P);
-        for (int i = 0; i < s->scr.tr_n; i++) TAKE(P_R000 + s->scr.tr[i].cell);   /* its pieces, then any it left */
-        for (int k = P_R000; k < P_R000 + TILE_COLS * TILE_ROWS; k++) TAKE(k);
+        /* the trail: first the tiles it left (else, on a fast orbiter, MPC keeps showing them: pieces piled up over the
+         * whole screen on GLASS STAR), then its newest pieces, then the older ones' change of brightness, which may lag */
+        for (int k = P_R000; k < P_R000 + TILE_COLS * TILE_ROWS; k++) if (!s->sent_trail[k - P_R000]) TAKE(k);
+        for (int i = s->scr.tr_n - 1; i >= 0; i--) TAKE(P_R000 + s->scr.tr[i].cell);
         for (int k = P_WA; k <= P_WD; k++) TAKE(k);
         for (int k = P_IM_M1; k <= P_IM_M4; k++) TAKE(k);
         for (int k = P_E00; k < P_E00 + ENV_COLS; k++) TAKE(k);
@@ -1487,6 +1500,19 @@ static int get_param(void *p, const char *key, char *buf, int len) {
             TAKE(g < TILE_COLS * TILE_ROWS ? P_T000 + g : P_L000 + g - TILE_COLS * TILE_ROWS);
         }
 #undef TAKE
+        /* then, with budget to spare, the pieces that went empty 3 or more polls ago, once more (see heal_later) */
+        s->poll_no++;
+        for (int i = 0; i < s->heal_n && budget > 0 && n < len - 8;) {
+            if (s->poll_no - s->heal_at[i] < 3) { i++; continue; }
+            int p = s->heal_p[i];
+            int still = p >= P_R000 && p < P_R000 + TILE_COLS * TILE_ROWS ? !s->sent_trail[p - P_R000]
+                      : p >= P_BO00 && p < P_BO00 + BALL_N * BALL_N ? !s->sent_bo[p - P_BO00]
+                      : p >= P_BP00 && p < P_BP00 + BALL_N * BALL_N ? !s->sent_bp[p - P_BP00] : 0;
+            if (still && !s->dirty[p]) { budget--; n += snprintf(buf + n, (size_t)(len - n), "%d ", p); }
+            memmove(s->heal_p + i, s->heal_p + i + 1, (size_t)(s->heal_n - i - 1) * sizeof(int));
+            memmove(s->heal_at + i, s->heal_at + i + 1, (size_t)(s->heal_n - i - 1) * sizeof(int));
+            s->heal_n--;
+        }
         s->grid_next = (s->grid_next + 97) % (2 * TILE_COLS * TILE_ROWS);
         return n > 0 ? n : snprintf(buf, (size_t)len, " ");
     }

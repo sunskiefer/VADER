@@ -217,6 +217,30 @@ int main(void) {
         }
         CHECK(mx <= 10 && tot < 60 * 8, "steady play: the screen reports %.1f pieces a poll on average, %d at most", tot / 60.0, mx);
     }
+    /* 0.4.6: a fast orbiter under the report cap: the tiles the trail left are reported before new pieces, so what MPC
+     * shows never piles up (GLASS STAR on the device: trail pieces over the whole screen) */
+    {
+        setp(s, "preset", 1);   /* GLASS STAR: 3D SPIN, a fast suborbit */
+        setp(s, "motion", 1);
+        setp(s, "sub_speed", 1);
+        setp(s, "orb_speed", 1);
+        chord(s, 1);
+        int worst = 0;
+        for (int u = 0; u < 200; u++) {
+            run(s, 14);
+            drain(s);
+            int lit = 0;
+            char k[16], b[32];
+            for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
+                snprintf(k, sizeof k, "r%03d", i);
+                if (E->get_param(s, k, b, sizeof b) > 0 && atoi(b)) lit++;
+            }
+            if (lit > worst) worst = lit;
+        }
+        CHECK(worst <= 16, "a fast orbiter: MPC shows at most %d trail tiles (the trail is 14 long)", worst);
+        chord(s, 0);
+        run(s, 100);
+    }
     /* the balls (0.4.3): one cell each at a time, always whole on the screen, colours following the sizes */
     {
         setp(s, "shape", 3);   /* SQUARE: the path reaches the square's edges */
