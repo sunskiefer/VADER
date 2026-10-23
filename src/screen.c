@@ -123,42 +123,106 @@ void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int
     finish(&w);
 }
 
-void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const float *lx, const float *ly, int ln,
-                  const float *tx, const float *ty, int tn, int motion) {
-    memcpy(s->tiles, s->shape, sizeof s->tiles);
+void screen_line(screen_t *s, const float *lx, const float *ly, int ln) {
+    /* the orbit line, faint: its longest piece in each tile (line1: shown on the main tiles where the shape leaves
+     * room), and the second one (where it crosses itself, or the shape) on its own layer (line2) */
+    memset(s->line1, 0, sizeof s->line1);
+    memset(s->line2, 0, sizeof s->line2);
+    if (ln < 2) return;
+    static walk_t w;
+    memset(&w, 0, sizeof w);
+    w.g = s->line1;
+    w.g2 = s->line2;
+    w.cell = -1;
+    for (int i = 0; i < ln - 1; i++) segment(&w, scr_x(lx[i]), scr_y(ly[i]), scr_x(lx[i + 1]), scr_y(ly[i + 1]));
+    finish(&w);
+}
+
+void screen_merge(screen_t *s) {
+    for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
+        if (s->shape[i]) { s->tiles[i] = s->shape[i]; s->orbit[i] = s->line1[i]; }
+        else { s->tiles[i] = s->line1[i] ? (unsigned short)(s->line1[i] + EDGE_PAIRS) : 0; s->orbit[i] = s->line2[i]; }
+    }
+}
+
+/* the trail's pieces as the layer shows them: the newest TRAIL_BRIGHT bright (level 1), the rest softer (level 2),
+ * as 0.4.4 drew it; a piece changes its level once in its life, so this costs one report per tile more */
+static void trail_draw(screen_t *s) {
     memset(s->trail, 0, sizeof s->trail);
-    memset(s->orbit, 0, sizeof s->orbit);
-    if (!motion) return;
-    if (ln > 1) {   /* the orbit line, faint: its longest piece in each tile on the main tiles (where the shape leaves
-                     * room), and the second one (where it crosses itself, or the shape) on its own layer */
-        static unsigned short l1[TILE_COLS * TILE_ROWS], l2[TILE_COLS * TILE_ROWS];
-        static walk_t w;
-        memset(l1, 0, sizeof l1);
-        memset(l2, 0, sizeof l2);
-        memset(&w, 0, sizeof w);
-        w.g = l1;
-        w.g2 = l2;
-        w.cell = -1;
-        for (int i = 0; i < ln - 1; i++) segment(&w, scr_x(lx[i]), scr_y(ly[i]), scr_x(lx[i + 1]), scr_y(ly[i + 1]));
-        finish(&w);
-        for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
-            if (!s->tiles[i]) { s->tiles[i] = l1[i] ? (unsigned short)(l1[i] + EDGE_PAIRS) : 0; s->orbit[i] = l2[i]; }
-            else s->orbit[i] = l1[i];
-        }
+    int per = TRAIL_N * (TRAIL_N - 1) / 2;
+    for (int i = 0; i < s->tr_n; i++) {
+        unsigned short f = s->tr[i].frame;
+        if (f && i < s->tr_n - TRAIL_BRIGHT && TRAIL_LV > 1) f = (unsigned short)(f + per);
+        s->trail[s->tr[i].cell] = f;
     }
-    if (tn > 1) {   /* the light trail, newest first: a tile keeps the newest, brightest piece */
-        walk_t w;
-        memset(&w, 0, sizeof w);
-        w.g = s->trail;
-        w.cell = -1;
-        for (int i = 0; i < tn - 1; i++) {
-            int lv = 1 + i * TRAIL_LV / (tn - 1);
-            if (lv > TRAIL_LV) lv = TRAIL_LV;
-            if (lv != w.trail) { finish(&w); w.cell = -1; w.trail = lv; }
-            segment(&w, scr_x(tx[i]), scr_y(ty[i]), scr_x(tx[i + 1]), scr_y(ty[i + 1]));
-        }
-        finish(&w);
+}
+
+static void trail_clear(screen_t *s) {
+    s->tr_n = 0;
+    s->tr_has = 0;
+    trail_draw(s);
+}
+
+/* a piece the orbiter drew: from where it entered a tile (ax, ay) to where it is now (bx, by) */
+static void trail_piece(screen_t *s, int cell, float ax, float ay, float bx, float by) {
+    unsigned short f = (unsigned short)piece_frame(cell, ax, ay, bx, by, 1);
+    if (s->tr_n && s->tr[s->tr_n - 1].cell == cell) { s->tr[s->tr_n - 1].frame = f; return; }   /* still in that tile */
+    for (int i = 0; i < s->tr_n; i++)   /* crossed again: the older visit goes */
+        if (s->tr[i].cell == cell) { memmove(&s->tr[i], &s->tr[i + 1], (size_t)(s->tr_n - i - 1) * sizeof s->tr[0]); s->tr_n--; break; }
+    if (s->tr_n == TRAIL_K) { memmove(&s->tr[0], &s->tr[1], (TRAIL_K - 1) * sizeof s->tr[0]); s->tr_n--; }
+    s->tr[s->tr_n].cell = cell;
+    s->tr[s->tr_n].ax = ax;
+    s->tr[s->tr_n].ay = ay;
+    s->tr[s->tr_n].frame = f;
+    s->tr_n++;
+}
+
+void screen_trail_step(screen_t *s, float px, float py, int motion) {
+    const float X = TILE_COLS * TILE_W - 0.001f, Y = TILE_ROWS * TILE_H - 0.001f;
+    px = fminf(fmaxf(px, 0), X);
+    py = fminf(fmaxf(py, 0), Y);
+    if (!motion) { if (s->tr_n || s->tr_has) trail_clear(s); return; }
+    if (!s->tr_has || hypotf(px - s->tr_x, py - s->tr_y) > 160) {   /* a jump: the trail starts again here */
+        trail_clear(s);
+        s->tr_has = 1;
+        s->tr_x = px;
+        s->tr_y = py;
+        return;
     }
+    /* the straight piece from where it was to where it is, cut at tile edges, oldest tile first; at most TRAIL_STEP of
+     * them (the last ones: nearest the orbiter) */
+    float x0 = s->tr_x, y0 = s->tr_y, dx = px - x0, dy = py - y0;
+    struct { int cell; float ax, ay, bx, by; } seg[64];
+    int ns = 0;
+    for (int guard = 0; guard < 64; guard++) {
+        int c = (int)((x0 + (dx > 0 ? 1e-4f : dx < 0 ? -1e-4f : 0)) / TILE_W);
+        int r = (int)((y0 + (dy > 0 ? 1e-4f : dy < 0 ? -1e-4f : 0)) / TILE_H);
+        if (c < 0) c = 0;
+        if (c >= TILE_COLS) c = TILE_COLS - 1;
+        if (r < 0) r = 0;
+        if (r >= TILE_ROWS) r = TILE_ROWS - 1;
+        float tx = dx > 0 ? ((c + 1) * TILE_W - x0) / dx : dx < 0 ? (c * TILE_W - x0) / dx : 2;
+        float ty = dy > 0 ? ((r + 1) * TILE_H - y0) / dy : dy < 0 ? (r * TILE_H - y0) / dy : 2;
+        float t = fminf(fminf(tx, ty), 1.0f);
+        if (t < 0) t = 0;
+        float xn = x0 + dx * t, yn = y0 + dy * t;
+        seg[ns].cell = r * TILE_COLS + c;
+        seg[ns].ax = x0; seg[ns].ay = y0; seg[ns].bx = xn; seg[ns].by = yn;
+        ns++;
+        if (t >= 1.0f) break;
+        dx = px - xn; dy = py - yn;
+        x0 = xn; y0 = yn;
+        if (fabsf(dx) < 1e-5f && fabsf(dy) < 1e-5f) break;
+    }
+    int first = ns > TRAIL_STEP ? ns - TRAIL_STEP : 0;
+    for (int i = first; i < ns; i++) {
+        if (i == 0 && s->tr_n && s->tr[s->tr_n - 1].cell == seg[0].cell)   /* going on inside the newest tile */
+            trail_piece(s, seg[0].cell, s->tr[s->tr_n - 1].ax, s->tr[s->tr_n - 1].ay, seg[0].bx, seg[0].by);
+        else trail_piece(s, seg[i].cell, seg[i].ax, seg[i].ay, seg[i].bx, seg[i].by);
+    }
+    s->tr_x = px;
+    s->tr_y = py;
+    trail_draw(s);
 }
 
 /* one ball on its layer of cells: the cell whose square holds its centre shows it at its place there, every other cell

@@ -113,8 +113,9 @@ path point and the orbiter, each one sharp round dot whose colour shows its size
 from yellow (small) through amber, orange, red and rose to pink (large); the orbiter's follows SUBORBIT SIZE, from blue
 (small) through sky, cyan, aqua and green to lime (large). The orbiter passes behind the path point on the upper half
 of its circle, and both always stay whole inside the screen. Behind the orbiter, its **orbit line**: the whole path it takes over one orbit,
-suborbit loops included, as a faint thin line, with the part it has just passed lit up as a **light trail** (bright and
-thick right behind it, fading into the faint line). It turns, grows, spins and tilts with the shape. A, B, C and D mark the corners; the four bars under it show how much of each you are hearing. It follows the newest
+suborbit loops included, as a faint thin line, with the tiles it has just crossed lit up as a **light trail** (bright and
+thick right behind it, softer towards its end). The line is drawn once per change (shape, size, turn, speed ratio)
+and then stays still, and the whole screen asks MPC for at most 10 redraws every 40 ms, so it never crackles the sound. It turns, grows, spins and tilts with the shape. A, B, C and D mark the corners; the four bars under it show how much of each you are hearing. It follows the newest
 note of the timbre you are editing, and moves 25 times a second.
 
 How the shape is drawn:

@@ -202,6 +202,21 @@ int main(void) {
     nd = 0;
     for (char *p = db; *p;) { char *e; strtol(p, &e, 10); if (e == p) break; p = e; nd++; }
     CHECK(nd > 0 && nd < 120, "a moving orbit changes %d pieces per update", nd);
+    /* 0.4.5: in steady play the screen costs MPC little: at most 10 reports a poll, well under that on average (0.4.4
+     * sent 35..47 a poll, 1000 a second, and MPC's redraws crackled the audio) */
+    {
+        int tot = 0, mx = 0;
+        for (int u = 0; u < 150; u++) { run(s, 14); drain(s); }   /* the shape change's redraw (spread over polls) has gone out */
+        for (int u = 0; u < 60; u++) {
+            run(s, 14);
+            E->get_param(s, "dirty", db, sizeof db);
+            int k = 0;
+            for (char *p = db; *p;) { char *e; strtol(p, &e, 10); if (e == p) break; p = e; k++; }
+            tot += k;
+            if (k > mx) mx = k;
+        }
+        CHECK(mx <= 10 && tot < 60 * 8, "steady play: the screen reports %.1f pieces a poll on average, %d at most", tot / 60.0, mx);
+    }
     /* the balls (0.4.3): one cell each at a time, always whole on the screen, colours following the sizes */
     {
         setp(s, "shape", 3);   /* SQUARE: the path reaches the square's edges */

@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.5 (2026-10-23)
+
+Not yet tested on a device.
+
+- **No more crackle with MOTION on.** 0.4.4 asked MPC to redraw 35 to 47 screen pieces every 40 ms (about 1000 a
+  second; MPC redraws each one itself, which is the CPU you saw): the orbit line was redrawn as its start phase
+  drifted, and the light trail re-levelled every tile along it each frame. Now the drawing is the same (the dotted
+  orbit line, the light trail, the two balls at 25 frames a second) but:
+  - the orbit line is worked out once, when the shape, its picture frame, ORBIT SIZE, ROTATE, SUBORBIT SIZE or the
+    speed ratio changes, and then left alone;
+  - the light trail is the last 14 tiles the orbiter crossed (the newest 6 bright, the rest softer): only the tile it
+    enters and the one that falls off the end change;
+  - the corner bars and the IMAGE meters report about 8 times a second, in steps of 5;
+  - and a hard ceiling: at most 10 screen pieces a poll (250 a second), the balls first, then the trail, then the bars,
+    meters and envelope, then the shape's and the orbit line's tiles in turn. A new shape or size spreads its redraw
+    over a second or two instead of a burst.
+  In steady play that is 4 to 8 pieces a poll (100 to 200 a second), the level of 0.4.1.
+- A fresh instance, and one whose state was just restored, report only the pieces that show something (not every one
+  of the 1500 screen parameters).
+- A preset change no longer re-sends the whole screen.
+
 ## 0.4.4 (2026-10-23)
 
 Not yet tested on a device.

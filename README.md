@@ -75,7 +75,8 @@ directly. So VADER's screen is built from pieces MPC can switch:
   after the plugin window is opened again);
 - the **orbit line**: the orbiter's whole path over one orbit as a faint thin line, unbroken (with a second layer of
   tiles where it crosses itself or the shape), lit up as a **light trail** where the orbiter has just passed, on its
-  own layer of tiles;
+  own layer of tiles (the last tiles the orbiter crossed: the newest bright, the rest softer). The line is drawn once
+  per change of shape, size, turn or speed ratio and then left alone, so travelling it costs MPC nothing;
 - the **two balls**: the path point and the orbiter, each one sharp round dot (no glow) in its own colour, which
   changes with its size: the path point's with ORBIT SIZE (yellow, amber, orange, red, rose, pink), the orbiter's with
   SUBORBIT SIZE (blue, sky, cyan, aqua, green, lime). They move in 3 px steps, the orbiter passes behind the path point
@@ -131,7 +132,9 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.4.2 has not been tested on a device yet.** Offline it passes the framework's VST2 host test and VADER's own engine
+**0.4.5 has not been tested on a device yet.** It is the build that stops the crackle with MOTION on: the screen asks MPC
+for at most 10 redraws every 40 ms (0.4.4 asked for up to 48, about 1000 a second, and MPC's redraws starved the
+audio), with the same drawing. Offline it passes the framework's VST2 host test and VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
 Force can show:

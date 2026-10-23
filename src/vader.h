@@ -88,12 +88,20 @@ void fx_clear(fx_t *f);
 
 /* ---- screen.c: the line screen (tiles) and the envelope line */
 #define LINE_PTS 640   /* most points of the orbit line */
-#define TRAIL_PTS 48   /* points of the light trail, newest first */
+#define TRAIL_K 14     /* tiles the light trail is long (0.4.5: the last tiles the orbiter crossed) */
+#define TRAIL_STEP 4   /* most trail tiles taken up in one frame (a faster orbiter leaves a sparser trail) */
+#define TRAIL_BRIGHT 6 /* of them, the newest drawn bright; the rest softer */
+typedef struct { int cell; float ax, ay; unsigned short frame; } trail_piece_t;
 typedef struct {
     unsigned short tiles[TILE_COLS * TILE_ROWS];
     unsigned short shape[TILE_COLS * TILE_ROWS];   /* the shape alone (when the tiles draw it) */
+    unsigned short line1[TILE_COLS * TILE_ROWS];   /* the orbit line alone: its first and second piece per tile */
+    unsigned short line2[TILE_COLS * TILE_ROWS];
     unsigned short trail[TILE_COLS * TILE_ROWS];   /* the light trail's layer */
     unsigned short orbit[TILE_COLS * TILE_ROWS];   /* the orbit line's second layer (0.4.3) */
+    trail_piece_t tr[TRAIL_K];                     /* the trail's pieces, oldest first */
+    int tr_n, tr_has;
+    float tr_x, tr_y;                              /* where the orbiter was last frame (screen pixels) */
     unsigned char env[ENV_COLS];
     unsigned char bo[BALL_N * BALL_N], bp[BALL_N * BALL_N];   /* the balls' cells: the orbiter's, the path point's */
     unsigned char ball_o, ball_p;                               /* their colour steps (the orbiter's + BALL_COLS: behind) */
@@ -109,11 +117,16 @@ static inline void upic_frame(int k, int *w, int *h) {
 }
 int write_user_pictures(const char *skin_dir, const path_t *p);   /* 1: written */
 void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int draw);
-/* the dots (path point fx, fy; orbiter ox, oy); the orbit line through lx, ly (ln points on the square: the orbiter's
- * whole path over one orbit, drawn faint and thin with the shape's pieces where the shape leaves room); the light trail
- * through tx, ty (tn points, newest first: bright for the first half, softer after). The dots are drawn by screen_balls. */
-void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const float *lx, const float *ly, int ln,
-                  const float *tx, const float *ty, int tn, int motion);
+/* the orbit line through lx, ly (ln points on the square: the orbiter's whole path over one orbit, drawn faint and
+ * thin with the shape's pieces where the shape leaves room; ln 0: none). 0.4.5: worked out only when the line's inputs
+ * change (engine.c), then it stays still: no screen traffic while the orbiter travels it. */
+void screen_line(screen_t *s, const float *lx, const float *ly, int ln);
+/* the main tiles and the orbit layer from the shape and the line (after either changed) */
+void screen_merge(screen_t *s);
+/* the light trail (0.4.5): the last TRAIL_K tiles the orbiter crossed, each the piece it drew there. Called once a
+ * frame with the orbiter's place on the screen (pixels); only the tile it enters and the one that falls off the end
+ * change. A jump (a new note somewhere else) restarts it; motion off clears it. */
+void screen_trail_step(screen_t *s, float px, float py, int motion);
 /* the balls (0.4.3): the path point at fx, fy and the orbiter at ox, oy (on the square), their colours from ORBIT SIZE and
  * SUBORBIT SIZE; behind: the orbiter passes under the path point */
 void screen_balls(screen_t *s, float fx, float fy, float ox, float oy, float orb_size, float sub_size, int behind, int motion);
