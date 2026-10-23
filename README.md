@@ -73,11 +73,15 @@ directly. So VADER's screen is built from pieces MPC can switch:
   symmetry (a STAR every 12 degrees), and CUBE and ICOSA as spinning frames, so they stay crisp and move in small steps;
 - **your own 2D shapes** drawn by VADER itself into its skin folder when loaded (an experiment: MPC may show them only
   after the plugin window is opened again);
-- the **orbit line**: the orbiter's whole path over one orbit as a faint thin line, lit up as a **light trail** where the
-  orbiter has just passed, on its own layer of tiles;
-- a grid of **32 × 16 fine tiles** for the rest: the path point, the orbiter (a round dot moving
-  in 3 px steps) and shapes without pictures. Each tile holds a straight piece of line at one of 24 angles, so a line
-  stays straight across tiles;
+- the **orbit line**: the orbiter's whole path over one orbit as a faint thin line, unbroken (with a second layer of
+  tiles where it crosses itself or the shape), lit up as a **light trail** where the orbiter has just passed, on its
+  own layer of tiles;
+- the **two balls**: the path point and the orbiter, each one sharp round dot (no glow) in its own colour, which
+  changes with its size: the path point's with ORBIT SIZE (yellow, amber, orange, red, rose, pink), the orbiter's with
+  SUBORBIT SIZE (blue, sky, cyan, aqua, green, lime). They move in 3 px steps, the orbiter passes behind the path point
+  on the upper half of its circle, and both always stay whole inside the screen;
+- a grid of **32 × 16 fine tiles** for shapes without pictures. Each tile holds a straight piece of line from one fixed place on its edge
+  to another, and its neighbour starts at that same place, so lines join up across tiles;
 - a light **glass** layer on top (fine scanlines, darker edges), like a CRT;
 - the **envelope**, drawn as 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE;
 - **four corner bars**, showing how much A, B, C and D you hear.
@@ -85,7 +89,7 @@ directly. So VADER's screen is built from pieces MPC can switch:
 The square of the corners is drawn square, at its true proportions.
 
 The engine works out what each piece shows, 25 times a second, and only tells MPC about the pieces that changed.
-The shape is drawn in dim blue, the orbit line faint and its light trail bright cyan, the path point in amber and the orbiter in cyan.
+The shape is drawn in dim blue, the orbit line faint and its light trail bright cyan; the balls take the colours of their sizes.
 **MOTION** off freezes the screen, which saves MPC's screen CPU in a heavy project.
 
 | | |

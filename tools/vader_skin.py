@@ -343,80 +343,64 @@ def meter_strip(w, h, frames=101, colour=ACCENT):
 SS = 4   # drawn 4 times larger, then shrunk: smooth edges
 
 
-def _piece(fr, ang, k, A, step, colour, width, glow, dotted=False, alpha=1.0):
-    """a straight piece: angle ang of A steps, k steps of step px from the tile's middle (src/screen.c piece_frame)"""
+def edge_xy(k, nx, ny):
+    """place k round a tile's edge (src/screen.c edge_point): top left to right, right top to bottom, bottom right to
+    left, left bottom to top, each in the middle of its stretch"""
+    w, h = TILE_W, TILE_H
+    if k < nx:
+        return ((k + 0.5) * w / nx, 0.0)
+    k -= nx
+    if k < ny:
+        return (float(w), (k + 0.5) * h / ny)
+    k -= ny
+    if k < nx:
+        return ((nx - 1 - k + 0.5) * w / nx, float(h))
+    k -= nx
+    return (0.0, (ny - 1 - k + 0.5) * h / ny)
+
+
+def _seg(fr, p0, p1, colour, width, glow, alpha=1.0):
+    """a straight piece from p0 to p1 (tile pixels, on its edges), drawn past both ends so the pieces of two tiles
+    meet without a gap; the tile's edge cuts it"""
     Image, ImageDraw, ImageFilter, _ = _pil()
     w, h = TILE_W, TILE_H
-    th = ang * math.pi / A
-    ux, uy, nx, ny = math.cos(th), math.sin(th), -math.sin(th), math.cos(th)
-    px, py = w / 2 + nx * k * step, h / 2 + ny * k * step
-    t0, t1 = -100.0, 100.0
-    for p_, q_ in ((-ux, px), (ux, w - px), (-uy, py), (uy, h - py)):
-        if abs(p_) < 1e-9:
-            if q_ < 0:
-                return
-            continue
-        r = q_ / p_
-        if p_ < 0:
-            t0 = max(t0, r)
-        else:
-            t1 = min(t1, r)
-    if t1 - t0 < 0.5:
-        return
+    dx, dy = p1[0] - p0[0], p1[1] - p0[1]
+    L = math.hypot(dx, dy) or 1.0
+    ex, ey = dx / L * 2.0, dy / L * 2.0
+    a = ((p0[0] - ex) * SS, (p0[1] - ey) * SS)
+    b = ((p1[0] + ex) * SS, (p1[1] + ey) * SS)
     big = Image.new("RGBA", (w * SS, h * SS), colour + (0,))
     m = Image.new("L", (w * SS, h * SS), 0)
-    dm = ImageDraw.Draw(m)
-    if not dotted:
-        dm.line([((px + ux * t0) * SS, (py + uy * t0) * SS), ((px + ux * t1) * SS, (py + uy * t1) * SS)], fill=255,
-                width=int(width * SS))
-    gap = 2.6   # dots along the line, counted from the point nearest the tile's middle
-    t = math.ceil(t0 / gap) * gap
-    while dotted and t <= t1:
-        X, Y, r = (px + ux * t) * SS, (py + uy * t) * SS, width * 0.62 * SS
-        dm.ellipse([X - r, Y - r, X + r, Y + r], fill=255)
-        t += gap
+    ImageDraw.Draw(m).line([a, b], fill=255, width=max(1, int(round(width * SS))))
     halo = m.filter(ImageFilter.GaussianBlur(glow * SS)).point(lambda v: int(min(255, v * 1.6)))
     np_ = __import__("numpy")
     big.putalpha(Image.fromarray((np_.maximum(np_.asarray(m), np_.asarray(halo) * 0.55) * alpha).astype("uint8")))
     fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
 
 
-def _dot(fr, cx, cy, colour, core, halo):
-    """a round dot centred at (cx, cy) in the tile (the centre may lie outside it: the tile shows its part)"""
-    Image, ImageDraw, ImageFilter, _ = _pil()
-    w, h = TILE_W, TILE_H
-    big = Image.new("RGBA", (w * SS, h * SS), colour + (0,))
-    m = Image.new("L", (w * SS, h * SS), 0)
-    ImageDraw.Draw(m).ellipse([(cx - halo) * SS, (cy - halo) * SS, (cx + halo) * SS, (cy + halo) * SS], fill=110)
-    m = m.filter(ImageFilter.GaussianBlur(1.4 * SS))
-    ImageDraw.Draw(m).ellipse([(cx - core) * SS, (cy - core) * SS, (cx + core) * SS, (cy + core) * SS], fill=255)
-    big.putalpha(m)
-    fr.alpha_composite(big.resize((w, h), Image.LANCZOS))
+def _pairs(n):
+    return [(i, j) for i in range(n) for j in range(i + 1, n)]   # src/screen.c pair_index order
 
 
-def tile_strip():
-    """the screen's pieces, in src/screen.c's order: empty; every straight piece of the shape (dim blue); every piece
-    of the trail (bright cyan); the path dot (amber) and the orbiter dot (cyan) at each of their 5 x 5 places"""
+SHAPE_LOOK = ((70, 160, 255), 1.7, 1.0, 1.0)    # the shape's pieces: colour, width, glow, opacity
+ORBIT_LOOK = ((70, 140, 230), 1.2, 0.6, 0.55)   # the orbit line: faint and thin
+
+
+def edge_strip(looks):
+    """tiles of edge pieces (src/screen.c piece_frame): empty, then for each look a piece between every pair of edge
+    places. The main tiles: the shape's look, then the orbit line's; the orbit line's own layer: its look alone."""
     Image, _, _, _ = _pil()
     w, h = TILE_W, TILE_H
-    strip = Image.new("RGBA", (w, h * G.TILE_FRAMES), (0, 0, 0, 0))
-    frames = [None]
-    hs = (G.SHAPE_OFF - 1) // 2
-    frames += [("s", a, k - hs) for a in range(G.SHAPE_ANG) for k in range(G.SHAPE_OFF)]
-    frames += [("p", j % G.DOT_NX, j // G.DOT_NX) for j in range(G.DOT_NX * G.DOT_NY)]
-    frames += [("o", j % G.ORB_NX, j // G.ORB_NX) for j in range(G.ORB_NX * G.ORB_NY)]
-    assert len(frames) == G.TILE_FRAMES
-    for i, f in enumerate(frames):
-        if f is None:
-            continue
-        fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-        if f[0] == "s":
-            _piece(fr, f[1], f[2], G.SHAPE_ANG, G.SHAPE_DSTEP, (70, 160, 255), 1.7, 1.0)
-        elif f[0] == "p":
-            _dot(fr, (f[1] + 0.5) * w / G.DOT_NX, (f[2] + 0.5) * h / G.DOT_NY, AMBER, 2.4, 3.6)
-        else:
-            _dot(fr, G.ORB_X0 + f[1] * G.ORB_STEP, G.ORB_Y0 + f[2] * G.ORB_STEP, CYAN, 3.4, 5.0)
-        strip.alpha_composite(fr, (0, i * h))
+    pairs = _pairs(G.EDGE_N)
+    assert len(pairs) == G.EDGE_PAIRS
+    strip = Image.new("RGBA", (w, h * (1 + len(looks) * len(pairs))), (0, 0, 0, 0))
+    f = 1
+    for col, width, glow, al in looks:
+        for i, j in pairs:
+            fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+            _seg(fr, edge_xy(i, G.EDGE_NX, G.EDGE_NY), edge_xy(j, G.EDGE_NX, G.EDGE_NY), col, width, glow, alpha=al)
+            strip.alpha_composite(fr, (0, f * h))
+            f += 1
     return strip
 
 
@@ -429,17 +413,40 @@ def trail_strip():
     Image, _, _, _ = _pil()
     w, h = TILE_W, TILE_H
     strip = Image.new("RGBA", (w, h * G.TRAIL_FRAMES), (0, 0, 0, 0))
-    ht = (G.TRAIL_OFF - 1) // 2
-    i = 1
+    pairs = _pairs(G.TRAIL_N)
+    f = 1
     for lv in range(G.TRAIL_LV):
         col, width, glow, al = TRAIL_LOOK[lv]
-        for a in range(G.TRAIL_ANG):
-            for k in range(G.TRAIL_OFF):
-                fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-                _piece(fr, a, k - ht, G.TRAIL_ANG, G.TRAIL_DSTEP, col, width, glow, alpha=al)
-                strip.alpha_composite(fr, (0, i * h))
-                i += 1
-    assert i == G.TRAIL_FRAMES
+        for i, j in pairs:
+            fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+            _seg(fr, edge_xy(i, G.TRAIL_NX, G.TRAIL_NY), edge_xy(j, G.TRAIL_NX, G.TRAIL_NY), col, width, glow, alpha=al)
+            strip.alpha_composite(fr, (0, f * h))
+            f += 1
+    assert f == G.TRAIL_FRAMES
+    return strip
+
+
+# 0.4.3: the balls' colours, from small to large (the path point with ORBIT SIZE, the orbiter with SUBORBIT SIZE)
+PATH_COLS = [(255, 225, 74), (255, 176, 32), (255, 128, 26), (255, 84, 40), (255, 52, 90), (255, 60, 170)]
+ORB_COLS = [(70, 120, 255), (60, 175, 255), (125, 252, 255), (90, 255, 200), (110, 255, 140), (190, 255, 90)]
+
+
+def ball_strip(d, colour):
+    """a ball's cell (src/screen.c ball): empty, then one sharp round dot of diameter d at each of BALL_POS x BALL_POS
+    places BALL_STEP px apart, its whole disc inside the frame (the frame reaches d/2 past the cell on every side)"""
+    Image, ImageDraw, _, _ = _pil()
+    r = d / 2
+    fw = G.BALL_PITCH + d
+    strip = Image.new("RGBA", (fw, fw * G.BALL_FRAMES), (0, 0, 0, 0))
+    big = 8   # drawn 8 times larger, then shrunk: a clean round edge, no glow
+    for iy in range(G.BALL_POS):
+        for ix in range(G.BALL_POS):
+            cx, cy = r + ix * G.BALL_STEP + G.BALL_STEP / 2, r + iy * G.BALL_STEP + G.BALL_STEP / 2
+            m = Image.new("L", (fw * big, fw * big), 0)
+            ImageDraw.Draw(m).ellipse([(cx - r) * big, (cy - r) * big, (cx + r) * big, (cy + r) * big], fill=255)
+            fr = Image.new("RGBA", (fw, fw), colour + (0,))
+            fr.putalpha(m.resize((fw, fw), Image.LANCZOS))
+            strip.alpha_composite(fr, (0, (1 + iy * G.BALL_POS + ix) * fw))
     return strip
 
 
@@ -893,17 +900,48 @@ def build_page(sk, page_no, comps):
                     i = r * G.TILE_COLS + q
                     kids.append(placed(tk, "r%d" % i, sk.index["r%03d" % i],
                                        (TILES_XY[0] + q * TILE_W, TILES_XY[1] + r * TILE_H, TILE_W, TILE_H), False))
-            strip = sk.save(tile_strip(), "vd_tiles.png")
+            strip = sk.save(edge_strip([SHAPE_LOOK, ORBIT_LOOK]), "vd_tiles.png")
             dk = define("vdTile", [], [filmstrip(strip, G.TILE_FRAMES, TILE_W, TILE_H, "Vertical")], ignore=True)
             for r in range(G.TILE_ROWS):
                 for q in range(G.TILE_COLS):
                     i = r * G.TILE_COLS + q
                     kids.append(placed(dk, "t%d" % i, sk.index["t%03d" % i],
                                        (TILES_XY[0] + q * TILE_W, TILES_XY[1] + r * TILE_H, TILE_W, TILE_H), False))
+            # 0.4.3: the orbit line's second layer, where it crosses itself or the shape
+            ostrip = sk.save(edge_strip([ORBIT_LOOK]), "vd_orbit.png")
+            ok_ = define("vdOrbit", [], [filmstrip(ostrip, G.ORBIT_FRAMES, TILE_W, TILE_H, "Vertical")], ignore=True)
+            for r in range(G.TILE_ROWS):
+                for q in range(G.TILE_COLS):
+                    i = r * G.TILE_COLS + q
+                    kids.append(placed(ok_, "l%d" % i, sk.index["l%03d" % i],
+                                       (TILES_XY[0] + q * TILE_W, TILES_XY[1] + r * TILE_H, TILE_W, TILE_H), False))
             gname = sk.save(glass(), "vd_glass.png")
             gk = define("vdGlass", [], [image(gname, 0, 0, G.TILE_COLS * TILE_W, G.TILE_ROWS * TILE_H)], ignore=True)
             kids.append(placed(gk, "glass", sk.index["shape_pic"], (TILES_XY[0], TILES_XY[1], G.TILE_COLS * TILE_W,
                                                                   G.TILE_ROWS * TILE_H), False))
+            # 0.4.3: the balls, over the glass so they stay sharp. A layer of cells per colour, shown by the colour's
+            # parameter (ball_o / ball_p); the orbiter's layers come twice, under the path point (ball_o 6..11: it
+            # passes behind) and over it (0..5)
+            def balls(prefix, d, colour, step_key, step_value, steps):
+                fw = G.BALL_PITCH + d
+                name = "vd_ball_%s_%d.png" % (prefix, step_value % G.BALL_COLS)
+                strip = name if name in sk.files else sk.save(ball_strip(d, colour), name)
+                bk = define("vdBall_%s_%d" % (prefix, step_value % G.BALL_COLS), [],
+                            [filmstrip(strip, G.BALL_FRAMES, fw, fw, "Vertical")], ignore=True)
+                cond = "IndexedEnabling/%d/%d/Parameter %d" % (step_value, steps, sk.index[step_key])
+                for r in range(G.BALL_N):
+                    for q in range(G.BALL_N):
+                        i = r * G.BALL_N + q
+                        x = TILES_XY[0] + G.SQUARE_X + q * G.BALL_PITCH - d // 2
+                        y = TILES_XY[1] + r * G.BALL_PITCH - d // 2
+                        kids.append(placed(bk, "%s%d %d" % (prefix, step_value, i), sk.index["b%s%02d" % (prefix, i)],
+                                           (x, y, fw, fw), False, cond=cond))
+            for k_ in range(G.BALL_COLS):
+                balls("o", G.BALL_OD, ORB_COLS[k_], "ball_o", G.BALL_COLS + k_, 2 * G.BALL_COLS)
+            for k_ in range(G.BALL_COLS):
+                balls("p", G.BALL_PD, PATH_COLS[k_], "ball_p", k_, G.BALL_COLS)
+            for k_ in range(G.BALL_COLS):
+                balls("o", G.BALL_OD, ORB_COLS[k_], "ball_o", k_, 2 * G.BALL_COLS)
         elif k == "meter":   # an IMAGE MOD's source, live
             x, y, w = c["x"], c["y"], c["w"]
             d.text((x, y + 12), c["label"], font=font(20), fill=WHITE + (255,), anchor="lm")

@@ -60,8 +60,8 @@ BUZZ, AIR, HIGHS, PRIMES, SPREAD, FORMANT, METAL. Every 3 or so steps of the kno
 neighbours are mixed. Each spectrum is built from up to 64 harmonics and thinned out for high notes, so nothing folds back
 into noise.
 
-**The orbiter.** A point, the *path point* (amber on the screen), travels round the SHAPE at ORBIT SPEED. A second
-point, the *orbiter* (cyan), circles the path point (SUBORBIT SIZE, SUBORBIT SPEED). Where the orbiter is sets the mix
+**The orbiter.** A point, the *path point* (a ball on the screen, its colour set by ORBIT SIZE), travels round the SHAPE at ORBIT SPEED. A second
+point, the *orbiter* (a bigger ball, its colour set by SUBORBIT SIZE), circles the path point (SUBORBIT SIZE, SUBORBIT SPEED). Where the orbiter is sets the mix
 of the four corners: in the top-left corner you hear only A, in the middle all four equally. ORBIT SIZE scales the
 shape: small keeps the orbiter near the middle (all four mixed), large reaches the corners. This movement is VADER's
 modulation: there are no LFOs to patch, the shape *is* the modulation.
@@ -108,8 +108,11 @@ With **ALT on**, the same places show the voice and the vibrato:
 **CORNER SELECT**: A, B, C, D or ALL: the corner the five corner knobs under the screen edit. ALL sets all four at
 once (and shows corner A's value).
 
-**SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in blue, the path
-point (amber) and the orbiter (cyan). Behind the orbiter, its **orbit line**: the whole path it takes over one orbit,
+**SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in blue and the two balls: the
+path point and the orbiter, each one sharp round dot whose colour shows its size. The path point's follows ORBIT SIZE,
+from yellow (small) through amber, orange, red and rose to pink (large); the orbiter's follows SUBORBIT SIZE, from blue
+(small) through sky, cyan, aqua and green to lime (large). The orbiter passes behind the path point on the upper half
+of its circle, and both always stay whole inside the screen. Behind the orbiter, its **orbit line**: the whole path it takes over one orbit,
 suborbit loops included, as a faint thin line, with the part it has just passed lit up as a **light trail** (bright and
 thick right behind it, fading into the faint line). It turns, grows, spins and tilts with the shape. A, B, C and D mark the corners; the four bars under it show how much of each you are hearing. It follows the newest
 note of the timbre you are editing, and moves 25 times a second.

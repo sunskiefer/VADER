@@ -34,21 +34,21 @@ CORNERS = "ABCD"
 # Screen geometry (tools/vader_art.py draws the same grid)
 TILE_COLS, TILE_ROWS = 32, 16
 TILE_W, TILE_H = 20, 18
-# A tile shows one straight piece of line, stored by its angle and its distance from the tile's middle (src/screen.c),
-# or one of the two dots at one of 5 x 5 places in the tile. Frames:
-#   0 empty | the shape's pieces: SHAPE_ANG angles x SHAPE_OFF offsets | the trail's: TRAIL_ANG x TRAIL_OFF |
-#   the path dot at 25 places | the orbiter dot at 25 places
-SHAPE_ANG, SHAPE_OFF, SHAPE_DSTEP = 24, 19, 1.4
-# the light trail has its own layer of tiles (over the shape, under the dots): a piece at TRAIL_ANG angles x TRAIL_OFF
-# offsets (0.4.3: 13 offsets 2 px apart, finer), in TRAIL_LV brightnesses (newest: bright and thick, then softer). The faint
-# line of the whole orbit is drawn with the shape's pieces on the main tiles, and stays still while nothing changes.
-TRAIL_ANG, TRAIL_OFF, TRAIL_DSTEP, TRAIL_LV = 24, 13, 2.0, 2
-TRAIL_FRAMES = 1 + TRAIL_LV * TRAIL_ANG * TRAIL_OFF
-DOT_NX, DOT_NY = 5, 5
-# the orbiter: a round dot at 2 px steps, its centre up to 3 px outside the tile, so the tiles around it draw their
-# parts of it and it is never cut at a tile's edge
-ORB_NX, ORB_NY, ORB_X0, ORB_Y0, ORB_STEP = 10, 9, -3, -3, 3
-TILE_FRAMES = 1 + SHAPE_ANG * SHAPE_OFF + DOT_NX * DOT_NY + ORB_NX * ORB_NY
+# 0.4.3: a tile shows one straight piece of line from one point on its edge to another (src/screen.c). The points sit
+# at fixed places along each edge (EDGE_NX on the top and bottom, EDGE_NY on the left and right), and a tile's
+# neighbour has the same places on the edge they share, so a line leaves one tile exactly where it enters the next: no
+# breaks, no steps. Frames: 0 empty, then every pair of points (i < j), numbered pair_index(i, j).
+#   main tiles: the shape (when it has no picture), dim blue; then the same pieces faint and thin, for the orbit line
+#   orbit tiles: the orbit line where it crosses itself or the shape (a tile holds one piece per layer), faint
+#   trail tiles: the light trail, in TRAIL_LV brightnesses (newest: bright and thick, then softer), its own layer
+EDGE_NX, EDGE_NY = 7, 6                      # 2.9 px apart on the top and bottom, 3 px on the sides
+EDGE_N = 2 * (EDGE_NX + EDGE_NY)
+EDGE_PAIRS = EDGE_N * (EDGE_N - 1) // 2
+TRAIL_NX, TRAIL_NY, TRAIL_LV = 7, 6, 2       # 2.9 and 3 px apart (two brightnesses must fit in one strip)
+TRAIL_N = 2 * (TRAIL_NX + TRAIL_NY)
+TILE_FRAMES = 1 + 2 * EDGE_PAIRS
+ORBIT_FRAMES = 1 + EDGE_PAIRS
+TRAIL_FRAMES = 1 + TRAIL_LV * (TRAIL_N * (TRAIL_N - 1) // 2)
 # the built-in 2D shapes as ready-drawn pictures: one per shape, size step and quarter turn
 # 0.4.0: one filmstrip per shape and size step; its frames are the turns, over the shape's own symmetry (a STAR
 # repeats every 1/5 turn, so 6 frames cover it in 12-degree steps). PIC_SYM: how many times a shape repeats in one
@@ -67,6 +67,15 @@ SEL_USER = SEL_3D + P3_SHAPES * P3_SIZES * P3_TILT
 PIC_COUNT = SEL_USER + U_SIZES - 1
 SQUARE_X = 176            # the corners' square on the screen: x 176..464, y 0..288 (true proportions)
 SQUARE = 288
+# 0.4.3: the two balls, each one sharp round dot in its own colour, which steps with its size (the orbiter with
+# SUBORBIT SIZE, the path point with ORBIT SIZE). Each ball has its own layer of BALL_N x BALL_N cells over the corners'
+# square, BALL_PITCH px apart; a cell's frames are the ball at BALL_POS x BALL_POS places BALL_STEP px apart inside it,
+# drawn whole (the cell's picture reaches the ball's radius past its edges, so it is never cut). One cell at a time shows it.
+# A layer per colour step (BALL_COLS), switched by BALL_O / BALL_P; the orbiter's has a copy under the path point
+# (BALL_O = colour + BALL_COLS) for when it passes behind it. The balls stay whole inside the screen.
+BALL_N, BALL_PITCH, BALL_STEP, BALL_POS, BALL_COLS = 8, 36, 3, 12, 6
+BALL_FRAMES = 1 + BALL_POS * BALL_POS
+BALL_OD, BALL_PD = 32, 22                  # the orbiter's and the path point's diameter (px)
 ENV_COLS, ENV_ROWS = 32, 14
 ENV_FRAMES = ENV_ROWS * (ENV_ROWS + 1) // 2
 
@@ -281,6 +290,15 @@ def build():
     for k in POPUPS_LATE:
         params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
         rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
+    # 0.4.3 (appended): the balls' cells and colours
+    for i in range(BALL_N * BALL_N):
+        add("bo%02d" % i, "ORBITER %d" % (i + 1), 0, 0, BALL_FRAMES - 1, None, True, "DISP", 5000 + i)
+    for i in range(BALL_N * BALL_N):
+        add("bp%02d" % i, "PATH POINT %d" % (i + 1), 0, 0, BALL_FRAMES - 1, None, True, "DISP", 5100 + i)
+    add("ball_o", "ORBITER COLOUR", 0, 0, 2 * BALL_COLS - 1, None, True, "DISP", 5200)
+    add("ball_p", "PATH POINT COLOUR", 0, 0, BALL_COLS - 1, None, True, "DISP", 5201)
+    for i in range(TILE_COLS * TILE_ROWS):   # the orbit line's second layer
+        add("l%03d" % i, "ORBIT LINE %d" % (i + 1), 0, 0, ORBIT_FRAMES - 1, None, True, "DISP", 6000 + i)
     return params, rows, snd_slots, glob_slots
 
 
@@ -306,11 +324,11 @@ def write():
     L.append("#define NGLOB %d" % len(glob))
     L.append("#define NCF %d   /* fields per corner */" % len(CORNER))
     L.append("#define TILE_COLS %d\n#define TILE_ROWS %d\n#define TILE_FRAMES %d" % (TILE_COLS, TILE_ROWS, TILE_FRAMES))
-    for k in ("TILE_W", "TILE_H", "SHAPE_ANG", "SHAPE_OFF", "TRAIL_ANG", "TRAIL_OFF", "TRAIL_LV", "TRAIL_FRAMES", "DOT_NX", "DOT_NY", "ORB_NX", "ORB_NY", "ORB_X0", "ORB_Y0", "ORB_STEP", "PIC_SHAPES",
+    for k in ("TILE_W", "TILE_H", "EDGE_NX", "EDGE_NY", "EDGE_N", "EDGE_PAIRS", "ORBIT_FRAMES", "TRAIL_NX", "TRAIL_NY", "TRAIL_N", "TRAIL_LV", "TRAIL_FRAMES", "PIC_SHAPES",
               "PIC_SIZES", "PIC_COUNT", "SQUARE_X", "SQUARE", "P3_SHAPES", "P3_SIZES", "P3_TILT", "P3_YAW",
-              "U_SIZES", "U_ROT", "SEL_2D", "SEL_3D", "SEL_USER"):
+              "U_SIZES", "U_ROT", "SEL_2D", "SEL_3D", "SEL_USER", "BALL_N", "BALL_PITCH", "BALL_STEP", "BALL_POS",
+              "BALL_COLS", "BALL_FRAMES", "BALL_OD", "BALL_PD"):
         L.append("#define %s %d" % (k, globals()[k]))
-    L.append("#define SHAPE_DSTEP %sf\n#define TRAIL_DSTEP %sf" % (SHAPE_DSTEP, TRAIL_DSTEP))
     L.append("static const unsigned char PIC_SYM[%d] = {%s};" % (PIC_SHAPES, ", ".join(map(str, PIC_SYM))))
     L.append("static const unsigned char PIC_ROT[%d] = {%s};" % (PIC_SHAPES, ", ".join(map(str, PIC_ROT))))
     L.append("static const unsigned char P3_SYM[%d] = {%s};" % (P3_SHAPES, ", ".join(map(str, P3_SYM))))

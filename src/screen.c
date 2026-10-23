@@ -1,10 +1,10 @@
 /* The screen, made of pieces MPC can swap (it draws a plugin's screen from pictures; a plugin can't draw on it):
- *  - TILE_COLS x TILE_ROWS tiles. Each shows one straight piece of line, stored by its angle and its distance from the
- *    tile's middle, both rounded (SHAPE_ANG x SHAPE_OFF), or a dot (the path point, the orbiter). A second layer of
- *    tiles draws the light trail the same way (TRAIL_ANG x TRAIL_OFF, in TRAIL_LV brightnesses). A straight
- *    line has the same angle in every tile it crosses, so it stays straight from tile to tile.
+ *  - TILE_COLS x TILE_ROWS tiles. Each shows one straight piece of line from a point on its edge to another (0.4.3).
+ *    The points sit at fixed places along each edge (EDGE_NX x EDGE_NY), the same on both sides of an edge two tiles
+ *    share, so a line leaves one tile exactly where it enters the next and stays unbroken. A second layer of tiles
+ *    draws the light trail the same way (TRAIL_NX x TRAIL_NY, in TRAIL_LV brightnesses).
  *  - The built-in 2D shapes are ready-drawn pictures (tools/vader_skin.py); the tiles draw only your own shapes and
- *    the 3D ones, plus the trail and the dots.
+ *    the 3D ones, plus the orbit line and the trail. The two balls have layers of their own (screen_balls).
  *  - ENV_COLS columns draw the envelope, each a stroke between two rows.
  * The engine works out what each piece shows; only the ones that change are sent to MPC (engine.c). */
 #include <math.h>
@@ -13,46 +13,66 @@
 
 #define PI_F 3.14159265f
 
-/* one tile's piece, a to b (screen pixels): its frame, or 0 when it's too short to draw. The shape's pieces are frames of
- * the main tiles; the trail's (trail 1..TRAIL_LV: its brightness) frames of the trail's own layer. */
+/* the place on a tile's edge nearest to (lx, ly) (tile pixels), numbered round the tile: the top edge left to right,
+ * the right edge top to bottom, the bottom edge right to left, the left edge bottom to top. NX places on the top and
+ * bottom, NY on the sides, each in the middle of its stretch: the tile next door has the same places on the shared edge. */
+static int edge_point(float lx, float ly, int NX, int NY) {
+    float dt = ly, db = TILE_H - ly, dl = lx, dr = TILE_W - lx;
+    int i = (int)floorf(lx / ((float)TILE_W / NX)), j = (int)floorf(ly / ((float)TILE_H / NY));
+    if (i < 0) i = 0;
+    if (i > NX - 1) i = NX - 1;
+    if (j < 0) j = 0;
+    if (j > NY - 1) j = NY - 1;
+    float m = fminf(fminf(dt, db), fminf(dl, dr));
+    if (m == dt) return i;
+    if (m == dr) return NX + j;
+    if (m == db) return NX + NY + (NX - 1 - i);
+    return 2 * NX + NY + (NY - 1 - j);
+}
+
+static int pair_index(int i, int j, int n) {
+    if (i > j) { int t = i; i = j; j = t; }
+    return i * (2 * n - i - 1) / 2 + (j - i - 1);
+}
+
+/* one tile's piece, a to b (screen pixels): its frame, or 0 when both ends land on the same place. The shape's and the
+ * orbit line's pieces are frames of the main tiles; the trail's (trail 1..TRAIL_LV: its brightness) of its own layer. */
 static int piece_frame(int cell, float ax, float ay, float bx, float by, int trail) {
-    float dx = bx - ax, dy = by - ay;
-    if (dx * dx + dy * dy < (trail ? 0.25f : 0.64f)) return 0;
-    int A = trail ? TRAIL_ANG : SHAPE_ANG, OFF = trail ? TRAIL_OFF : SHAPE_OFF;
-    float step = trail ? TRAIL_DSTEP : SHAPE_DSTEP;
-    float th = atan2f(dy, dx);
-    if (th < 0) th += PI_F;
-    if (th >= PI_F) th -= PI_F;
-    int ai = (int)lroundf(th / (PI_F / A)) % A;
-    float tq = ai * (PI_F / A), nx = -sinf(tq), ny = cosf(tq);
-    float cx = (cell % TILE_COLS) * TILE_W + TILE_W * 0.5f, cy = (cell / TILE_COLS) * TILE_H + TILE_H * 0.5f;
-    float d = ((ax + bx) * 0.5f - cx) * nx + ((ay + by) * 0.5f - cy) * ny;
-    int half = (OFF - 1) / 2, k = (int)lroundf(d / step);
-    if (k < -half) k = -half;
-    if (k > half) k = half;
-    if (trail) return 1 + ((trail - 1) * TRAIL_ANG + ai) * OFF + (k + half);
-    return FR_SHAPE + ai * OFF + (k + half);
+    float x0 = (cell % TILE_COLS) * TILE_W, y0 = (cell / TILE_COLS) * TILE_H;
+    int NX = trail ? TRAIL_NX : EDGE_NX, NY = trail ? TRAIL_NY : EDGE_NY, N = 2 * (NX + NY);
+    int i = edge_point(ax - x0, ay - y0, NX, NY), j = edge_point(bx - x0, by - y0, NX, NY);
+    if (i == j) return 0;
+    int k = pair_index(i, j, N);
+    if (trail) return 1 + (trail - 1) * (N * (N - 1) / 2) + k;
+    return 1 + k;
 }
 
-static int dot_frame(float px, float py, int base, int *cell) {
-    if (px < 0) px = 0;
-    if (py < 0) py = 0;
-    if (px > TILE_COLS * TILE_W - 0.01f) px = TILE_COLS * TILE_W - 0.01f;
-    if (py > TILE_ROWS * TILE_H - 0.01f) py = TILE_ROWS * TILE_H - 0.01f;
-    int c = (int)(px / TILE_W), r = (int)(py / TILE_H);
-    int sx = (int)((px - c * TILE_W) / ((float)TILE_W / DOT_NX)), sy = (int)((py - r * TILE_H) / ((float)TILE_H / DOT_NY));
-    if (sx > DOT_NX - 1) sx = DOT_NX - 1;
-    if (sy > DOT_NY - 1) sy = DOT_NY - 1;
-    *cell = r * TILE_COLS + c;
-    return base + sy * DOT_NX + sx;
-}
+typedef struct {
+    unsigned short *g, *g2;                        /* g2: a second layer, for a tile the line crosses again (or NULL) */
+    float best[TILE_COLS * TILE_ROWS], best2[TILE_COLS * TILE_ROWS];
+    unsigned char lv[TILE_COLS * TILE_ROWS];
+    int trail, cell;
+    float ax, ay, bx, by;
+} walk_t;
 
-typedef struct { unsigned short *g; unsigned char done[TILE_COLS * TILE_ROWS]; int trail, cell; float ax, ay, bx, by; } walk_t;
-
+/* a tile the line crosses more than once keeps its longest piece (the trail: of its brightest, newest part); with a
+ * second layer, its second longest goes there */
 static void finish(walk_t *w) {
-    if (w->cell < 0 || w->done[w->cell]) return;
-    int f = piece_frame(w->cell, w->ax, w->ay, w->bx, w->by, w->trail);
-    if (f) { w->g[w->cell] = (unsigned short)f; w->done[w->cell] = 1; }
+    int c = w->cell;
+    if (c < 0) return;
+    if (w->lv[c] && w->lv[c] != (w->trail ? w->trail : 1)) return;
+    float l = hypotf(w->bx - w->ax, w->by - w->ay);
+    int f = piece_frame(c, w->ax, w->ay, w->bx, w->by, w->trail);
+    if (!f) return;
+    if (l > w->best[c]) {
+        if (w->g2 && w->g[c] && w->g[c] != f) { w->g2[c] = w->g[c]; w->best2[c] = w->best[c]; }
+        w->g[c] = (unsigned short)f;
+        w->best[c] = l;
+        w->lv[c] = (unsigned char)(w->trail ? w->trail : 1);
+    } else if (w->g2 && l > w->best2[c] && f != w->g[c]) {
+        w->g2[c] = (unsigned short)f;
+        w->best2[c] = l;
+    }
 }
 
 /* a straight segment in screen pixels, cut where it crosses tile edges: each tile's first visit is its piece */
@@ -107,18 +127,24 @@ void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const flo
                   const float *tx, const float *ty, int tn, int motion) {
     memcpy(s->tiles, s->shape, sizeof s->tiles);
     memset(s->trail, 0, sizeof s->trail);
+    memset(s->orbit, 0, sizeof s->orbit);
     if (!motion) return;
-    if (ln > 1) {   /* the orbit line: only into tiles the shape doesn't use */
-        static unsigned short line[TILE_COLS * TILE_ROWS];
-        walk_t w;
-        memset(line, 0, sizeof line);
+    if (ln > 1) {   /* the orbit line, faint: its longest piece in each tile on the main tiles (where the shape leaves
+                     * room), and the second one (where it crosses itself, or the shape) on its own layer */
+        static unsigned short l1[TILE_COLS * TILE_ROWS], l2[TILE_COLS * TILE_ROWS];
+        static walk_t w;
+        memset(l1, 0, sizeof l1);
+        memset(l2, 0, sizeof l2);
         memset(&w, 0, sizeof w);
-        w.g = line;
+        w.g = l1;
+        w.g2 = l2;
         w.cell = -1;
         for (int i = 0; i < ln - 1; i++) segment(&w, scr_x(lx[i]), scr_y(ly[i]), scr_x(lx[i + 1]), scr_y(ly[i + 1]));
         finish(&w);
-        for (int i = 0; i < TILE_COLS * TILE_ROWS; i++)
-            if (!s->tiles[i]) s->tiles[i] = line[i];
+        for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
+            if (!s->tiles[i]) { s->tiles[i] = l1[i] ? (unsigned short)(l1[i] + EDGE_PAIRS) : 0; s->orbit[i] = l2[i]; }
+            else s->orbit[i] = l1[i];
+        }
     }
     if (tn > 1) {   /* the light trail, newest first: a tile keeps the newest, brightest piece */
         walk_t w;
@@ -133,18 +159,44 @@ void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const flo
         }
         finish(&w);
     }
-    int cell;
-    int f = dot_frame(scr_x(fx), scr_y(fy), FR_PATHDOT, &cell);
-    s->tiles[cell] = (unsigned short)f;
-    /* the orbiter: every tile it reaches draws its part of the dot */
-    float px = scr_x(ox), py = scr_y(oy);
-    for (int r = (int)floorf(py / TILE_H) - 1; r <= (int)floorf(py / TILE_H) + 1; r++)
-        for (int c = (int)floorf(px / TILE_W) - 1; c <= (int)floorf(px / TILE_W) + 1; c++) {
-            if (r < 0 || r >= TILE_ROWS || c < 0 || c >= TILE_COLS) continue;
-            int ix = (int)lroundf((px - c * TILE_W - ORB_X0) / ORB_STEP), iy = (int)lroundf((py - r * TILE_H - ORB_Y0) / ORB_STEP);
-            if (ix < 0 || ix >= ORB_NX || iy < 0 || iy >= ORB_NY) continue;
-            s->tiles[r * TILE_COLS + c] = (unsigned short)(FR_ORBDOT + iy * ORB_NX + ix);
-        }
+}
+
+/* one ball on its layer of cells: the cell whose square holds its centre shows it at its place there, every other cell
+ * is empty. The centre is kept a radius from the screen's edges, so the whole ball is always on the screen. */
+static void ball(unsigned char *cells, float px, float py, int d) {
+    float r = d * 0.5f, X = TILE_COLS * TILE_W, Y = TILE_ROWS * TILE_H;
+    px = fminf(fmaxf(px, r), X - r);
+    py = fminf(fmaxf(py, r), Y - r);
+    memset(cells, 0, BALL_N * BALL_N);
+    float lx = px - SQUARE_X, ly = py;   /* on the corners' square, where the cells are */
+    int c = (int)floorf(lx / BALL_PITCH), rr = (int)floorf(ly / BALL_PITCH);
+    if (c < 0) c = 0;
+    if (c > BALL_N - 1) c = BALL_N - 1;
+    if (rr < 0) rr = 0;
+    if (rr > BALL_N - 1) rr = BALL_N - 1;
+    int ix = (int)floorf((lx - c * BALL_PITCH) / BALL_STEP), iy = (int)floorf((ly - rr * BALL_PITCH) / BALL_STEP);
+    if (ix < 0) ix = 0;
+    if (ix > BALL_POS - 1) ix = BALL_POS - 1;
+    if (iy < 0) iy = 0;
+    if (iy > BALL_POS - 1) iy = BALL_POS - 1;
+    cells[rr * BALL_N + c] = (unsigned char)(1 + iy * BALL_POS + ix);
+}
+
+static int colour_step(float size) {
+    int k = (int)floorf(size * BALL_COLS);
+    return k < 0 ? 0 : k > BALL_COLS - 1 ? BALL_COLS - 1 : k;
+}
+
+void screen_balls(screen_t *s, float fx, float fy, float ox, float oy, float orb_size, float sub_size, int behind, int motion) {
+    if (!motion) {
+        memset(s->bo, 0, sizeof s->bo);
+        memset(s->bp, 0, sizeof s->bp);
+    } else {
+        ball(s->bp, scr_x(fx), scr_y(fy), BALL_PD);
+        ball(s->bo, scr_x(ox), scr_y(oy), BALL_OD);
+    }
+    s->ball_p = (unsigned char)colour_step(orb_size);
+    s->ball_o = (unsigned char)(colour_step(sub_size) + (behind ? BALL_COLS : 0));
 }
 
 int env_pair_index(int r0, int r1) {

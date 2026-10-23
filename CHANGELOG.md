@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.3 (2026-10-23)
+
+Not yet tested on a device.
+
+- **Two sharp balls**: the path point and the orbiter are each one sharp round dot with no glow (the orbiter 32 px, the
+  path point 22 px), on layers of their own over the screen's glass. Each ball's colour shows its size, in 6 steps:
+  the path point's follows ORBIT SIZE (yellow, amber, orange, red, rose, pink), the orbiter's SUBORBIT SIZE (blue, sky,
+  cyan, aqua, green, lime). The orbiter passes behind the path point on the upper half of its circle.
+- The balls always stay whole inside the screen: near the top or bottom edge they stop at the edge instead of
+  reaching over the panel.
+- **An unbroken orbit line**: every piece of the screen's lines now runs from a fixed place on a tile's edge to
+  another, and the next tile starts at that same place, so the orbit line, the light trail and drawn shapes join up
+  with no breaks or steps. The orbit line is faint and thin, and has a second layer of its own where it crosses itself
+  or the shape, so crossings don't leave gaps. It stays still while nothing changes.
+- Screen reports are budgeted (at most 48 tiles a poll, the moving ones first), so a big redraw no longer comes as one
+  burst.
+- Wrapper: mpc-vst-plugins #486 (no UpdateDisplay for a plain host write, so Q-Links move parameters on the automation
+  screen), #487 (at most one UpdateDisplay per 50 ms), #488 (params.lock: parameters keep their index; the new ball
+  parameters are appended).
+
 ## 0.4.2 (2026-10-17)
 
 - **The orbit line and the light trail**: the screen draws the orbiter's whole path over one orbit (with its suborbit

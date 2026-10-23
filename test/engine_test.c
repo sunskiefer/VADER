@@ -202,6 +202,55 @@ int main(void) {
     nd = 0;
     for (char *p = db; *p;) { char *e; strtol(p, &e, 10); if (e == p) break; p = e; nd++; }
     CHECK(nd > 0 && nd < 120, "a moving orbit changes %d pieces per update", nd);
+    /* the balls (0.4.3): one cell each at a time, always whole on the screen, colours following the sizes */
+    {
+        setp(s, "shape", 3);   /* SQUARE: the path reaches the square's edges */
+        setp(s, "orb_size", 1);
+        setp(s, "sub_size", 1);
+        setp(s, "orb_speed", 0.8);
+        int bad_count = 0, bad_edge = 0, polls = 0, behind = 0, front = 0;
+        char k[16];
+        for (int u = 0; u < 400; u++) {
+            run(s, 14);
+            polls++;
+            int lit[2] = {0, 0};
+            for (int w = 0; w < 2; w++)
+                for (int i = 0; i < BALL_N * BALL_N; i++) {
+                    snprintf(k, sizeof k, "b%c%02d", w ? 'p' : 'o', i);
+                    int f = (int)getp(s, k);
+                    if (!f) continue;
+                    lit[w]++;
+                    int ix = (f - 1) % BALL_POS, iy = (f - 1) / BALL_POS;
+                    float r = (w ? BALL_PD : BALL_OD) * 0.5f;
+                    float cx = SQUARE_X + (i % BALL_N) * BALL_PITCH + ix * BALL_STEP + BALL_STEP * 0.5f;
+                    float cy = (i / BALL_N) * BALL_PITCH + iy * BALL_STEP + BALL_STEP * 0.5f;
+                    if (cx - r < -0.01f || cy - r < -0.01f || cx + r > TILE_COLS * TILE_W + 0.01f || cy + r > TILE_ROWS * TILE_H + 0.01f) bad_edge++;
+                }
+            if (lit[0] != 1 || lit[1] != 1) bad_count++;
+            int o = (int)getp(s, "ball_o");
+            if (o >= BALL_COLS) behind++; else front++;
+        }
+        CHECK(bad_count == 0, "the balls: one cell each in every one of %d updates (%d wrong)", polls, bad_count);
+        CHECK(bad_edge == 0, "the balls stay whole inside the screen, on the SQUARE at full size (%d outside)", bad_edge);
+        CHECK(behind > 20 && front > 20, "the orbiter passes behind the path point and in front of it (%d / %d updates)", behind, front);
+        CHECK((int)getp(s, "ball_o") % BALL_COLS == BALL_COLS - 1 && (int)getp(s, "ball_p") == BALL_COLS - 1,
+              "full ORBIT SIZE and SUBORBIT SIZE: both balls at their last colour");
+        setp(s, "orb_size", 0.05);
+        setp(s, "sub_size", 0.5);
+        run(s, 30);
+        CHECK((int)getp(s, "ball_p") == 0 && (int)getp(s, "ball_o") % BALL_COLS == 3,
+              "small ORBIT SIZE: the path point's first colour; SUBORBIT SIZE 50: the orbiter's colour 4 (%d, %d)",
+              (int)getp(s, "ball_p"), (int)getp(s, "ball_o"));
+        setp(s, "motion", 0);
+        run(s, 30);
+        int any = 0;
+        for (int w = 0; w < 2; w++) for (int i = 0; i < BALL_N * BALL_N; i++) { snprintf(k, sizeof k, "b%c%02d", w ? 'p' : 'o', i); any += getp(s, k) != 0; }
+        CHECK(any == 0, "MOTION off: no balls");
+        setp(s, "motion", 1);
+        setp(s, "orb_size", 0.7);
+        setp(s, "sub_size", 0.3);
+        setp(s, "orb_speed", 0.35);
+    }
     chord(s, 0);
     run(s, 600);
     /* state round trip */

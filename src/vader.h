@@ -87,16 +87,16 @@ void fx_process(fx_t *f, const fx_params_t *p, float *l, float *r, int n);
 void fx_clear(fx_t *f);
 
 /* ---- screen.c: the line screen (tiles) and the envelope line */
-#define FR_SHAPE 1
-#define FR_PATHDOT (FR_SHAPE + SHAPE_ANG * SHAPE_OFF)
 #define LINE_PTS 640   /* most points of the orbit line */
 #define TRAIL_PTS 48   /* points of the light trail, newest first */
-#define FR_ORBDOT (FR_PATHDOT + DOT_NX * DOT_NY)
 typedef struct {
     unsigned short tiles[TILE_COLS * TILE_ROWS];
     unsigned short shape[TILE_COLS * TILE_ROWS];   /* the shape alone (when the tiles draw it) */
     unsigned short trail[TILE_COLS * TILE_ROWS];   /* the light trail's layer */
+    unsigned short orbit[TILE_COLS * TILE_ROWS];   /* the orbit line's second layer (0.4.3) */
     unsigned char env[ENV_COLS];
+    unsigned char bo[BALL_N * BALL_N], bp[BALL_N * BALL_N];   /* the balls' cells: the orbiter's, the path point's */
+    unsigned char ball_o, ball_p;                               /* their colour steps (the orbiter's + BALL_COLS: behind) */
 } screen_t;
 /* x, y in -1..1 (the corners' square) -> the screen's pixels (640 x 288: the square in the middle, true proportions) */
 static inline float scr_x(float x) { return SQUARE_X + (x + 1) * 0.5f * SQUARE; }
@@ -111,8 +111,11 @@ int write_user_pictures(const char *skin_dir, const path_t *p);   /* 1: written 
 void screen_shape(screen_t *s, const float *x2, const float *y2, float size, int draw);
 /* the dots (path point fx, fy; orbiter ox, oy); the orbit line through lx, ly (ln points on the square: the orbiter's
  * whole path over one orbit, drawn faint and thin with the shape's pieces where the shape leaves room); the light trail
- * through tx, ty (tn points, newest first: bright for the first half, softer after) */
+ * through tx, ty (tn points, newest first: bright for the first half, softer after). The dots are drawn by screen_balls. */
 void screen_frame(screen_t *s, float fx, float fy, float ox, float oy, const float *lx, const float *ly, int ln,
                   const float *tx, const float *ty, int tn, int motion);
+/* the balls (0.4.3): the path point at fx, fy and the orbiter at ox, oy (on the square), their colours from ORBIT SIZE and
+ * SUBORBIT SIZE; behind: the orbiter passes under the path point */
+void screen_balls(screen_t *s, float fx, float fy, float ox, float oy, float orb_size, float sub_size, int behind, int motion);
 void screen_env(screen_t *s, float a, float d, float sus, float r);
 int env_pair_index(int r0, int r1);

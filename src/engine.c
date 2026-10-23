@@ -110,8 +110,9 @@ typedef struct {
     unsigned rng;
     /* screen */
     screen_t scr;
-    unsigned short sent_tiles[TILE_COLS * TILE_ROWS], sent_trail[TILE_COLS * TILE_ROWS];
+    unsigned short sent_tiles[TILE_COLS * TILE_ROWS], sent_trail[TILE_COLS * TILE_ROWS], sent_orbit[TILE_COLS * TILE_ROWS];
     unsigned char sent_env[ENV_COLS];
+    unsigned char sent_bo[BALL_N * BALL_N], sent_bp[BALL_N * BALL_N], sent_ball_o, sent_ball_p;
     int sent_pic;
     int grid_next;               /* where the screen's tile reports take their turn from */
     unsigned char sent_w[4], sent_rd;
@@ -159,7 +160,10 @@ static inline float norm_of(int p, float v) {
     return q->max > q->min ? (v - q->min) / (q->max - q->min) : 0;
 }
 #define SCREEN_BUDGET 48   /* screen tiles reported to MPC per poll (25 polls a second) */
-static int is_grid(int p) { return (p >= P_T000 && p < P_T000 + TILE_COLS * TILE_ROWS) || (p >= P_R000 && p < P_R000 + TILE_COLS * TILE_ROWS); }
+static int is_grid(int p) {
+    return (p >= P_T000 && p < P_T000 + TILE_COLS * TILE_ROWS) || (p >= P_R000 && p < P_R000 + TILE_COLS * TILE_ROWS) ||
+           (p >= P_L000 && p < P_L000 + TILE_COLS * TILE_ROWS);
+}
 static void mark(vader_t *s, int p) {
     if (p >= 0 && p < NP) s->dirty[p] = 1;
 }
@@ -1013,7 +1017,16 @@ static void screen_update(vader_t *s, int force_shape) {
     for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
         if (s->scr.tiles[i] != s->sent_tiles[i]) { s->sent_tiles[i] = s->scr.tiles[i]; mark(s, P_T000 + i); }
         if (s->scr.trail[i] != s->sent_trail[i]) { s->sent_trail[i] = s->scr.trail[i]; mark(s, P_R000 + i); }
+        if (s->scr.orbit[i] != s->sent_orbit[i]) { s->sent_orbit[i] = s->scr.orbit[i]; mark(s, P_L000 + i); }
     }
+    /* the balls: the orbiter passes behind the path point on the upper half of its suborbit */
+    screen_balls(&s->scr, fx, fy, ox, oy, P[S_ORB_SIZE], P[S_SUB_SIZE], sinf(TWO_PI * oo) < 0, motion);
+    for (int i = 0; i < BALL_N * BALL_N; i++) {
+        if (s->scr.bo[i] != s->sent_bo[i]) { s->sent_bo[i] = s->scr.bo[i]; mark(s, P_BO00 + i); }
+        if (s->scr.bp[i] != s->sent_bp[i]) { s->sent_bp[i] = s->scr.bp[i]; mark(s, P_BP00 + i); }
+    }
+    if (s->scr.ball_o != s->sent_ball_o) { s->sent_ball_o = s->scr.ball_o; mark(s, P_BALL_O); }
+    if (s->scr.ball_p != s->sent_ball_p) { s->sent_ball_p = s->scr.ball_p; mark(s, P_BALL_P); }
     if (motion) {
         /* the corner bars: what the sound really hears */
         float sx = best ? best->ox : ox, sy = best ? best->oy : oy;
@@ -1115,11 +1128,15 @@ static void *create(const char *data_dir) {
     }
     memset(s->sent_tiles, 0xff, sizeof s->sent_tiles);
     memset(s->sent_trail, 0xff, sizeof s->sent_trail);
+    memset(s->sent_orbit, 0xff, sizeof s->sent_orbit);
     s->sent_pic = -1;
     for (int k = 0; k < 3; k++) s->sent_r[k] = -1;
     memset(s->sent_im, 0xff, sizeof s->sent_im);
     memset(s->sent_env, 0xff, sizeof s->sent_env);
     memset(s->sent_w, 0xff, sizeof s->sent_w);
+    memset(s->sent_bo, 0xff, sizeof s->sent_bo);
+    memset(s->sent_bp, 0xff, sizeof s->sent_bp);
+    s->sent_ball_o = s->sent_ball_p = 0xff;
     s->sent_rd = 0xff;
     snprintf(s->readout, sizeof s->readout, "VADER");
     rescan(s);
@@ -1387,10 +1404,16 @@ static int get_param(void *p, const char *key, char *buf, int len) {
             if (i >= P_E00 && i < P_E00 + ENV_COLS) return snprintf(buf, (size_t)len, "%d", s->sent_env[i - P_E00]);
             if (i >= P_R000 && i < P_R000 + TILE_COLS * TILE_ROWS)
                 return snprintf(buf, (size_t)len, "%d", s->sent_trail[i - P_R000] == 0xffff ? 0 : s->sent_trail[i - P_R000]);
+            if (i >= P_L000 && i < P_L000 + TILE_COLS * TILE_ROWS)
+                return snprintf(buf, (size_t)len, "%d", s->sent_orbit[i - P_L000] == 0xffff ? 0 : s->sent_orbit[i - P_L000]);
             if (i >= P_T000 && i < P_T000 + TILE_COLS * TILE_ROWS) return snprintf(buf, (size_t)len, "%d", s->sent_tiles[i - P_T000]);
             if (i >= P_PIC_R6 && i <= P_PIC_R12) return snprintf(buf, (size_t)len, "%d", s->sent_r[i - P_PIC_R6] < 0 ? 0 : s->sent_r[i - P_PIC_R6]);
             if (i >= P_IM_M1 && i <= P_IM_M4) return snprintf(buf, (size_t)len, "%d", s->sent_im[i - P_IM_M1] == 0xff ? 0 : s->sent_im[i - P_IM_M1]);
             if (i == P_SHAPE_PIC) return snprintf(buf, (size_t)len, "%d", s->sent_pic < 0 ? 0 : s->sent_pic);
+            if (i >= P_BO00 && i < P_BO00 + BALL_N * BALL_N) return snprintf(buf, (size_t)len, "%d", s->sent_bo[i - P_BO00] == 0xff ? 0 : s->sent_bo[i - P_BO00]);
+            if (i >= P_BP00 && i < P_BP00 + BALL_N * BALL_N) return snprintf(buf, (size_t)len, "%d", s->sent_bp[i - P_BP00] == 0xff ? 0 : s->sent_bp[i - P_BP00]);
+            if (i == P_BALL_O) return snprintf(buf, (size_t)len, "%d", s->sent_ball_o == 0xff ? 0 : s->sent_ball_o);
+            if (i == P_BALL_P) return snprintf(buf, (size_t)len, "%d", s->sent_ball_p == 0xff ? 0 : s->sent_ball_p);
             return snprintf(buf, (size_t)len, "0");
         default: return 0;
         }
@@ -1407,19 +1430,20 @@ static int get_param(void *p, const char *key, char *buf, int len) {
                 s->dirty[k] = 0;
                 n += snprintf(buf + n, (size_t)(len - n), "%d ", k);
             }
-        /* the orbiter's and the trail's tiles first (they move), then the rest in turn */
+        /* the trail's tiles first (they move), then the rest in turn */
         for (int pass = 0; pass < 2 && budget > 0; pass++)
-            for (int j = 0; j < 2 * TILE_COLS * TILE_ROWS && budget > 0 && n < len - 8; j++) {
-                int g = (s->grid_next + j) % (2 * TILE_COLS * TILE_ROWS);
-                int k = g < TILE_COLS * TILE_ROWS ? P_T000 + g : P_R000 + g - TILE_COLS * TILE_ROWS;
+            for (int j = 0; j < 3 * TILE_COLS * TILE_ROWS && budget > 0 && n < len - 8; j++) {
+                int g = (s->grid_next + j) % (3 * TILE_COLS * TILE_ROWS);
+                int k = g < TILE_COLS * TILE_ROWS ? P_T000 + g : g < 2 * TILE_COLS * TILE_ROWS ? P_R000 + g - TILE_COLS * TILE_ROWS
+                      : P_L000 + g - 2 * TILE_COLS * TILE_ROWS;
                 if (!s->dirty[k]) continue;
-                int moving = g >= TILE_COLS * TILE_ROWS || s->scr.tiles[g] >= FR_PATHDOT;
+                int moving = g >= TILE_COLS * TILE_ROWS && g < 2 * TILE_COLS * TILE_ROWS;   /* the trail's layer */
                 if (pass == 0 && !moving) continue;
                 s->dirty[k] = 0;
                 budget--;
                 n += snprintf(buf + n, (size_t)(len - n), "%d ", k);
             }
-        s->grid_next = (s->grid_next + 97) % (2 * TILE_COLS * TILE_ROWS);
+        s->grid_next = (s->grid_next + 97) % (3 * TILE_COLS * TILE_ROWS);
         return n > 0 ? n : snprintf(buf, (size_t)len, " ");
     }
     if (!strcmp(key, "state")) {
