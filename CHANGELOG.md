@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.5.0 (2026-10-23)
+
+Not yet tested on a device: this build is the try.
+
+- **The live screen**: VADER draws its screen itself, straight onto a hardware overlay plane of the display, so MPC
+  redraws nothing while it moves. The plugin runs inside MPC, and uses the display handle MPC already holds (no change
+  to the firmware, no patch, no service: the same install as always). The drawing: the shape as an anti-aliased glowing
+  line (3D shapes shaded by depth), the orbit line faint, the orbiter's light trail as a smooth fading curve, the two
+  balls as soft-edged spheres with a glow, a loaded picture dimly under its shape, a bloom over the lights, scanlines
+  and a vignette; 30 frames a second, slower by itself when the device is slower. The tile screen rests (empty) while
+  it is up and carries on as before when it isn't.
+- Where the screen box is on the display, and whether it is on screen at all, VADER reads from the picture MPC shows:
+  two marker pixels in the skin's glass layer at the box's corners. The live screen hides itself on the other pages,
+  when the SHAPE list is open over it, and whenever the markers can't be seen.
+- Everything it finds and does goes to `overlay.log` in the plugin's folder (the display's planes and formats, the
+  plane it took, where the box is, frame times, any error). A file `overlay.off` in the plugin's folder keeps the live
+  screen off. Screen captures through MPC Remote don't show it (the display chip composes it, not MPC).
+- With two VADER instances in one project, the first one up has the live screen; the other keeps the tile screen.
+
 ## 0.4.5 (2026-10-23)
 
 Not yet tested on a device.

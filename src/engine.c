@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include "engine.h"
 #include "vader.h"
+#include "overlay.h"
 
 /* ------------------------------------------------------------------------------------------------ parameters */
 #define HSIZE 2048
@@ -137,6 +138,9 @@ typedef struct {
     int has_user;
     image_t img, load_img;        /* the picture under the shape (IMAGE page), from the last PNG/JPG loaded */
     char skin_dir[600];           /* <plugin folder>/Plugin Skins: where your shape's screen pictures are written */
+    char base_dir[600];           /* the plugin folder */
+    overlay_t ovl;                /* 0.5.0: the live screen (overlay.c) */
+    int shape_ver, pub_key, rested;
     int upics;                    /* 1: the pictures of the loaded shape are written */
     int load_upics;
     int sent_r[3];
@@ -216,6 +220,7 @@ static void timbre_shape(vader_t *s, int t) {
     s->tm[t].shape_built = 1;
     s->tm[t].last_rot = -99;   /* project again */
     if (t == edit(s)) s->shape_wait = 0;
+    s->shape_ver++;
 }
 
 static void project(vader_t *s, int t, float dt) {
@@ -335,6 +340,7 @@ static void collect_load(vader_t *s) {
         s->user = s->load_buf;
         s->has_user = 1;
         if (s->load_img.ok) s->img = s->load_img;   /* a picture: it is the IMAGE too (an SVG or OBJ keeps the last one) */
+        s->shape_ver++;
         s->upics = s->load_upics;
         snprintf(s->user_file, sizeof s->user_file, "%s", s->load_name);
         snprintf(s->status, sizeof s->status, "LOADED");
@@ -1015,6 +1021,28 @@ static void screen_update(vader_t *s, int force_shape) {
         fy *= size;
     }
     float ox = clampf(fx + sr_ * cosf(TWO_PI * oo), -1, 1), oy = clampf(fy + sr_ * sinf(TWO_PI * oo), -1, 1);
+    if (overlay_live(&s->ovl)) {   /* 0.5.0: the live screen draws it all: the tiles, balls and picture rest (empty) */
+        if (!s->rested) {
+            s->rested = 1;
+            memset(&s->scr.tiles, 0, sizeof s->scr.tiles);
+            memset(&s->scr.trail, 0, sizeof s->scr.trail);
+            memset(&s->scr.orbit, 0, sizeof s->scr.orbit);
+            memset(&s->scr.bo, 0, sizeof s->scr.bo);
+            memset(&s->scr.bp, 0, sizeof s->scr.bp);
+            s->scr.tr_n = 0;
+            for (int i = 0; i < TILE_COLS * TILE_ROWS; i++) {
+                if (s->sent_tiles[i]) { s->sent_tiles[i] = 0; mark(s, P_T000 + i); }
+                if (s->sent_trail[i]) { s->sent_trail[i] = 0; mark(s, P_R000 + i); }
+                if (s->sent_orbit[i]) { s->sent_orbit[i] = 0; mark(s, P_L000 + i); }
+            }
+            for (int i = 0; i < BALL_N * BALL_N; i++) {
+                if (s->sent_bo[i]) { s->sent_bo[i] = 0; mark(s, P_BO00 + i); }
+                if (s->sent_bp[i]) { s->sent_bp[i] = 0; mark(s, P_BP00 + i); }
+            }
+            if (s->sent_pic) { s->sent_pic = 0; mark(s, P_SHAPE_PIC); }
+        }
+        goto bars;
+    } else if (s->rested) { s->rested = 0; force_shape = 1; s->line_key = ~0u; }
     if (pic != s->sent_pic) { s->sent_pic = pic; mark(s, P_SHAPE_PIC); force_shape = 1; }
     if (fparam >= 0 && frame != s->sent_r[fparam]) { s->sent_r[fparam] = frame; mark(s, P_PIC_R6 + fparam); }
     int redraw = 0;
@@ -1077,6 +1105,7 @@ static void screen_update(vader_t *s, int force_shape) {
     }
     if (s->scr.ball_o != s->sent_ball_o) { s->sent_ball_o = s->scr.ball_o; mark(s, P_BALL_O); }
     if (s->scr.ball_p != s->sent_ball_p) { s->sent_ball_p = s->scr.ball_p; mark(s, P_BALL_P); }
+bars:
     if (motion && --s->bar_wait <= 0) {   /* 0.4.5: about 8 times a second, in steps of 5, so they cost little */
         s->bar_wait = 3;
         /* the corner bars: what the sound really hears */
@@ -1164,6 +1193,7 @@ static void *create(const char *data_dir) {
         snprintf(s->pdir, sizeof s->pdir, "%s/User Presets", base);
         snprintf(s->skin_dir, sizeof s->skin_dir, "%s/Plugin Skins", base);
         if (access(s->skin_dir, W_OK) != 0) s->skin_dir[0] = 0;   /* no skin folder here (tests): don't write */
+        if (s->skin_dir[0]) snprintf(s->base_dir, sizeof s->base_dir, "%s", base);
     }
     memcpy(s->g, GLOB_DEF, sizeof s->g);
     memcpy(T(0), SND_DEF, sizeof(float) * NSND);
@@ -1190,12 +1220,14 @@ static void *create(const char *data_dir) {
     rescan(s);
     screen_update(s, 1);
     env_update(s);
+    overlay_start(&s->ovl, s->base_dir);   /* 0.5.0: the live screen, when the display allows it (overlay.log says) */
     return s;
 }
 
 static void destroy(void *p) {
     vader_t *s = p;
     if (!s) return;
+    overlay_stop(&s->ovl);
     if (s->loader_joinable) pthread_join(s->loader, NULL);
     for (int i = 0; i < s->nfiles; i++) { free(s->files[i].path); free(s->files[i].label); }
     fx_free(s->fx);
@@ -1652,6 +1684,39 @@ static void render(void *p, int16_t *out, int frames) {
     if (s->scr_wait <= 0) {
         s->scr_wait += 1764;   /* 25 times a second (the wrapper reports changes as often) */
         screen_update(s, 0);
+    }
+    /* ---- the live screen (overlay.c): what to draw, every block; the shape when it changes */
+    if (s->ovl.started) {
+        int t = edit(s);
+        timbre_t *m = &s->tm[t];
+        int key = s->shape_ver * 2 + t;
+        if (key != s->pub_key) {
+            s->pub_key = key;
+            static ovl_shape_t sh;   /* 19 KB: not on the stack */
+            memcpy(sh.px, m->base.x, sizeof sh.px);
+            memcpy(sh.py, m->base.y, sizeof sh.py);
+            memcpy(sh.pz, m->base.z, sizeof sh.pz);
+            sh.is3d = m->base.is3d;
+            sh.shape_user = (int)T(t)[S_SHAPE] == SHAPE_USER && s->has_user;
+            sh.has_img = s->img.ok;
+            if (sh.has_img) memcpy(sh.img, s->img.v, sizeof sh.img);
+            overlay_publish_shape(&s->ovl, &sh);
+        }
+        voice_t *best = NULL;
+        for (int i = 0; i < MAXV; i++)
+            if (s->v[i].active && s->v[i].timbre == t && (!best || s->v[i].age > best->age)) best = &s->v[i];
+        ovl_view_t v;
+        v.motion = (int)s->g[G_MOTION];
+        v.rot = m->rot_s;
+        v.yaw = m->yaw;
+        v.tilt = T(t)[S_TILT] * 1.5707963f;
+        v.size = m->size_s < 0 ? T(t)[S_ORB_SIZE] : m->size_s;
+        v.sub_size = m->sub_s < 0 ? T(t)[S_SUB_SIZE] : m->sub_s;
+        v.ot = best ? best->shown_t : m->orb_t;
+        v.oo = best ? best->shown_o : m->orb_o;
+        v.hz = m->hz_now;
+        v.sub = m->sub_now;
+        overlay_publish(&s->ovl, &v);
     }
 }
 

@@ -9,7 +9,8 @@
 #include <time.h>
 #include <unistd.h>
 #include "engine.h"
-#include "vader_params.h"
+#include "vader.h"
+#include "overlay.h"
 
 static int fails = 0;
 #define CHECK(c, ...) do { if (!(c)) { fails++; printf("FAIL: "); printf(__VA_ARGS__); printf("\n"); } else { printf("ok: "); printf(__VA_ARGS__); printf("\n"); } } while (0)
@@ -216,6 +217,39 @@ int main(void) {
             if (k > mx) mx = k;
         }
         CHECK(mx <= 10 && tot < 60 * 8, "steady play: the screen reports %.1f pieces a poll on average, %d at most", tot / 60.0, mx);
+    }
+    /* 0.5.0: the live screen (overlay.c), offline: a frame draws (lit pixels in the box, the balls in their colours),
+     * fast; the box finder finds the skin's markers on a picture of a display */
+    {
+        static ovl_shape_t sh; static ovl_view_t v; static path_t p;
+        shape_builtin(2, &p);
+        memcpy(sh.px, p.x, sizeof sh.px); memcpy(sh.py, p.y, sizeof sh.py); memcpy(sh.pz, p.z, sizeof sh.pz);
+        v.motion = 1; v.size = 0.7f; v.sub_size = 0.5f; v.ot = 0.3f; v.oo = 0.2f; v.hz = 0.8f; v.sub = 4.9f;
+        static uint8_t buf[OVL_W * OVL_H * 4];
+        struct timespec t0, t1;
+        clock_gettime(CLOCK_MONOTONIC, &t0);
+        int rc = 0;
+        for (int i = 0; i < 10; i++) rc |= overlay_render_test(&sh, &v, buf, OVL_W * 4);
+        clock_gettime(CLOCK_MONOTONIC, &t1);
+        double ms = ((t1.tv_sec - t0.tv_sec) * 1e3 + (t1.tv_nsec - t0.tv_nsec) / 1e6) / 10;
+        long lit = 0;
+        for (int i = 0; i < OVL_W * OVL_H; i++) if (buf[i * 4 + 2] > 60 || buf[i * 4 + 1] > 60) lit++;
+        CHECK(rc == 0 && lit > 2000 && lit < 60000 && ms < 40, "live screen: a frame draws %ld lit pixels in %.1f ms", lit, ms);
+        /* a 1280 x 800 display with the box at 312, 286 */
+        static uint8_t disp[1280 * 800 * 4];
+        memset(disp, 0x10, sizeof disp);
+        const uint8_t TL[4][3] = {{23, 7, 91}, {91, 7, 23}, {7, 91, 23}, {23, 91, 7}}, BR[4][3] = {{91, 23, 7}, {7, 23, 91}, {61, 7, 61}, {7, 61, 61}};
+        for (int k = 0; k < 4; k++) {
+            uint8_t *q = disp + ((size_t)(286 + 4 + k / 2) * 1280 + 312 + 8 + k % 2) * 4;
+            q[2] = TL[k][0]; q[1] = TL[k][1]; q[0] = TL[k][2];
+            q = disp + ((size_t)(286 + 4 + 288 - 2 + k / 2) * 1280 + 312 + 8 + 640 - 2 + k % 2) * 4;
+            q[2] = BR[k][0]; q[1] = BR[k][1]; q[0] = BR[k][2];
+        }
+        int bx = -1, by = -1;
+        int found = overlay_find_test(disp, 1280, 800, 1280 * 4, &bx, &by);
+        CHECK(found && bx == 312 && by == 286, "live screen: the box found at %d,%d on a display picture (found %d)", bx, by, found);
+        disp[((size_t)(286 + 4) * 1280 + 312 + 8) * 4 + 2] = 0;   /* a list over the corner */
+        CHECK(!overlay_find_test(disp, 1280, 800, 1280 * 4, &bx, &by), "live screen: not found with the corner covered");
     }
     /* 0.4.6: a fast orbiter under the report cap: the tiles the trail left are reported before new pieces, so what MPC
      * shows never piles up (GLASS STAR on the device: trail pieces over the whole screen) */

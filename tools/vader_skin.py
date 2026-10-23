@@ -534,6 +534,12 @@ def glass():
     a = np.clip(a + v, 0, 120)
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     im.putalpha(Image.fromarray(a.astype("uint8")))
+    # 0.5.0: two 2 x 2 markers, opaque, at the tiles' top-left and bottom-right (src/overlay.c MARK_TL / MARK_BR): the
+    # live screen finds the box on the display by them, and hides itself while they are not both visible
+    for (x0, y0, cols) in ((0, 0, [(23, 7, 91), (91, 7, 23), (7, 91, 23), (23, 91, 7)]),
+                           (w - 2, h - 2, [(91, 23, 7), (7, 23, 91), (61, 7, 61), (7, 61, 61)])):
+        for k, c in enumerate(cols):
+            im.putpixel((x0 + k % 2, y0 + k // 2), c + (255,))
     return im
 
 
