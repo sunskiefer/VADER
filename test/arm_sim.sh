@@ -16,4 +16,4 @@ OBJS=""
 for f in $PLUGIN_SRCS test/engine_test.c; do o="build/armsim/$(echo $f | tr / _).o"; $ZIG cc $TGT $FL -c $f -o $o; OBJS="$OBJS $o"; done
 $ZIG cc $TGT -static $OBJS -lm -o build/armsim/engine_test
 QEMU=$(command -v qemu-arm || command -v qemu-arm-static)
-$QEMU build/armsim/engine_test
+VADER_SLOW=1 $QEMU build/armsim/engine_test   # emulated: the engine test's timing check is skipped
