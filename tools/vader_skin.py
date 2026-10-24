@@ -44,14 +44,23 @@ LINE_Y = 30      # where the line sits inside the control
 TILE_W, TILE_H = 20, 18
 SCREEN = (312, 114, 656, 296)               # the screen window on MAIN
 TILES_XY = (320, 118)                        # its top-left tile
-ENV_BOX = (16, 94, 280, 64)
-ENV_XY = (28, 98)                            # the envelope columns' top-left
-ENV_CW, ENV_RH = 8, 4                        # column width, row height
+ENV_BOX = (16, 92, 400, 64)
+ENV_XY = (24, 96)                            # the envelope columns' top-left
+ENV_CW, ENV_RH = 12, 4                       # column width, row height (32 columns: 384 px)
+# 0.6.0: the companion screen's QR code on MAIN: QR_N modules of QR_MOD px, a quiet zone of 4 modules, on a light tile
+QR_QUIET = 3                                  # modules of quiet zone (the standard says 4; 3 reads fine, and fits)
+QR_TILE = G.QR_N * G.QR_MOD + 2 * QR_QUIET * G.QR_MOD   # 273
+QR_XY = (436 + (408 - QR_TILE) // 2, 120)    # the tile's top-left
+QR_MOD_XY = (QR_XY[0] + QR_QUIET * G.QR_MOD, QR_XY[1] + QR_QUIET * G.QR_MOD)   # the first module
 
 
 # ------------------------------------------------------------------------------------------------ the pages
-def hl(key, x, y, w, label=None, when=None):
-    return {"kind": "hline", "key": key, "x": x, "y": y, "w": w, "label": label, "when": when}
+def hl(key, x, y, w, label=None, when=None, big=False):
+    return {"kind": "hline", "key": key, "x": x, "y": y, "w": w, "label": label, "when": when, "big": big}
+
+
+HLB = 52         # a big line control's height (the MAIN page, 0.6.0): a 22 px name, a thicker line, a 26 px value
+LINE_HB = 18
 
 
 def tog(key, x, y, w, label=None, h=40, when=None):
@@ -76,8 +85,8 @@ def field(key, x, y, w, caption, h=44):
     return {"kind": "field", "key": key, "x": x, "y": y, "w": w, "h": h, "caption": caption}
 
 
-def fader(key, x, y, label):
-    return {"kind": "fader", "key": key, "x": x, "y": y, "w": 72, "h": 186, "label": label}
+def fader(key, x, y, label, w=72, big=False):
+    return {"kind": "fader", "key": key, "x": x, "y": y, "w": w, "h": 186, "label": label, "big": big}
 
 
 def title(text, x, y, w):
@@ -88,53 +97,56 @@ def text(t, x, y, size=18, colour=INK_DIM, w=None):
     return {"kind": "text", "text": t, "x": x, "y": y, "size": size, "colour": colour, "w": w}
 
 
-def mixer(x, y):
-    return [title("MIXER", x, y, 288)] + [fader(k, x + i * 72, y + 22, l) for i, (k, l) in
-                                          enumerate([("mix_rev", "REVERB"), ("mix_ch", "CHORUS"), ("mix_dly", "DELAY"),
-                                                     ("volume", "VOLUME")])]
+def mixer(x, y, w=288, big=False):
+    fw = w // 4
+    return [title("MIXER", x, y, w)] + [fader(k, x + i * fw, y + 22, l, w=fw, big=big) for i, (k, l) in
+                                        enumerate([("mix_rev", "REVERB"), ("mix_ch", "CHORUS"), ("mix_dly", "DELAY"),
+                                                   ("volume", "VOLUME")])]
 
 
 def page_main():
-    L, C, R = 16, 312, 980
+    """0.6.0: three columns of big controls; in the middle, instead of the screen, the companion screen's QR code
+    around the VADER mark (the phone draws the screen). ENV_BOX / QR_XY say where the envelope and the code sit."""
+    L, C, R = 16, 436, 864
+    W = 400
     c = []
-    c += [title("ENVELOPE", L, 70, 280), {"kind": "envwin"}]
-    c += [hl("attack", L, 166, 132), hl("decay", L + 148, 166, 132), hl("sustain", L, 220, 132), hl("release", L + 148, 220, 132)]
-    # ALT off: the orbit and the shape's own movement (size, turn, spin, depth); ALT on: the voice, vibrato, tremolo
-    c += [title("ORBIT  /  ALT: VOICE", L, 278, 280)]
-    c += [hl("orb_speed", L, 300, 132, "ORBIT SPEED", when="alt:OFF"), hl("orb_size", L + 148, 300, 132, "ORBIT SIZE", when="alt:OFF"),
-          hl("sub_size", L, 354, 132, "SUBORBIT SIZE", when="alt:OFF"), hl("sub_speed", L + 148, 354, 132, "SUBORB SPEED", when="alt:OFF"),
-          hl("detune", L, 300, 132, "DETUNE", when="alt:ON"), hl("glide", L + 148, 300, 132, "GLIDE", when="alt:ON"),
-          hl("velocity", L, 354, 132, "VELOCITY", when="alt:ON"), hl("t_volume", L + 148, 354, 132, "VOLUME", when="alt:ON")]
-    c += [title("SHAPE  /  ALT: VIB-TREM", L, 412, 280)]
-    c += [hl("rotate", L, 434, 132, "ROTATE", when="alt:OFF"), hl("spin", L + 148, 434, 132, "3D SPIN", when="alt:OFF"),
-          hl("tilt", L, 488, 132, "3D TILT", when="alt:OFF"), hl("orb_env", L + 148, 488, 132, "ORBIT ENV", when="alt:OFF"),
-          hl("vib_speed", L, 434, 132, "VIB SPEED", when="alt:ON"), hl("vib_depth", L + 148, 434, 132, "VIB DEPTH", when="alt:ON"),
-          hl("trem_speed", L, 488, 132, "TREM SPEED", when="alt:ON"), hl("trem_depth", L + 148, 488, 132, "TREM DEPTH", when="alt:ON")]
-    c += [title("CORNER SELECT", L, 546, 280), radio("corner", L, 568, 280, h=42)]
-    # centre: the screen
-    c += [popup("shape", C, 68, 300, "SHAPE", list_at=(C + 8, 118), cols=4, ow=158, oh=44),
-          {"kind": "screen"}, {"kind": "tiles"}, {"kind": "bars", "x": C, "y": 416}]
-    keys1 = [("f_og1", "GEN 1", "drive", "DRIVE"), ("f_og2", "GEN 2", "drive_col", "DRV COLOUR"),
-             ("f_blend", "BLEND", "rev_size", "REV SIZE"), ("f_cutoff", "CUTOFF", "rev_col", "REV COLOUR"),
-             ("f_reso", "RESO", "mres", "MSTR RESO")]
-    for i, (k, l, k2, l2) in enumerate(keys1):
-        c += [hl(k, C + i * 133, 446, 124, l, when="alt:OFF"), hl(k2, C + i * 133, 446, 124, l2, when="alt:ON")]
-    keys2 = [("dly_time", "DLY TIME"), ("dly_fb", "FEEDBACK"), ("ch_speed", "CH SPEED"), ("ch_depth", "CH DEPTH"),
-             ("ch_col", "CH COLOUR")]
-    for i, (k, l) in enumerate(keys2):
-        c += [hl(k, C + i * 133, 504, 124, l)]
-    c += [tog("alt", C, 566, 190, "ALT"), tog("motion", C + 206, 566, 190, "MOTION")]
-    # right: mixer, arpeggiator, sync
-    c += mixer(R, 70)
-    c += [title("ARPEGGIATOR", R, 286, 288), tog("arp_on", R, 308, 140, "ACTIVE"), tog("latch", R + 148, 308, 140, "LATCH"),
-          popup("arp_mode", R, 356, 140, "DIR", list_at=(R - 330, 300)), popup("arp_rate", R + 148, 356, 140, "RATE", list_at=(R - 330, 300)),
-          hl("note_len", R, 404, 288, "NOTE LENGTH")]
-    c += [title("SYNC", R, 462, 288),
-          tog("retrig", R, 484, 92, "RETRIG"), tog("orb_sync", R + 98, 484, 92, "ORBITER"), tog("vt_sync", R + 196, 484, 92, "V/T"),
-          btn("tap", R, 532, 92, "TAP"), tog("dly_sync", R + 98, 532, 92, "DELAY"), tog("ch_sync", R + 196, 532, 92, "CHORUS")]
+    # left: the envelope, the orbit and shape (ALT: the voice, vibrato, tremolo), the delay (ALT: the chorus)
+    c += [title("ENVELOPE", L, 70, W), {"kind": "envwin"}]
+    c += [hl("attack", L, 166, 192, big=True), hl("decay", L + 208, 166, 192, big=True),
+          hl("sustain", L, 222, 192, big=True), hl("release", L + 208, 222, 192, big=True)]
+    c += [title("ORBIT AND SHAPE  /  ALT: VOICE, VIB, TREM", L, 282, W)]
+    c += [hl("orb_speed", L, 304, 192, "ORBIT SPEED", when="alt:OFF", big=True), hl("orb_size", L + 208, 304, 192, "ORBIT SIZE", when="alt:OFF", big=True),
+          hl("sub_size", L, 360, 192, "SUBORBIT SIZE", when="alt:OFF", big=True), hl("sub_speed", L + 208, 360, 192, "SUBORB SPEED", when="alt:OFF", big=True),
+          hl("rotate", L, 416, 192, "ROTATE", when="alt:OFF", big=True), hl("spin", L + 208, 416, 192, "3D SPIN", when="alt:OFF", big=True),
+          hl("tilt", L, 472, 192, "3D TILT", when="alt:OFF", big=True), hl("orb_env", L + 208, 472, 192, "ORBIT ENV", when="alt:OFF", big=True),
+          hl("detune", L, 304, 192, "DETUNE", when="alt:ON", big=True), hl("glide", L + 208, 304, 192, "GLIDE", when="alt:ON", big=True),
+          hl("velocity", L, 360, 192, "VELOCITY", when="alt:ON", big=True), hl("t_volume", L + 208, 360, 192, "VOLUME", when="alt:ON", big=True),
+          hl("vib_speed", L, 416, 192, "VIB SPEED", when="alt:ON", big=True), hl("vib_depth", L + 208, 416, 192, "VIB DEPTH", when="alt:ON", big=True),
+          hl("trem_speed", L, 472, 192, "TREM SPEED", when="alt:ON", big=True), hl("trem_depth", L + 208, 472, 192, "TREM DEPTH", when="alt:ON", big=True)]
+    c += [title("DELAY  /  ALT: CHORUS", L, 532, W)]
+    c += [hl("dly_time", L, 554, 192, "DLY TIME", when="alt:OFF", big=True), hl("dly_fb", L + 208, 554, 192, "FEEDBACK", when="alt:OFF", big=True),
+          hl("ch_speed", L, 554, 192, "CH SPEED", when="alt:ON", big=True), hl("ch_depth", L + 208, 554, 192, "CH DEPTH", when="alt:ON", big=True)]
+    # middle: the shape, the QR code with the mark, the corner, the corner's sound (ALT: drive, reverb, master reso)
+    c += [popup("shape", C, 68, 408, "SHAPE", h=44, list_at=(C - 100, 118), cols=4, ow=158, oh=44), {"kind": "qr"}]
+    c += [title("CORNER SELECT", C, 398, 408), radio("corner", C, 416, 408, h=38)]
+    c += [hl("f_og1", C, 460, 192, "GEN 1", when="alt:OFF", big=True), hl("f_og2", C + 208, 460, 192, "GEN 2", when="alt:OFF", big=True),
+          hl("f_blend", C, 512, 192, "BLEND", when="alt:OFF", big=True), hl("f_cutoff", C + 208, 512, 192, "CUTOFF", when="alt:OFF", big=True),
+          hl("f_reso", C, 564, 192, "RESO", when="alt:OFF", big=True),
+          hl("drive", C, 460, 192, "DRIVE", when="alt:ON", big=True), hl("drive_col", C + 208, 460, 192, "DRV COLOUR", when="alt:ON", big=True),
+          hl("rev_size", C, 512, 192, "REV SIZE", when="alt:ON", big=True), hl("rev_col", C + 208, 512, 192, "REV COLOUR", when="alt:ON", big=True),
+          hl("mres", C, 564, 192, "MSTR RESO", when="alt:ON", big=True)]
+    c += [tog("alt", C + 208, 568, 92, "ALT", h=42), tog("motion", C + 316, 568, 92, "MOTION", h=42)]
+    # right: the mixer, the arpeggiator, the sync
+    c += mixer(R, 70, W, big=True)
+    c += [title("ARPEGGIATOR", R, 292, W), tog("arp_on", R, 314, 192, "ACTIVE", h=44), tog("latch", R + 208, 314, 192, "LATCH", h=44),
+          popup("arp_mode", R, 366, 192, "DIR", h=44, list_at=(R - 330, 300)), popup("arp_rate", R + 208, 366, 192, "RATE", h=44, list_at=(R - 330, 300)),
+          hl("note_len", R, 418, W, "NOTE LENGTH", big=True)]
+    c += [title("SYNC", R, 480, W),
+          tog("retrig", R, 502, 124, "RETRIG", h=44), tog("orb_sync", R + 138, 502, 124, "ORBITER", h=44), tog("vt_sync", R + 276, 502, 124, "V/T", h=44),
+          btn("tap", R, 554, 124, "TAP", h=44), tog("dly_sync", R + 138, 554, 124, "DELAY", h=44), tog("ch_sync", R + 276, 554, 124, "CHORUS", h=44)]
     q = [("MAIN 1", ["f_og1", "f_og2", "f_blend", "f_cutoff", "f_reso", "orb_speed", "orb_size", "sub_size",
                      "attack", "decay", "sustain", "release", "sub_speed", "mix_rev", "mix_dly", "volume"]),
-         ("MAIN 2", ["dly_time", "dly_fb", "ch_speed", "ch_depth", "ch_col", "vib_speed", "vib_depth", "trem_speed",
+         ("MAIN 2", ["dly_time", "dly_fb", "ch_speed", "ch_depth", "f_reso", "vib_speed", "vib_depth", "trem_speed",
                      "trem_depth", "note_len", "mix_ch", "drive", "drive_col", "rev_size", "rev_col", "mres"]),
          ("MAIN 3", ["rotate", "spin", "tilt", "orb_env", "detune", "glide", "velocity", "t_volume"])]
     return c, q
@@ -171,6 +183,7 @@ def page_orbit():
           hl("shape_osc", A, 470, 400, "SHAPE SOUND")]
     c += [title("SHAPE FILES", B, 70, 400), field("file", B, 92, 400, "FILE", h=56),
           btn("load", B, 158, 192, "LOAD", h=48), btn("rescan", B + 208, 158, 192, "RESCAN", h=48)]
+    c += [title("COMPANION SCREEN", B, 216, 400), field("web_url", B, 238, 400, "AT", h=44)]   # 0.6.0: the address (the QR code is on MAIN)
     c += [title("VOICE", B, 290, 400), hl("octave", B, 312, 192, "OCTAVE"), hl("t_volume", B + 208, 312, 192, "VOLUME"),
           hl("detune", B, 366, 192, "DETUNE"), hl("glide", B + 208, 366, 192, "GLIDE"),
           hl("velocity", B, 420, 400, "VELOCITY"), text("UNISON", B, 480, 18), radio("unison", B, 502, 400, h=42)]
@@ -296,18 +309,19 @@ def glow_line(img, xy0, xy1, colour, width, glow=6, strength=0.9):
     ImageDraw.Draw(img).line([xy0, xy1], fill=colour + (255,), width=width)
 
 
-def line_strip(w, frames=101):
+def line_strip(w, frames=101, lh=None):
     """a line control's filmstrip: the thin track and the thick glowing line over it, from nothing to full"""
     Image, ImageDraw, _, _ = _pil()
-    strip = Image.new("RGBA", (w, LINE_H * frames), (0, 0, 0, 0))
+    lh = lh or LINE_H
+    strip = Image.new("RGBA", (w, lh * frames), (0, 0, 0, 0))
     for k in range(frames):
-        fr = Image.new("RGBA", (w, LINE_H), (0, 0, 0, 0))
+        fr = Image.new("RGBA", (w, lh), (0, 0, 0, 0))
         d = ImageDraw.Draw(fr)
-        d.line([(2, LINE_H // 2), (w - 3, LINE_H // 2)], fill=TRACK + (255,), width=2)
+        d.line([(2, lh // 2), (w - 3, lh // 2)], fill=TRACK + (255,), width=2)
         x = 2 + (w - 6) * k / (frames - 1)
         if x > 3:
-            glow_line(fr, (3, LINE_H // 2), (x, LINE_H // 2), ACCENT, 6, glow=6)
-        strip.alpha_composite(fr, (0, k * LINE_H))
+            glow_line(fr, (3, lh // 2), (x, lh // 2), ACCENT, 6 if lh <= 16 else 8, glow=6)
+        strip.alpha_composite(fr, (0, k * lh))
     return strip
 
 
@@ -520,6 +534,89 @@ def upic_frame(k):
     import numpy as np
     r = float(np.float32(1.4142) * np.float32(k) / np.float32(G.U_SIZES) * np.float32(G.SQUARE) * np.float32(0.5) + np.float32(12))
     return 2 * math.ceil(min(r, G.SQUARE_X + G.SQUARE * 0.5)), 2 * math.ceil(min(r, G.SQUARE * 0.5))
+
+
+# ------------------------------------------------------------------------------------------------ the QR code (0.6.0)
+# light modules on the dark panel (an inverted code: phone cameras read it), white with neon blue accents
+QR_INKS = [(255, 255, 255), (255, 255, 255), (255, 255, 255), (125, 252, 255), (90, 190, 255), (255, 255, 255)]
+QR_BG = (6, 10, 18)
+
+
+def _qr_rng(seed):
+    """a small deterministic generator, so a rebuild draws the same art"""
+    x = (seed * 2654435761 + 97) & 0xffffffff
+    while True:
+        x = (x * 1103515245 + 12345) & 0x7fffffff
+        yield x >> 8
+
+
+def qr_shape(d, x, y, m, kind, col):
+    """one dark module as a small flat shape in a m x m cell at (x, y)"""
+    pad = 0.5
+    x0, y0, x1, y1 = x + pad, y + pad, x + m - pad, y + m - pad
+    if kind == 0:
+        d.ellipse([x0, y0, x1, y1], fill=col)
+    elif kind == 1:
+        d.rounded_rectangle([x0, y0, x1, y1], radius=1.5, fill=col)
+    elif kind == 2:
+        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        d.polygon([(cx, y0), (x1, cy), (cx, y1), (x0, cy)], fill=col)
+    elif kind == 3:
+        d.pieslice([x0 - (x1 - x0), y0 - (y1 - y0), x1, y1], 0, 90, fill=col)       # a quarter circle, bottom-right
+    elif kind == 4:
+        d.pieslice([x0, y0, x1 + (x1 - x0), y1 + (y1 - y0)], 180, 270, fill=col)   # a quarter circle, top-left
+    else:
+        d.rectangle([x0, y0 + 1.5, x1, y1 - 1.5], fill=col)                        # a bar
+
+
+def qr_row_strip(row):
+    """row's filmstrip: 256 frames of 8 modules (frame k: the byte k, the leftmost module its top bit), each dark module
+    a shape of the row's own set; a light module shows the tile"""
+    Image, ImageDraw, _, _ = _pil()
+    m = G.QR_MOD
+    SS = 4
+    rng = _qr_rng(row + 1)
+    kinds = [next(rng) % 6 for _ in range(8)]
+    cols = [QR_INKS[next(rng) % len(QR_INKS)] for _ in range(8)]
+    strip = Image.new("RGBA", (8 * m, m * 256), (0, 0, 0, 0))
+    for k in range(256):
+        fr = Image.new("RGBA", (8 * m * SS, m * SS), (0, 0, 0, 0))
+        d = ImageDraw.Draw(fr)
+        for i in range(8):
+            if k & (0x80 >> i):
+                qr_shape(d, i * m * SS, 0, m * SS, kinds[i], cols[i] + (255,))
+        strip.alpha_composite(fr.resize((8 * m, m), Image.LANCZOS), (0, k * m))
+    return strip
+
+
+def qr_eye(d, x, y, m):
+    """a finder pattern (7 x 7 modules at x, y) as a target: a white rounded ring, a dark gap, a neon round centre"""
+    d.rounded_rectangle([x, y, x + 7 * m - 1, y + 7 * m - 1], radius=2 * m, fill=(255, 255, 255, 255))
+    d.rounded_rectangle([x + m, y + m, x + 6 * m - 1, y + 6 * m - 1], radius=1.5 * m, fill=QR_BG + (255,))
+    d.ellipse([x + 2 * m, y + 2 * m, x + 5 * m - 1, y + 5 * m - 1], fill=(125, 252, 255, 255))
+
+
+def vader_mark(size):
+    """VADER's mark: the corners' square with its four corner points, the orbit ring through it and the orbiter;
+    art/logo.png is used instead when it exists"""
+    Image, ImageDraw, _, _ = _pil()
+    logo = os.path.join(ROOT, "art", "logo.png")
+    if os.path.exists(logo):
+        return Image.open(logo).convert("RGBA").resize((size, size), Image.LANCZOS)
+    SS = 4
+    s = size * SS
+    im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle([0, 0, s - 1, s - 1], radius=s * 0.18, fill=QR_BG + (255,))   # the dark ground, so no modules show through
+    q0, q1 = s * 0.2, s * 0.8
+    d.rectangle([q0, q0, q1, q1], outline=(255, 255, 255, 255), width=max(1, s // 36))
+    r = s * 0.065
+    for (cx, cy) in ((q0, q0), (q1, q0), (q0, q1), (q1, q1)):
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(125, 252, 255, 255))
+    d.ellipse([s * 0.26, s * 0.37, s * 0.74, s * 0.63], outline=(90, 190, 255, 255), width=max(1, s // 40))
+    rr = s * 0.08
+    d.ellipse([s * 0.63 - rr, s * 0.41 - rr, s * 0.63 + rr, s * 0.41 + rr], fill=(255, 255, 255, 255))
+    return im.resize((size, size), Image.LANCZOS)
 
 
 def glass():
@@ -772,23 +869,27 @@ def build_page(sk, page_no, comps):
         elif k == "hline":
             x, y, w = c["x"], c["y"], c["w"]
             lab = c["label"] or sk.params[key]["name"]
-            vw = 56   # the value, right of the line
-            limg = sk.save(label_img(lab, w, 18), "vd_lab_%s_%s_%d.png" % (t, key, w))
-            strip = sk.save(line_strip(w - vw - 4), "vd_line_%d.png" % (w - vw - 4))
-            dk = define("vdLine_%s_%s_%d" % (t, key, w), KNOB_ACTIONS,
-                        [focus(w, HL), image(limg, 0, 0, w, 24),
-                         text_label("Value", w - vw, 22, vw, 28, 22.0, "ffffff", "right verticallyCentred"),
-                         filmstrip(strip, 101, w - vw - 4, LINE_H, "Horizontal", 0, LINE_Y)])
-            kids.append(placed(dk, key, sk.index[key], (x, y, w, HL), True, cond=cond))
+            big = c.get("big")
+            vw = 64 if big else 56   # the value, right of the line
+            hh, lh, ly, lpx, vpx = (HLB, LINE_HB, 32, 22, 26.0) if big else (HL, LINE_H, LINE_Y, 18, 22.0)
+            limg = sk.save(label_img(lab, w, lpx, h=28 if big else 24), "vd_lab_%s_%s_%d%s.png" % (t, key, w, "b" if big else ""))
+            strip = sk.save(line_strip(w - vw - 4, lh=lh), "vd_line_%d_%d.png" % (w - vw - 4, lh))
+            dk = define("vdLine_%s_%s_%d%s" % (t, key, w, "b" if big else ""), KNOB_ACTIONS,
+                        [focus(w, hh), image(limg, 0, 0, w, 28 if big else 24),
+                         text_label("Value", w - vw, 22 if big else 22, vw, 30 if big else 28, vpx, "ffffff", "right verticallyCentred"),
+                         filmstrip(strip, 101, w - vw - 4, lh, "Horizontal", 0, ly)])
+            kids.append(placed(dk, key, sk.index[key], (x, y, w, hh), True, cond=cond))
         elif k == "fader":
             x, y, w, h = c["x"], c["y"], c["w"], c["h"]
-            limg = sk.save(label_img(c["label"], w, 18, INK, h=24), "vd_flab_%s.png" % key)
+            big = c.get("big")
+            limg = sk.save(label_img(c["label"], w, 22 if big else 18, INK, h=26 if big else 24), "vd_flab_%s_%d.png" % (key, w))
             fh = 120   # 101 frames: the strip stays under MPC's 12288 px
-            strip = sk.save(fader_strip(28, fh), "vd_fader_%d.png" % fh)
-            dk = define("vdFader_%s" % key, KNOB_ACTIONS,
-                        [focus(w, h), image(limg, 4, 0, w - 4, 22),
-                         filmstrip(strip, 101, 28, fh, "Vertical", (w - 28) // 2, 26),
-                         text_label("Value", 0, 26 + fh + 2, w, 28, 22.0, "ffffff")])
+            fw = 36 if big else 28
+            strip = sk.save(fader_strip(fw, fh), "vd_fader_%d_%d.png" % (fw, fh))
+            dk = define("vdFader_%s_%d" % (key, w), KNOB_ACTIONS,
+                        [focus(w, h), image(limg, 4, 0, w - 4, 26 if big else 22),
+                         filmstrip(strip, 101, fw, fh, "Vertical", (w - fw) // 2, 28 if big else 26),
+                         text_label("Value", 0, 28 + fh + 2, w, 30, 26.0 if big else 22.0, "ffffff")])
             kids.append(placed(dk, key, sk.index[key], (x, y, w, h), True))
         elif k in ("toggle", "button"):
             x, y, w, h = c["x"], c["y"], c["w"], c["h"]
@@ -864,6 +965,23 @@ def build_page(sk, page_no, comps):
                         [focus(w, h), filmstrip(empty, 2, 8, 8, "Horizontal", 0, 0),
                          text_label("Value", 12 + cw_, 0, w - 50 - cw_, h, 24.0, "ffffff", "left verticallyCentred")])
             kids.append(placed(dk, key, sk.index[key], (x, y, w, h), True))
+        elif k == "qr":
+            m = G.QR_MOD
+            tx, ty = QR_XY
+            mx, my = QR_MOD_XY
+            d.rounded_rectangle([tx, ty, tx + QR_TILE - 1, ty + QR_TILE - 1], radius=16, fill=QR_BG + (255,))   # a quiet dark ground
+            for (ex, ey) in ((0, 0), (G.QR_N - 7, 0), (0, G.QR_N - 7)):   # the eyes, on the tile (the modules there repeat them)
+                qr_eye(d, mx + ex * m, my + ey * m, m)
+            for r in range(G.QR_N):
+                strip = sk.save(qr_row_strip(r), "vd_qr_%02d.png" % r)
+                dk = define("vdQr_%02d" % r, [], [filmstrip(strip, 256, 8 * m, m, "Vertical")], ignore=True)
+                for b in range(G.QR_BYTES):
+                    i = r * G.QR_BYTES + b
+                    kids.append(placed(dk, "qr %d" % i, sk.index["q%03d" % i], (mx + b * 8 * m, my + r * m, 8 * m, m), False))
+            hole = G.QR_HOLE * m
+            mark = sk.save(vader_mark(hole), "vd_mark.png")
+            mk = define("vdMark", [], [image(mark, 0, 0, hole, hole)], ignore=True)
+            kids.append(placed(mk, "mark", sk.index["q000"], (mx + (G.QR_N - G.QR_HOLE) // 2 * m, my + (G.QR_N - G.QR_HOLE) // 2 * m, hole, hole), False))
         elif k == "envwin":
             window(d, ENV_BOX, 8)
             strip = sk.save(env_strip(), "vd_env.png")

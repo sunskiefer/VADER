@@ -65,33 +65,26 @@ artwork; it is not affiliated with Beetlecrab Audio.
   GEN 1, GEN 2, BLEND or LEVEL.
 - **Six pages**: MAIN, CORNERS, ORBIT, IMAGE, ARP, FX. Q-Links are mapped on every page.
 
-## The screen
+## The screen: on your phone
 
 MPC draws a plugin's screen itself, from pictures and the plugin's values; a plugin cannot draw on the Force's display
-directly. So VADER's screen is built from pieces MPC can switch:
-- the **built-in shapes** as ready-drawn, glowing pictures: 12 size steps and fine turn steps over each shape's own
-  symmetry (a STAR every 12 degrees), and CUBE and ICOSA as spinning frames, so they stay crisp and move in small steps;
-- **your own 2D shapes** drawn by VADER itself into its skin folder when loaded (an experiment: MPC may show them only
-  after the plugin window is opened again);
-- the **orbit line**: the orbiter's whole path over one orbit as a faint thin line, unbroken (with a second layer of
-  tiles where it crosses itself or the shape), lit up as a **light trail** where the orbiter has just passed, on its
-  own layer of tiles (the last tiles the orbiter crossed: the newest bright, the rest softer). The line is drawn once
-  per change of shape, size, turn or speed ratio and then left alone, so travelling it costs MPC nothing;
-- the **two balls**: the path point and the orbiter, each one sharp round dot (no glow) in its own colour, which
-  changes with its size: the path point's with ORBIT SIZE (yellow, amber, orange, red, rose, pink), the orbiter's with
-  SUBORBIT SIZE (blue, sky, cyan, aqua, green, lime). They move in 3 px steps, the orbiter passes behind the path point
-  on the upper half of its circle, and both always stay whole inside the screen;
-- a grid of **32 × 16 fine tiles** for shapes without pictures. Each tile holds a straight piece of line from one fixed place on its edge
-  to another, and its neighbour starts at that same place, so lines join up across tiles;
-- a light **glass** layer on top (fine scanlines, darker edges), like a CRT;
-- the **envelope**, drawn as 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE;
-- **four corner bars**, showing how much A, B, C and D you hear.
+directly, and every moving piece costs MPC a redraw (0.1 to 0.4 drew the screen from thousands of switchable pieces,
+and a busy one crackled the audio). Since 0.6.0 VADER's screen is the **companion screen**: a web page served by the
+plugin itself, on the Force's own network address, that any phone, tablet or laptop on the same Wi-Fi opens in its
+browser:
 
-The square of the corners is drawn square, at its true proportions.
+- scan the **QR code** on the MAIN page with the phone's camera (or type the address shown on the ORBIT page; Apple
+  devices can also use `vader.local`);
+- the page draws the shape as a glowing line (3D shapes shaded by depth), the orbit line, the orbiter with its light
+  trail and the two balls in their size colours, smoothly, with a **FULLSCREEN** button. On a phone it always draws in
+  landscape: hold the phone sideways. "Add to Home Screen" gives it an icon that opens it full screen like an app;
+- **LOAD SHAPE** on the page sends a picture (PNG, JPG), an SVG or an OBJ from the phone to the Force: it lands in the
+  Shapes folder and plays at once;
+- several devices can watch at the same time. The Force sends 30 small messages a second and draws nothing: the sound
+  gets the whole machine. **MOTION** switches the companion screen's motion.
 
-The engine works out what each piece shows, 25 times a second, and only tells MPC about the pieces that changed.
-The shape is drawn in dim blue, the orbit line faint and its light trail bright cyan; the balls take the colours of their sizes.
-**MOTION** off freezes the screen, which saves MPC's screen CPU in a heavy project.
+On the Force, the MAIN page shows the QR code around the VADER mark where the screen was, with bigger controls around
+it; the envelope line stays, drawn by MPC from 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE.
 
 | | |
 |---|---|
@@ -132,17 +125,12 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.4.5 has not been tested on a device yet.** It is the build that stops the crackle with MOTION on: the screen asks MPC
-for at most 10 redraws every 40 ms (0.4.4 asked for up to 48, about 1000 a second, and MPC's redraws starved the
-audio), with the same drawing. Offline it passes the framework's VST2 host test and VADER's own engine
+**0.6.0 has not been tested on a device yet.** Offline it passes the framework's VST2 host test, VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
-round trip, the screen updates) on x86 and as ARM code, and the release zip passes the catalog check. Two things only a
-Force can show:
-- **CPU**: the worst case (16 voices, all four corners with ladder filters, every effect) should be measured with the
-  framework's `tools/bench.sh`. The default is 8 voices.
-- **The screen**: the MAIN page has about 1330 parts, and the shape pictures take about 260 MB once MPC has loaded them
-  (more steps for size, turn and spin). If MPC is slow to open VADER or runs short, the steps can be made coarser.
-- **Your shape's pictures**: whether MPC shows the pictures VADER writes when a file is loaded (an experiment).
+round trip) and the companion screen's server test (the page, the WebSocket stream, an upload) on x86, and the engine
+test as ARM code; the release zip passes the catalog check. 0.4.5 and 0.5.0 were tried on a Force (the sound is clean
+with the screen quiet; the overlay experiment of 0.5.x drew well but made MPC's own screen lag, which is why the screen
+moved to the phone).
 
 ## License
 

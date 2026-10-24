@@ -7,6 +7,7 @@ cd "$(dirname "$0")/.."
 ZIG="${ZIG:-python3 -m ziglang}"
 MPC_VST=third_party/mpc-vst-plugins
 python3 tools/gen_params.py >/dev/null
+python3 tools/gen_web.py >/dev/null
 python3 $MPC_VST/tools/gen_vst.py vst.json --params-h >/dev/null
 TGT="-target arm-linux-musleabihf -mcpu=generic+v7a+vfp3d16-d32-neon+thumb2 -ffp-contract=off"
 FL="-O2 -w -std=gnu11 -Ibuild -I$MPC_VST/wrapper $INCS"

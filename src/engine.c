@@ -20,9 +20,10 @@
 #include "engine.h"
 #include "vader.h"
 #include "overlay.h"
+#include "web.h"
 
 /* ------------------------------------------------------------------------------------------------ parameters */
-#define HSIZE 2048
+#define HSIZE 4096   /* more than twice the parameters (a full table would loop) */
 static short g_hash[HSIZE];
 static pthread_once_t g_hash_once = PTHREAD_ONCE_INIT;
 static unsigned hkey(const char *s, int n) {
@@ -139,8 +140,12 @@ typedef struct {
     image_t img, load_img;        /* the picture under the shape (IMAGE page), from the last PNG/JPG loaded */
     char skin_dir[600];           /* <plugin folder>/Plugin Skins: where your shape's screen pictures are written */
     char base_dir[600];           /* the plugin folder */
-    overlay_t ovl;                /* 0.5.0: the live screen (overlay.c) */
-    int shape_ver, pub_key, rested;
+    overlay_t ovl;                /* 0.5.0: the live screen (overlay.c), off unless overlay.on exists */
+    web_t web;                    /* 0.6.0: the companion screen (web.c) */
+    unsigned web_seen;            /* the address version last shown (the readout and the QR code) */
+    unsigned char sent_qr[QR_N * QR_BYTES];
+    char web_text[96];
+    int shape_ver, pub_key, rested, screen_on;
     int upics;                    /* 1: the pictures of the loaded shape are written */
     int load_upics;
     int sent_r[3];
@@ -1001,10 +1006,7 @@ static int shape_picture(vader_t *s, int t, int *frame, int *fparam, float *px, 
 }
 
 static void screen_update(vader_t *s, int force_shape) {
-#ifdef NOSCREEN
-    (void)s; (void)force_shape;   /* VADER_NOSCREEN=1: no screen at all, nothing drawn, nothing reported */
-    return;
-#endif
+    if (!s->screen_on) return;   /* 0.6.0: the MAIN page has no tile screen any more (the companion screen draws) */
     int t = edit(s);
     const float *P = T(t);
     timbre_t *m = &s->tm[t];
@@ -1224,15 +1226,16 @@ static void *create(const char *data_dir) {
     rescan(s);
     screen_update(s, 1);
     env_update(s);
-#ifndef NOSCREEN
-    overlay_start(&s->ovl, s->base_dir);   /* 0.5.0: the live screen, when the display allows it (overlay.log says) */
-#endif
+    overlay_start(&s->ovl, s->base_dir);   /* 0.5.0: the live screen: only with overlay.on in the plugin folder */
+    if (s->base_dir[0] || getenv("VADER_WEB")) web_start(&s->web, &s->ovl, s->dir);   /* 0.6.0: the companion screen */
+    snprintf(s->web_text, sizeof s->web_text, "%s", s->web.started ? "STARTING" : "OFF");
     return s;
 }
 
 static void destroy(void *p) {
     vader_t *s = p;
     if (!s) return;
+    web_stop(&s->web);
     overlay_stop(&s->ovl);
     if (s->loader_joinable) pthread_join(s->loader, NULL);
     for (int i = 0; i < s->nfiles; i++) { free(s->files[i].path); free(s->files[i].label); }
@@ -1374,6 +1377,7 @@ static void load_user(vader_t *s) {
 static void set_param(void *p, const char *key, const char *val) {
     vader_t *s = p;
     collect_load(s);
+    if (!strcmp(key, "tile_screen")) { s->screen_on = atoi(val); s->shape_wait = 0; s->line_key = ~0u; return; }   /* the tests: the old tile screen */
     if (!strcmp(key, "host_time")) {
         int pl = 0;
         double ppq = 0, tempo = 0;
@@ -1484,8 +1488,10 @@ static int get_param(void *p, const char *key, char *buf, int len) {
         case K_SND: return put_num(buf, len, T(edit(s))[q->slot], q);
         case K_GLOB: return put_num(buf, len, s->g[q->slot], q);
         case K_TRIG: return snprintf(buf, (size_t)len, "0");
-        case K_STR: return snprintf(buf, (size_t)len, "%s", s->readout);
+        case K_STR: return snprintf(buf, (size_t)len, "%s", i == P_WEB_URL ? s->web_text : s->readout);
         case K_DISP:
+            if (i >= P_Q000 && i < P_Q000 + QR_N * QR_BYTES) return snprintf(buf, (size_t)len, "%d", s->sent_qr[i - P_Q000]);
+            /* fall through */
             if (i == P_RD_LINE) return snprintf(buf, (size_t)len, "%d", s->sent_rd == 0xff ? 0 : s->sent_rd);
             if (i >= P_WA && i <= P_WD) return snprintf(buf, (size_t)len, "%d", s->sent_w[i - P_WA] == 0xff ? 25 : s->sent_w[i - P_WA]);
             if (i >= P_E00 && i < P_E00 + ENV_COLS) return snprintf(buf, (size_t)len, "%d", s->sent_env[i - P_E00]);
@@ -1690,9 +1696,35 @@ static void render(void *p, int16_t *out, int frames) {
     if (s->scr_wait <= 0) {
         s->scr_wait += 1764;   /* 25 times a second (the wrapper reports changes as often) */
         screen_update(s, 0);
+        /* the companion screen's address, when it changes: the readout text and the QR code's bytes */
+        if (s->web.started) {
+            unsigned wv = web_version(&s->web);
+            if (wv != s->web_seen) {
+                unsigned char qr[QR_N * QR_BYTES];
+                char st[96];
+                s->web_seen = web_get(&s->web, st, sizeof st, qr);
+                snprintf(s->web_text, sizeof s->web_text, "%s", st);
+                mark(s, P_WEB_URL);
+                for (int i = 0; i < QR_N * QR_BYTES; i++)
+                    if (qr[i] != s->sent_qr[i]) { s->sent_qr[i] = qr[i]; mark(s, P_Q000 + i); }
+            }
+            /* a shape sent from the phone: into the list, and loaded as the edited timbre's */
+            char up[1100];
+            if (web_take_load(&s->web, up, sizeof up)) {
+                rescan(s);
+                const char *base = strrchr(up, '/');
+                base = base ? base + 1 : up;
+                for (int i = 0; i < s->nfiles; i++) {
+                    const char *fb = strrchr(s->files[i].path, '/');
+                    if (!strcmp(fb ? fb + 1 : s->files[i].path, base)) { s->g[G_FILE] = (float)i; mark(s, P_FILE); break; }
+                }
+                s->load_select = 1;
+                start_load(s, up);
+            }
+        }
     }
-    /* ---- the live screen (overlay.c): what to draw, every block; the shape when it changes */
-    if (s->ovl.started) {
+    /* ---- what to draw (the companion screen, web.c; the live screen, overlay.c): every block; the shape when it changes */
+    if (s->ovl.started || s->web.started) {
         int t = edit(s);
         timbre_t *m = &s->tm[t];
         int key = s->shape_ver * 2 + t;
@@ -1722,6 +1754,12 @@ static void render(void *p, int16_t *out, int frames) {
         v.oo = best ? best->shown_o : m->orb_o;
         v.hz = m->hz_now;
         v.sub = m->sub_now;
+        v.env = best ? best->env : 0;
+        {
+            float sx = best ? best->ox : 0, sy = best ? best->oy : 0;
+            float u = (sx + 1) * 0.5f, ww = (sy + 1) * 0.5f;
+            v.w[0] = (1 - u) * (1 - ww); v.w[1] = u * (1 - ww); v.w[2] = (1 - u) * ww; v.w[3] = u * ww;
+        }
         overlay_publish(&s->ovl, &v);
     }
 }

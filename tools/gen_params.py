@@ -77,6 +77,11 @@ BALL_N, BALL_PITCH, BALL_STEP, BALL_POS, BALL_COLS = 8, 36, 3, 12, 6
 BALL_FRAMES = 1 + BALL_POS * BALL_POS
 BALL_OD, BALL_PD = 32, 22                  # the orbiter's and the path point's diameter (px)
 ENV_COLS, ENV_ROWS = 32, 14
+# 0.6.0: the QR code of the companion screen's address: version 4 (33 modules), level H (a logo may cover the middle)
+QR_VER, QR_N = 4, 33
+QR_BYTES = (QR_N + 7) // 8
+QR_MOD = 7                 # a module's size on the skin (px)
+QR_HOLE = 11               # modules under the logo (centred)
 ENV_FRAMES = ENV_ROWS * (ENV_ROWS + 1) // 2
 
 # ---- per corner (x4, keys a_..d_): (field, name, default, min, max, options, int)
@@ -299,6 +304,11 @@ def build():
     add("ball_p", "PATH POINT COLOUR", 0, 0, BALL_COLS - 1, None, True, "DISP", 5201)
     for i in range(TILE_COLS * TILE_ROWS):   # the orbit line's second layer
         add("l%03d" % i, "ORBIT LINE %d" % (i + 1), 0, 0, ORBIT_FRAMES - 1, None, True, "DISP", 6000 + i)
+    # 0.6.0: the companion screen's address (text) and its QR code on the MAIN page: QR_N rows of QR_BYTES bytes, each a
+    # byte of 8 modules (a filmstrip of 256 frames), set once when the address is known
+    add("web_url", "COMPANION SCREEN", 0, 0, 1, None, False, "STR", 1, {"display": "string"})
+    for i in range(QR_N * QR_BYTES):
+        add("q%03d" % i, "QR %d" % (i + 1), 0, 0, 255, None, True, "DISP", 7000 + i)
     return params, rows, snd_slots, glob_slots
 
 
@@ -324,7 +334,7 @@ def write():
     L.append("#define NGLOB %d" % len(glob))
     L.append("#define NCF %d   /* fields per corner */" % len(CORNER))
     L.append("#define TILE_COLS %d\n#define TILE_ROWS %d\n#define TILE_FRAMES %d" % (TILE_COLS, TILE_ROWS, TILE_FRAMES))
-    for k in ("TILE_W", "TILE_H", "EDGE_NX", "EDGE_NY", "EDGE_N", "EDGE_PAIRS", "ORBIT_FRAMES", "TRAIL_NX", "TRAIL_NY", "TRAIL_N", "TRAIL_LV", "TRAIL_FRAMES", "PIC_SHAPES",
+    for k in ("QR_VER", "QR_N", "QR_BYTES", "QR_MOD", "QR_HOLE", "TILE_W", "TILE_H", "EDGE_NX", "EDGE_NY", "EDGE_N", "EDGE_PAIRS", "ORBIT_FRAMES", "TRAIL_NX", "TRAIL_NY", "TRAIL_N", "TRAIL_LV", "TRAIL_FRAMES", "PIC_SHAPES",
               "PIC_SIZES", "PIC_COUNT", "SQUARE_X", "SQUARE", "P3_SHAPES", "P3_SIZES", "P3_TILT", "P3_YAW",
               "U_SIZES", "U_ROT", "SEL_2D", "SEL_3D", "SEL_USER", "BALL_N", "BALL_PITCH", "BALL_STEP", "BALL_POS",
               "BALL_COLS", "BALL_FRAMES", "BALL_OD", "BALL_PD"):

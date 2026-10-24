@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#06080f">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.png">
+<link rel="icon" href="/icon.png">
+<title>VADER</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #06080f; overflow: hidden; -webkit-user-select: none; user-select: none; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+  #ui { position: fixed; left: 0; right: 0; bottom: 0; box-sizing: border-box; display: flex; justify-content: space-between; align-items: flex-end;
+        padding: 14px 18px calc(14px + env(safe-area-inset-bottom)); font: 600 15px/1.2 system-ui, -apple-system, sans-serif;
+        color: #9fc6ff; letter-spacing: .08em; text-transform: uppercase; pointer-events: none; transition: opacity .6s; }
+  #ui.hide { opacity: 0; }
+  #ui span { opacity: .75 }
+  #fs, #ld { pointer-events: auto; background: rgba(58,160,255,.14); border: 1px solid rgba(58,160,255,.5); color: #cfe3ff;
+        border-radius: 10px; padding: 10px 16px; font: inherit; letter-spacing: inherit; text-transform: inherit; margin-left: 8px; }
+  #fs:active, #ld:active { background: rgba(58,160,255,.35) }
+  #st { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 0; right: 0; text-align: center; color: #5a7fb0;
+        font: 600 14px system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="st">connecting</div>
+<div id="ui"><span>VADER &middot; L'Cronx</span><span><button id="ld">Load shape</button> <button id="fs">Fullscreen</button></span></div>
+<input id="file" type="file" accept=".png,.jpg,.jpeg,.svg,.obj,image/png,image/jpeg,image/svg+xml" style="display:none">
+<script>
+(() => {
+'use strict';
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const st = document.getElementById('st'), ui = document.getElementById('ui'), fs = document.getElementById('fs');
+let W = 0, H = 0, DPR = 1;
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = cv.width = Math.floor(innerWidth * DPR); H = cv.height = Math.floor(innerHeight * DPR);
+}
+addEventListener('resize', resize); resize();
+
+/* ---- what the Force sends */
+let shape = null;      // {n, x[], y[], z[], is3d, user, img}
+let v = null;          // the last view: motion, rot, yaw, tilt, size, sub, ot, oo, hz, subhz, env, w[4]
+let vAt = 0;           // when it arrived (ms)
+let ws = null, tries = 0;
+function connect() {
+  const url = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+  ws = new WebSocket(url); ws.binaryType = 'arraybuffer';
+  ws.onopen = () => { tries = 0; st.textContent = ''; };
+  ws.onclose = () => { st.textContent = 'reconnecting'; setTimeout(connect, Math.min(4000, 400 * ++tries)); };
+  ws.onerror = () => { try { ws.close(); } catch (e) {} };
+  ws.onmessage = (e) => {
+    const d = new DataView(e.data), t = d.getUint8(0);
+    if (t === 2) {
+      const n = d.getUint32(4, true); let p = 8;
+      const x = new Float32Array(n), y = new Float32Array(n), z = new Float32Array(n);
+      for (let i = 0; i < n; i++) { x[i] = d.getFloat32(p, true); y[i] = d.getFloat32(p + 4, true); z[i] = d.getFloat32(p + 8, true); p += 12; }
+      const hasImg = d.getUint8(3); let img = null;
+      if (hasImg) { img = new Uint8Array(e.data, p, 64 * 64); }
+      shape = { n, x, y, z, is3d: d.getUint8(1), user: d.getUint8(2), img };
+    } else if (t === 1) {
+      let p = 4; const f = () => { const r = d.getFloat32(p, true); p += 4; return r; };
+      v = { motion: d.getUint8(1), rot: f(), yaw: f(), tilt: f(), size: f(), sub: f(), ot: f(), oo: f(), hz: f(), subhz: f(), env: f(), w: [f(), f(), f(), f()] };
+      vAt = performance.now();
+    }
+  };
+}
+connect();
+
+/* ---- the drawing */
+const TAU = Math.PI * 2;
+const PATH_COLS = ['#ffe14a', '#ffb020', '#ff801a', '#ff5428', '#ff345a', '#ff3caa'];
+const ORB_COLS = ['#4678ff', '#3cafff', '#7dfcff', '#5affc8', '#6eff8c', '#beff5a'];
+function colStep(s) { return Math.max(0, Math.min(5, Math.floor(s * 6))); }
+const x2 = new Float32Array(256), y2 = new Float32Array(256), z2 = new Float32Array(256);
+function project(sh, rot, yaw, tilt) {
+  const cr = Math.cos(rot * TAU), sr = Math.sin(rot * TAU);
+  if (sh.is3d) {
+    const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(tilt), sp = Math.sin(tilt);
+    for (let i = 0; i < sh.n; i++) {
+      const x = sh.x[i], y = sh.y[i], z = sh.z[i];
+      const x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
+      const y1 = y * cp - z1 * sp, zz = y * sp + z1 * cp;
+      const persp = 1 / (1 + 0.25 * zz), a = x1 * persp, b = y1 * persp;
+      x2[i] = a * cr - b * sr; y2[i] = a * sr + b * cr; z2[i] = zz;
+    }
+  } else for (let i = 0; i < sh.n; i++) { x2[i] = sh.x[i] * cr - sh.y[i] * sr; y2[i] = sh.x[i] * sr + sh.y[i] * cr; z2[i] = 0; }
+  let m = 0;
+  for (let i = 0; i < sh.n; i++) { m = Math.max(m, Math.abs(x2[i]), Math.abs(y2[i])); }
+  if (m > 1) for (let i = 0; i < sh.n; i++) { x2[i] /= m; y2[i] /= m; }
+}
+function pathAt(n, t) { let u = (t - Math.floor(t)) * n; let i = Math.floor(u), f = u - i; i %= n; const j = (i + 1) % n; return [x2[i] + (x2[j] - x2[i]) * f, y2[i] + (y2[j] - y2[i]) * f]; }
+
+let S = 0, CX = 0, CY = 0;   // the square's size and centre on the canvas
+function sx(x) { return CX + x * S * 0.5; }
+function sy(y) { return CY + y * S * 0.5; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+
+let lastT = performance.now(), uiTimer = 0;
+let portrait = false;   // a portrait phone: the picture is turned, so held sideways it is a landscape screen
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#06080f'; ctx.fillRect(0, 0, cv.width, cv.height);
+  portrait = cv.height > cv.width;
+  if (portrait) { W = cv.height; H = cv.width; ctx.translate(cv.width, 0); ctx.rotate(Math.PI / 2); } else { W = cv.width; H = cv.height; }
+  // the glass: a vignette, scanlines
+  const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.2, W / 2, H / 2, Math.max(W, H) * 0.75);
+  g.addColorStop(0, 'rgba(14,24,48,0.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // the Force's screen box proportions (640 x 288, the square in the middle): the square as big as the height allows
+  S = Math.min(H * 0.74, W * 0.46); CX = W / 2; CY = H / 2 - S * 0.03;
+  // the corners
+  ctx.strokeStyle = 'rgba(70,120,180,0.9)'; ctx.lineWidth = 2 * DPR; ctx.lineCap = 'round';
+  const L = S * 0.06, c0 = CX - S / 2, c1 = CX + S / 2, r0 = CY - S / 2, r1 = CY + S / 2;
+  for (const [x, y, dx, dy] of [[c0, r0, 1, 1], [c1, r0, -1, 1], [c0, r1, 1, -1], [c1, r1, -1, -1]]) {
+    ctx.beginPath(); ctx.moveTo(x + dx * L, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * L); ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(90,140,200,0.9)'; ctx.font = `600 ${Math.round(S * 0.055)}px system-ui, sans-serif`;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillText('A', c0 - S * 0.09, r0 + S * 0.05); ctx.fillText('B', c1 + S * 0.035, r0 + S * 0.05);
+  ctx.fillText('C', c0 - S * 0.09, r1); ctx.fillText('D', c1 + S * 0.035, r1);
+  if (!shape || !v) return;
+  // the phases, moved on between the Force's messages so the motion is smooth
+  const age = (now - vAt) / 1000;
+  const ot = v.ot + (v.motion ? v.hz * age : 0), oo = v.oo + (v.motion ? v.subhz * age : 0);
+  project(shape, v.rot, v.yaw, v.tilt);
+  const size = v.size, sr = v.sub * 0.6;
+  // a loaded picture, dim, under its shape
+  if (shape.img && shape.user) {
+    const cell = S / 64 * size;
+    ctx.save(); ctx.translate(CX, CY); ctx.rotate(v.rot * TAU);
+    for (let j = 0; j < 64; j++) for (let i = 0; i < 64; i++) {
+      const b = shape.img[j * 64 + i] / 255; if (b < 0.04) continue;
+      ctx.fillStyle = `rgba(90,150,255,${(b * 0.35).toFixed(3)})`;
+      ctx.fillRect((i - 32) * cell, (j - 32) * cell, cell + 0.5, cell + 0.5);
+    }
+    ctx.restore();
+  }
+  // the orbit line: the orbiter's whole path over one orbit, faint
+  if (v.motion && Math.abs(v.hz) > 0.05 && sr > 0.004) {
+    let ratio = Math.round(v.subhz / v.hz); ratio = clamp(ratio, -12, 12);
+    const b0 = oo - ratio * ot, ln = Math.min(640, 96 + Math.abs(ratio) * 40);
+    ctx.beginPath();
+    for (let k = 0; k < ln; k++) {
+      const a = k / (ln - 1), b = b0 + ratio * a; let [px, py] = pathAt(shape.n, a); px *= size; py *= size;
+      const X = sx(clamp(px + sr * Math.cos(TAU * b), -1, 1)), Y = sy(clamp(py + sr * Math.sin(TAU * b), -1, 1));
+      k ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+    }
+    ctx.strokeStyle = 'rgba(90,160,245,0.28)'; ctx.lineWidth = 1.2 * DPR; ctx.shadowBlur = 0; ctx.stroke();
+  }
+  // the shape: a glowing line, a 3D shape shaded by depth
+  ctx.lineJoin = 'round';
+  if (shape.is3d) {
+    for (let i = 0; i < shape.n; i++) {
+      const j = (i + 1) % shape.n, depth = clamp(0.5 - 0.25 * (z2[i] + z2[j]), 0, 1);
+      ctx.beginPath(); ctx.moveTo(sx(x2[i] * size), sy(y2[i] * size)); ctx.lineTo(sx(x2[j] * size), sy(y2[j] * size));
+      ctx.strokeStyle = `rgba(80,165,255,${(0.35 + 0.65 * depth).toFixed(3)})`; ctx.lineWidth = (1.4 + 1.6 * depth) * DPR;
+      ctx.shadowColor = 'rgba(58,160,255,0.9)'; ctx.shadowBlur = 10 * DPR * depth; ctx.stroke();
+    }
+  } else {
+    ctx.beginPath();
+    for (let i = 0; i <= shape.n; i++) { const k = i % shape.n; i ? ctx.lineTo(sx(x2[k] * size), sy(y2[k] * size)) : ctx.moveTo(sx(x2[k] * size), sy(y2[k] * size)); }
+    ctx.strokeStyle = 'rgba(70,160,255,0.55)'; ctx.lineWidth = 7 * DPR; ctx.shadowColor = 'rgba(58,160,255,1)'; ctx.shadowBlur = 24 * DPR; ctx.stroke();
+    ctx.strokeStyle = '#bfe3ff'; ctx.lineWidth = 2.2 * DPR; ctx.shadowBlur = 8 * DPR; ctx.stroke();
+  }
+  ctx.shadowBlur = 0;
+  // the orbiter and the path point
+  let [fx, fy] = pathAt(shape.n, ot); fx *= size; fy *= size;
+  const ox = clamp(fx + sr * Math.cos(TAU * oo), -1, 1), oy = clamp(fy + sr * Math.sin(TAU * oo), -1, 1);
+  const oc = ORB_COLS[colStep(v.sub)], pc = PATH_COLS[colStep(v.size)];
+  if (v.motion) {
+    // the light trail: where the orbiter has just been, a fading glowing curve
+    let tl = Math.abs(v.subhz) > 0.01 ? 0.6 / Math.abs(v.subhz) : 0.35; tl = clamp(tl, 0.06, 0.6);
+    const N = 36; let lx = sx(ox), ly = sy(oy);
+    for (let k = 1; k < N; k++) {
+      const tk = tl * k / (N - 1); let [px, py] = pathAt(shape.n, ot - v.hz * tk); px *= size; py *= size;
+      const b = oo - v.subhz * tk, X = sx(clamp(px + sr * Math.cos(TAU * b), -1, 1)), Y = sy(clamp(py + sr * Math.sin(TAU * b), -1, 1));
+      const f = 1 - k / N;
+      ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(X, Y);
+      ctx.strokeStyle = oc; ctx.globalAlpha = 0.08 + 0.9 * f * f * f; ctx.lineWidth = (1 + 5 * f * f) * DPR;
+      ctx.shadowColor = oc; ctx.shadowBlur = 14 * DPR * f; ctx.stroke();
+      lx = X; ly = Y;
+    }
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    const behind = Math.sin(TAU * oo) < 0;
+    const ball = (x, y, r, col, glow) => {
+      const gx = sx(x), gy = sy(y);
+      ctx.shadowColor = col; ctx.shadowBlur = glow * DPR;
+      const rg = ctx.createRadialGradient(gx - r * 0.35, gy - r * 0.35, r * 0.1, gx, gy, r);
+      rg.addColorStop(0, '#ffffff'); rg.addColorStop(0.35, col); rg.addColorStop(1, col);
+      ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(gx, gy, r, 0, TAU); ctx.fill(); ctx.shadowBlur = 0;
+    };
+    const RO = S * 0.055 * (0.8 + 0.4 * v.env), RP = S * 0.038;
+    if (behind) { ball(ox, oy, RO, oc, 26); ball(fx, fy, RP, pc, 18); } else { ball(fx, fy, RP, pc, 18); ball(ox, oy, RO, oc, 26); }
+  }
+  // the corner bars: how much of each corner is heard
+  const bw = S * 0.5, bh = 4 * DPR, by = r1 + S * 0.09;
+  ['A', 'B', 'C', 'D'].forEach((n, i) => {
+    const x0 = CX - S / 2 + i * (S / 4) + S * 0.02, w = S / 4 - S * 0.04;
+    ctx.fillStyle = 'rgba(40,60,90,0.8)'; ctx.fillRect(x0, by, w, bh);
+    ctx.fillStyle = '#7dfcff'; ctx.shadowColor = '#7dfcff'; ctx.shadowBlur = 8 * DPR; ctx.fillRect(x0, by, w * clamp(v.w[i], 0, 1), bh); ctx.shadowBlur = 0;
+  });
+  // scanlines
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  for (let y = 0; y < H; y += 3 * DPR) ctx.fillRect(0, y, W, DPR);
+  if (portrait) { const t2 = ctx.getTransform(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.setTransform(t2); }
+}
+requestAnimationFrame(frame);
+
+/* ---- fullscreen, and the controls fade away */
+function showUi() { ui.classList.remove('hide'); clearTimeout(uiTimer); uiTimer = setTimeout(() => ui.classList.add('hide'), 3500); }
+showUi();
+addEventListener('pointerdown', showUi);
+fs.addEventListener('click', () => {
+  const el = document.documentElement;
+  const lock = () => { try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); } catch (e) {} };
+  if (document.fullscreenElement) document.exitFullscreen();
+  else if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).then(lock).catch(() => {});
+  else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); lock(); }
+  else st.textContent = 'add to home screen for full screen';
+});
+/* a shape from the phone: a picture (PNG, JPG), an SVG or an OBJ, sent to the Force, which saves it in its Shapes
+ * folder and plays it at once */
+const ld = document.getElementById('ld'), file = document.getElementById('file');
+ld.addEventListener('click', () => { file.value = ''; file.click(); showUi(); });
+file.addEventListener('change', async () => {
+  const f = file.files && file.files[0]; if (!f) return;
+  st.textContent = 'sending ' + f.name;
+  try {
+    const r = await fetch('/upload?name=' + encodeURIComponent(f.name), { method: 'POST', body: f });
+    const msg = await r.text();
+    st.textContent = r.ok ? '' : msg;
+    if (!r.ok) setTimeout(() => { st.textContent = ''; }, 4000);
+  } catch (e) { st.textContent = 'could not send'; setTimeout(() => { st.textContent = ''; }, 4000); }
+});
+// the UI row reads the right way up on a turned phone too
+function placeUi() {
+  if (innerHeight > innerWidth) {   /* a turned phone: the row runs down the right-hand edge, which is the picture's bottom */
+    ui.style.left = '0'; ui.style.right = 'auto'; ui.style.top = '0'; ui.style.bottom = 'auto';
+    ui.style.width = innerHeight + 'px'; ui.style.transformOrigin = '0 0';
+    ui.style.transform = 'rotate(90deg) translateY(-100%)';
+  } else { ui.style.left = '0'; ui.style.right = '0'; ui.style.top = 'auto'; ui.style.bottom = '0'; ui.style.width = 'auto'; ui.style.transform = ''; }
+}
+addEventListener('resize', placeUi); placeUi();
+})();
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ ZIG="${ZIG:-python3 -m ziglang}"
 NAME="L'Cronx - VST - VADER"
 . ./build_srcs.sh
 python3 tools/gen_params.py
+python3 tools/gen_web.py
 python3 tools/vader_skin.py --layout
 
 mkdir -p build/tools build/arm

@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.6.0 (2026-10-24)
+
+Not yet tested on a device.
+
+- **The companion screen.** VADER's screen is now drawn on your phone, tablet or laptop: open the address shown on
+  the ORBIT page (or scan the QR code on MAIN with the phone's camera) on the same Wi-Fi, and the page draws the shape,
+  the orbit line, the orbiter with its light trail and the two balls, smoothly, with a FULLSCREEN button; on a phone it
+  draws in landscape whichever way the phone is held. "Add to Home Screen" gives it an icon that opens it full screen
+  like an app. Apple devices can also type `vader.local`. Several devices can watch at once. The Force sends 30 small
+  messages a second and draws nothing itself: the sound gets the whole machine.
+- **LOAD SHAPE on the page**: send a picture (PNG, JPG), an SVG or an OBJ from the phone to the Force; it lands in the
+  Shapes folder and plays at once.
+- **The MAIN page, redone**: three columns of bigger controls (bigger names, values and lines), and in the middle,
+  instead of the screen, the QR code of the companion screen around the VADER mark, in the panel's colours. The tile
+  screen (the 3000 pieces of 0.4.x) and its 288 MB of pictures are gone: the plugin loads faster and MPC redraws
+  nothing while you play. MOTION now only switches the companion screen's motion.
+- The live screen of 0.5.x (the overlay plane) stays in the code as an experiment, off unless a file `overlay.on` is in
+  the plugin's folder.
+- Fixed: a hang at start when the parameter list grew past the lookup table.
+
 ## 0.5.3 (2026-10-23)
 
 - No tearing on the live screen: each frame is copied into the plane's buffer right after the display's vertical

@@ -105,36 +105,25 @@ With **ALT on**, the same places show the voice and the vibrato:
 - SHAPE section: **VIB SPEED** and **VIB DEPTH** (pitch, up to a semitone; the mod wheel adds to it), **TREM SPEED**
   and **TREM DEPTH** (level). With V/T sync on (SYNC section), the speeds pick note values from 1 bar to 1/48.
 
-**CORNER SELECT**: A, B, C, D or ALL: the corner the five corner knobs under the screen edit. ALL sets all four at
-once (and shows corner A's value).
+**DELAY** (left, bottom; ALT: **CHORUS**): **DLY TIME** and **FEEDBACK**, with ALT on **CH SPEED** and **CH DEPTH**;
+the rest of the delay and chorus is on the [FX page](#fx-page).
 
-**SCREEN** (centre). SHAPE (a list: tap it to open, tap a shape to pick). The screen draws the shape in blue and the two balls: the
-path point and the orbiter, each one sharp round dot whose colour shows its size. The path point's follows ORBIT SIZE,
-from yellow (small) through amber, orange, red and rose to pink (large); the orbiter's follows SUBORBIT SIZE, from blue
-(small) through sky, cyan, aqua and green to lime (large). The orbiter passes behind the path point on the upper half
-of its circle, and both always stay whole inside the screen. Behind the orbiter, its **orbit line**: the whole path it takes over one orbit,
-suborbit loops included, as a faint thin line, with the tiles it has just crossed lit up as a **light trail** (bright and
-thick right behind it, softer towards its end). The line is drawn once per change (shape, size, turn, speed ratio)
-and then stays still, and the whole screen asks MPC for at most 10 redraws every 40 ms, so it never crackles the sound. It turns, grows, spins and tilts with the shape. A, B, C and D mark the corners; the four bars under it show how much of each you are hearing. It follows the newest
-note of the timbre you are editing, and moves 25 times a second.
+**SHAPE** (middle, top): a list: tap it to open, tap a shape to pick.
 
-How the shape is drawn:
-- **Built-in 2D shapes** are ready-drawn pictures: 12 size steps and fine turn steps (a STAR every 12 degrees, a
-  SQUARE every 15, a HEART every 45), so ORBIT SIZE and ROTATE move the picture in small steps.
-- **CUBE and ICOSA** are ready-drawn while they spin (12 frames per repeat of the shape, 3 sizes, 3 tilt steps). Turn
-  ROTATE away from 0 and the tiles draw them instead.
-- **Your own 2D shape** is drawn by VADER into its skin folder when you load it. MPC may show these pictures only after
-  you close the plugin window and open it again (see [Your own shapes](#your-own-shapes)). Until then, and for OBJ
-  files, a grid of small line pieces draws it.
+**The QR code** (middle): the companion screen's address, around the VADER mark. Point the phone's camera at it and
+tap the link it offers: the phone's browser opens VADER's screen (see [The companion screen](#the-companion-screen)).
+The code is drawn when the Force has a network address; without one the middle shows only the mark, and the ORBIT
+page's COMPANION SCREEN line says NO NETWORK.
+
+**CORNER SELECT**: A, B, C, D or ALL: the corner the five corner knobs under it edit. ALL sets all four at once (and
+shows corner A's value).
 
 **The corner knobs** (ALT off): **GEN 1**, **GEN 2** (the two overtone generators), **BLEND**, **CUTOFF**, **RESO**,
 for the corner(s) picked with CORNER SELECT. With ALT on, the same knobs are **DRIVE**, **DRV COLOUR**, **REV SIZE**,
 **REV COLOUR** and **MSTR RESO** (resonance added to every corner's filter).
 
-**DLY TIME, FEEDBACK, CH SPEED, CH DEPTH, CH COLOUR** (delay and chorus): see the [FX page](#fx-page). **V/T** under
-SYNC syncs vibrato and tremolo to the tempo.
-
-**ALT** switches the second functions. **MOTION** turns the screen's movement on or off (the sound doesn't change).
+**ALT** switches the second functions. **MOTION** turns the companion screen's movement on or off (the sound doesn't
+change).
 
 ORBIT SIZE, SUBORBIT SIZE and ROTATE glide to a new value in about 40 ms, so turning them never clicks.
 
@@ -298,6 +287,27 @@ In this order after the voices:
 - **FILTERS**: MASTER RESONANCE adds resonance to all four corners' filters.
 - **MIXER**: the REVERB, CHORUS and DELAY levels, and VOLUME. A soft limiter at the end keeps VADER from clipping.
 
+## The companion screen
+
+VADER's screen is drawn by your phone, tablet or laptop, in its browser, from what the Force sends it: the Force itself
+draws nothing while you play, so the sound gets the whole machine.
+
+1. Put the device on the same Wi-Fi as the Force (the Force's network settings are in MPC's PREFERENCES).
+2. Scan the QR code on VADER's MAIN page with the phone's camera (iPhone and Android cameras read it as they are), or
+   type the address shown on the ORBIT page under COMPANION SCREEN (`http://<address>:6731/`). Apple devices can type
+   `vader.local` instead.
+3. The page draws the shape as a glowing line (3D shapes shaded by depth), the orbit line, the orbiter with its light
+   trail and the two balls in their size colours, and the four corner bars. It follows the newest note of the timbre
+   you are editing. Tap **FULLSCREEN** for the whole screen; on a phone the picture is always landscape: hold the phone
+   sideways. The buttons fade out; tap the picture to see them again.
+4. **Add to Home Screen** (the browser's share or menu button) gives it an icon that opens it full screen like an app,
+   so next time it is one tap. If the Force gets another address from the router, scan the code again.
+5. **LOAD SHAPE** sends a picture (PNG, JPG), an SVG or an OBJ from the phone to the Force: it lands in VADER's Shapes
+   folder, shows in the SHAPE FILES list, and plays at once as the edited timbre's shape (see
+   [Your own shapes](#your-own-shapes) for what makes a good one). Up to 16 MB.
+
+Several devices can watch at once. The page needs only the local network, nothing from the internet.
+
 ## Your own shapes
 
 Put files in either place:
@@ -449,5 +459,4 @@ precisely (MPC's knob overlay).
   on the IMAGE page: if it doesn't move, the orbiter isn't crossing anything (try a bigger ORBIT SIZE or SUBORBIT SIZE).
 - **A file won't load**: the field says why (not an SVG/OBJ/PNG/JPG, no lines found, no shape found in the picture).
   Pictures: use a high-contrast silhouette.
-- **CPU**: lower VOICES to 8, UNISON to 1, and turn MOTION off in a heavy project (that saves MPC's screen CPU, not
-  the sound's).
+- **CPU**: lower VOICES to 8, UNISON to 1. The screen on the Force costs nothing since 0.6.0 (the phone draws it).

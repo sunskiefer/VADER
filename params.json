@@ -15302,6 +15302,1334 @@
    "min": 0,
    "max": 325,
    "display": "int"
+  },
+  {
+   "key": "web_url",
+   "name": "COMPANION SCREEN",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "q000",
+   "name": "QR 1",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q001",
+   "name": "QR 2",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q002",
+   "name": "QR 3",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q003",
+   "name": "QR 4",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q004",
+   "name": "QR 5",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q005",
+   "name": "QR 6",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q006",
+   "name": "QR 7",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q007",
+   "name": "QR 8",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q008",
+   "name": "QR 9",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q009",
+   "name": "QR 10",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q010",
+   "name": "QR 11",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q011",
+   "name": "QR 12",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q012",
+   "name": "QR 13",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q013",
+   "name": "QR 14",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q014",
+   "name": "QR 15",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q015",
+   "name": "QR 16",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q016",
+   "name": "QR 17",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q017",
+   "name": "QR 18",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q018",
+   "name": "QR 19",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q019",
+   "name": "QR 20",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q020",
+   "name": "QR 21",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q021",
+   "name": "QR 22",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q022",
+   "name": "QR 23",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q023",
+   "name": "QR 24",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q024",
+   "name": "QR 25",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q025",
+   "name": "QR 26",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q026",
+   "name": "QR 27",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q027",
+   "name": "QR 28",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q028",
+   "name": "QR 29",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q029",
+   "name": "QR 30",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q030",
+   "name": "QR 31",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q031",
+   "name": "QR 32",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q032",
+   "name": "QR 33",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q033",
+   "name": "QR 34",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q034",
+   "name": "QR 35",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q035",
+   "name": "QR 36",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q036",
+   "name": "QR 37",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q037",
+   "name": "QR 38",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q038",
+   "name": "QR 39",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q039",
+   "name": "QR 40",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q040",
+   "name": "QR 41",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q041",
+   "name": "QR 42",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q042",
+   "name": "QR 43",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q043",
+   "name": "QR 44",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q044",
+   "name": "QR 45",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q045",
+   "name": "QR 46",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q046",
+   "name": "QR 47",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q047",
+   "name": "QR 48",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q048",
+   "name": "QR 49",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q049",
+   "name": "QR 50",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q050",
+   "name": "QR 51",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q051",
+   "name": "QR 52",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q052",
+   "name": "QR 53",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q053",
+   "name": "QR 54",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q054",
+   "name": "QR 55",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q055",
+   "name": "QR 56",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q056",
+   "name": "QR 57",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q057",
+   "name": "QR 58",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q058",
+   "name": "QR 59",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q059",
+   "name": "QR 60",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q060",
+   "name": "QR 61",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q061",
+   "name": "QR 62",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q062",
+   "name": "QR 63",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q063",
+   "name": "QR 64",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q064",
+   "name": "QR 65",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q065",
+   "name": "QR 66",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q066",
+   "name": "QR 67",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q067",
+   "name": "QR 68",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q068",
+   "name": "QR 69",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q069",
+   "name": "QR 70",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q070",
+   "name": "QR 71",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q071",
+   "name": "QR 72",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q072",
+   "name": "QR 73",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q073",
+   "name": "QR 74",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q074",
+   "name": "QR 75",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q075",
+   "name": "QR 76",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q076",
+   "name": "QR 77",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q077",
+   "name": "QR 78",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q078",
+   "name": "QR 79",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q079",
+   "name": "QR 80",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q080",
+   "name": "QR 81",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q081",
+   "name": "QR 82",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q082",
+   "name": "QR 83",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q083",
+   "name": "QR 84",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q084",
+   "name": "QR 85",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q085",
+   "name": "QR 86",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q086",
+   "name": "QR 87",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q087",
+   "name": "QR 88",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q088",
+   "name": "QR 89",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q089",
+   "name": "QR 90",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q090",
+   "name": "QR 91",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q091",
+   "name": "QR 92",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q092",
+   "name": "QR 93",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q093",
+   "name": "QR 94",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q094",
+   "name": "QR 95",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q095",
+   "name": "QR 96",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q096",
+   "name": "QR 97",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q097",
+   "name": "QR 98",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q098",
+   "name": "QR 99",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q099",
+   "name": "QR 100",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q100",
+   "name": "QR 101",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q101",
+   "name": "QR 102",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q102",
+   "name": "QR 103",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q103",
+   "name": "QR 104",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q104",
+   "name": "QR 105",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q105",
+   "name": "QR 106",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q106",
+   "name": "QR 107",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q107",
+   "name": "QR 108",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q108",
+   "name": "QR 109",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q109",
+   "name": "QR 110",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q110",
+   "name": "QR 111",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q111",
+   "name": "QR 112",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q112",
+   "name": "QR 113",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q113",
+   "name": "QR 114",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q114",
+   "name": "QR 115",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q115",
+   "name": "QR 116",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q116",
+   "name": "QR 117",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q117",
+   "name": "QR 118",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q118",
+   "name": "QR 119",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q119",
+   "name": "QR 120",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q120",
+   "name": "QR 121",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q121",
+   "name": "QR 122",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q122",
+   "name": "QR 123",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q123",
+   "name": "QR 124",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q124",
+   "name": "QR 125",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q125",
+   "name": "QR 126",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q126",
+   "name": "QR 127",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q127",
+   "name": "QR 128",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q128",
+   "name": "QR 129",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q129",
+   "name": "QR 130",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q130",
+   "name": "QR 131",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q131",
+   "name": "QR 132",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q132",
+   "name": "QR 133",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q133",
+   "name": "QR 134",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q134",
+   "name": "QR 135",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q135",
+   "name": "QR 136",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q136",
+   "name": "QR 137",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q137",
+   "name": "QR 138",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q138",
+   "name": "QR 139",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q139",
+   "name": "QR 140",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q140",
+   "name": "QR 141",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q141",
+   "name": "QR 142",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q142",
+   "name": "QR 143",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q143",
+   "name": "QR 144",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q144",
+   "name": "QR 145",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q145",
+   "name": "QR 146",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q146",
+   "name": "QR 147",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q147",
+   "name": "QR 148",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q148",
+   "name": "QR 149",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q149",
+   "name": "QR 150",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q150",
+   "name": "QR 151",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q151",
+   "name": "QR 152",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q152",
+   "name": "QR 153",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q153",
+   "name": "QR 154",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q154",
+   "name": "QR 155",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q155",
+   "name": "QR 156",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q156",
+   "name": "QR 157",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q157",
+   "name": "QR 158",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q158",
+   "name": "QR 159",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q159",
+   "name": "QR 160",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q160",
+   "name": "QR 161",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q161",
+   "name": "QR 162",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q162",
+   "name": "QR 163",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q163",
+   "name": "QR 164",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
+  },
+  {
+   "key": "q164",
+   "name": "QR 165",
+   "default": 0,
+   "min": 0,
+   "max": 255,
+   "display": "int"
   }
  ]
 }

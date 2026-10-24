@@ -972,13 +972,14 @@ static void write_locked(unsigned *seq, void *dst, const void *src, size_t n) {
     __atomic_store_n(seq, *seq + 1, __ATOMIC_RELEASE);
 }
 void overlay_publish(overlay_t *o, const ovl_view_t *v) {
-    if (!o->started) return;
     write_locked(&o->seq, &o->view, v, sizeof *v);
 }
 void overlay_publish_shape(overlay_t *o, const ovl_shape_t *sh) {
-    if (!o->started) return;
     write_locked(&o->seq2, &o->shape, sh, sizeof *sh);
 }
+void overlay_read_view(overlay_t *o, ovl_view_t *v) { read_locked(&o->seq, &o->view, v, sizeof *v); }
+void overlay_read_shape(overlay_t *o, ovl_shape_t *sh) { read_locked(&o->seq2, &o->shape, sh, sizeof *sh); }
+unsigned overlay_shape_version(overlay_t *o) { return __atomic_load_n(&o->seq2, __ATOMIC_ACQUIRE); }
 
 int overlay_live(const overlay_t *o) { return __atomic_load_n(&o->live, __ATOMIC_ACQUIRE); }
 
@@ -986,9 +987,9 @@ void overlay_start(overlay_t *o, const char *plugin_dir) {
     memset(o, 0, sizeof *o);
     o->fd = -1;
     if (!plugin_dir || !plugin_dir[0]) return;
-    char off[700];
-    snprintf(off, sizeof off, "%s/overlay.off", plugin_dir);
-    if (access(off, F_OK) == 0) return;
+    char on[700];
+    snprintf(on, sizeof on, "%s/overlay.on", plugin_dir);   /* 0.6.0: off unless asked for (the companion screen draws) */
+    if (access(on, F_OK) != 0) return;
     snprintf(o->log_path, sizeof o->log_path, "%s/overlay.log", plugin_dir);
     FILE *f = fopen(o->log_path, "w");   /* a fresh log each start */
     if (f) fclose(f); else { o->log_path[0] = 0; return; }   /* can't write there (tests): no overlay */

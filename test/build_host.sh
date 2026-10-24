@@ -5,6 +5,7 @@ cd "$(dirname "$0")/.."
 . ./build_srcs.sh
 MPC_VST=third_party/mpc-vst-plugins
 python3 tools/gen_params.py >/dev/null
+python3 tools/gen_web.py >/dev/null
 python3 $MPC_VST/tools/gen_vst.py vst.json --params-h >/dev/null
 mkdir -p build/host
 CC="${CC:-clang}"

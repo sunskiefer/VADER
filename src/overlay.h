@@ -24,6 +24,7 @@ typedef struct {
     int motion;
     float rot, yaw, tilt, size, sub_size;               /* ROTATE (turns), the 3D spin and tilt (radians), the sizes */
     float ot, oo, hz, sub;                              /* the orbit and suborbit phases and speeds (turns, turns/s) */
+    float env, w[4];                                    /* the newest voice's envelope, the corners' weights (0..1) */
 } ovl_view_t;
 /* and the shape, published when it changes (overlay_publish_shape) */
 typedef struct {
@@ -59,5 +60,9 @@ void overlay_stop(overlay_t *o);
 void overlay_publish(overlay_t *o, const ovl_view_t *v);   /* audio thread, every block */
 void overlay_publish_shape(overlay_t *o, const ovl_shape_t *sh);   /* audio thread, when the shape or picture changes */
 int overlay_live(const overlay_t *o);                      /* 1: the plane is up: the tile screen can rest */
+/* the snapshots, for another reader (the web server): consistent copies */
+void overlay_read_view(overlay_t *o, ovl_view_t *v);
+void overlay_read_shape(overlay_t *o, ovl_shape_t *sh);
+unsigned overlay_shape_version(overlay_t *o);
 int overlay_render_test(const ovl_shape_t *sh, const ovl_view_t *v, uint8_t *out, uint32_t pitch);   /* one frame, offline */
 int overlay_find_test(uint8_t *xrgb, int w, int h, int pitch, int *bx, int *by);   /* the box finder on a picture of the caller's */

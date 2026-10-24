@@ -181,7 +181,8 @@ int main(void) {
         CHECK(a.rms > 0.01, "  plays on it (rms %.3f)", a.rms);
         nfiles++;
     }
-    /* the screen reports what changed */
+    /* the screen reports what changed (the tile screen: off since 0.6.0, on here for its own checks) */
+    setp(s, "tile_screen", 1);
     drain(s);
     setp(s, "shape", 0);
     chord(s, 1);
@@ -197,6 +198,9 @@ int main(void) {
         nd++;
         if (i >= P_T000) tiles++;
     }
+    run(s, 14);
+    E->get_param(s, "dirty", db, sizeof db);
+    for (char *p = db; *p;) { char *e; long i = strtol(p, &e, 10); if (e == p) break; p = e; nd++; if (i >= P_T000) tiles++; }
     CHECK(tiles > 10, "the screen sent %d changed tiles (of %d changes) after a shape change", tiles, nd);
     run(s, 40);
     E->get_param(s, "dirty", db, sizeof db);
@@ -437,6 +441,7 @@ int main(void) {
             if (system(cmd) != 0) printf("(could not set up %s)\n", root);
             snprintf(sk, sizeof sk, "%s/Shapes", root);
             void *s3 = E->create(sk);
+            E->set_param(s3, "tile_screen", "1");
             int li = -1;
             for (int i = 0; i < 40 && li < 0; i++) {
                 setp(s3, "file", i);
