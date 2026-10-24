@@ -238,7 +238,8 @@ int main(void) {
         double ms = ((t1.tv_sec - t0.tv_sec) * 1e3 + (t1.tv_nsec - t0.tv_nsec) / 1e6) / 10;
         long lit = 0;
         for (int i = 0; i < OVL_W * OVL_H; i++) if (buf[i * 4 + 2] > 60 || buf[i * 4 + 1] > 60) lit++;
-        CHECK(rc == 0 && lit > 2000 && lit < 60000 && ms < 40, "live screen: a frame draws %ld lit pixels in %.1f ms", lit, ms);
+        int slow_ok = getenv("VADER_SLOW") != NULL;   /* under valgrind (test/run_tests.sh) a frame takes far longer */
+        CHECK(rc == 0 && lit > 2000 && lit < 60000 && (ms < 40 || slow_ok), "live screen: a frame draws %ld lit pixels in %.1f ms%s", lit, ms, slow_ok ? " (timing not checked)" : "");
         /* a 1280 x 800 display with the box at 312, 286 */
         static uint8_t disp[1280 * 800 * 4];
         memset(disp, 0x10, sizeof disp);

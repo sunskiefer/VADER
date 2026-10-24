@@ -36,7 +36,8 @@ int main(int argc, char **argv) {
     E->midi(s, on2, 3);
     int16_t out[256];
     int nb = getenv("VADER_BLOCKS") ? atoi(getenv("VADER_BLOCKS")) : 345 * 2 + 37;   /* how long it plays first */
-    for (int i = 0; i < nb; i++) E->render(s, out, 128);
+    int realtime = getenv("VADER_REALTIME") != NULL;   /* the server test: play at the real pace, until killed */
+    for (int i = 0; i < nb; i++) { E->render(s, out, 128); if (realtime) usleep(2900); }
     for (int i = 0; i < NPARAMS; i++) {
         const param_t *p = &PARAMS[i];
         char v[256] = "", d[256] = "";

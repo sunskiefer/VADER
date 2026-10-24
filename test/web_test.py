@@ -8,7 +8,7 @@ root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 tmp = os.path.join(root, "build", "host", "webshapes")
 shutil.rmtree(tmp, ignore_errors=True); os.makedirs(tmp)
 shutil.copy(os.path.join(root, "shapes", "crescent.png"), os.path.join(tmp, "crescent.png"))
-env = dict(os.environ, VADER_WEB="1", VADER_BLOCKS="60000", VADER_DATA=tmp)
+env = dict(os.environ, VADER_WEB="1", VADER_BLOCKS="100000", VADER_REALTIME="1", VADER_DATA=tmp)   # plays at the real pace (5 min at most); killed at the end
 p = subprocess.Popen([os.path.join(root, "build/host/skin_dump"), "1", "2"], env=env, stdout=subprocess.DEVNULL, cwd=root)
 time.sleep(0.8)
 # the page
@@ -70,5 +70,6 @@ assert b"200 OK" in d and b"loaded" in d, d
 time.sleep(1.0)
 assert os.path.exists(os.path.join(tmp, "from_phone.png")), os.listdir(tmp)
 print("upload ok:", os.listdir(tmp))
-p.wait(timeout=60)
-print("engine exit", p.returncode)
+p.terminate()
+p.wait(timeout=30)
+print("engine stopped")
