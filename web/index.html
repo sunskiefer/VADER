@@ -115,7 +115,7 @@ function frame(now) {
   g.addColorStop(0, 'rgba(14,24,48,0.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   // the Force's screen box proportions (640 x 288, the square in the middle): the square as big as the height allows
-  S = Math.min(H * 0.74, W * 0.46); CX = W / 2; CY = H / 2 - S * 0.03;
+  S = Math.min(H * 0.84, W * 0.46); CX = W / 2; CY = H / 2 - S * 0.03;
   // the corners
   ctx.strokeStyle = 'rgba(70,120,180,0.9)'; ctx.lineWidth = 2 * DPR; ctx.lineCap = 'round';
   const L = S * 0.06, c0 = CX - S / 2, c1 = CX + S / 2, r0 = CY - S / 2, r1 = CY + S / 2;

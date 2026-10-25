@@ -16630,6 +16630,15 @@
    "min": 0,
    "max": 255,
    "display": "int"
+  },
+  {
+   "key": "qr_show",
+   "name": "SHOW QR",
+   "options": [
+    "LOGO",
+    "QR"
+   ],
+   "default": "LOGO"
   }
  ]
 }

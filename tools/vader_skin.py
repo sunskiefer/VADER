@@ -135,7 +135,7 @@ def page_main():
           hl("drive", C, 460, 192, "DRIVE", when="alt:ON", big=True), hl("drive_col", C + 208, 460, 192, "DRV COLOUR", when="alt:ON", big=True),
           hl("rev_size", C, 512, 192, "REV SIZE", when="alt:ON", big=True), hl("rev_col", C + 208, 512, 192, "REV COLOUR", when="alt:ON", big=True),
           hl("mres", C, 564, 192, "MSTR RESO", when="alt:ON", big=True)]
-    c += [tog("alt", C + 208, 568, 92, "ALT", h=42), tog("motion", C + 316, 568, 92, "MOTION", h=42)]
+    c += [tog("alt", C + 208, 568, 92, "ALT", h=42)]   # 0.6.1: no MOTION button (the picture is drawn on the phone; the setting stays on)
     # right: the mixer, the arpeggiator, the sync
     c += mixer(R, 70, W, big=True)
     c += [title("ARPEGGIATOR", R, 292, W), tog("arp_on", R, 314, 192, "ACTIVE", h=44), tog("latch", R + 208, 314, 192, "LATCH", h=44),
@@ -537,9 +537,17 @@ def upic_frame(k):
 
 
 # ------------------------------------------------------------------------------------------------ the QR code (0.6.0)
-# light modules on the dark panel (an inverted code: phone cameras read it), white with neon blue accents
-QR_INKS = [(255, 255, 255), (255, 255, 255), (255, 255, 255), (125, 252, 255), (90, 190, 255), (255, 255, 255)]
-QR_BG = (6, 10, 18)
+# light modules on the dark panel (an inverted code: phone cameras read it): neon blue dots on black, no white
+QR_BG = (0, 0, 0)
+QR_EYE_RING = (40, 150, 255)
+QR_EYE_CORE = (30, 110, 255)
+QR_MARK_INK = (70, 170, 255)
+
+
+def qr_blue(t):
+    """deep blue (t = 0) to bright cyan-blue (t = 1); never white"""
+    t = min(1.0, max(0.0, t))
+    return (int(20 + 50 * t), int(120 + 90 * t), 255)
 
 
 def _qr_rng(seed):
@@ -575,9 +583,9 @@ def qr_row_strip(row):
     Image, ImageDraw, _, _ = _pil()
     m = G.QR_MOD
     SS = 4
-    rng = _qr_rng(row + 1)
-    kinds = [next(rng) % 6 for _ in range(8)]
-    cols = [QR_INKS[next(rng) % len(QR_INKS)] for _ in range(8)]
+    kinds = [0] * 8                                  # round dots only
+    t = row / float(G.QR_N - 1)                      # the blue brightens down the code
+    cols = [qr_blue(t + (i - 3.5) * 0.03) for i in range(8)]
     strip = Image.new("RGBA", (8 * m, m * 256), (0, 0, 0, 0))
     for k in range(256):
         fr = Image.new("RGBA", (8 * m * SS, m * SS), (0, 0, 0, 0))
@@ -590,10 +598,36 @@ def qr_row_strip(row):
 
 
 def qr_eye(d, x, y, m):
-    """a finder pattern (7 x 7 modules at x, y) as a target: a white rounded ring, a dark gap, a neon round centre"""
-    d.rounded_rectangle([x, y, x + 7 * m - 1, y + 7 * m - 1], radius=2 * m, fill=(255, 255, 255, 255))
+    """a finder pattern (7 x 7 modules at x, y) as a target: a blue rounded ring, a dark gap, a blue rounded centre"""
+    d.rectangle([x, y, x + 7 * m - 1, y + 7 * m - 1], fill=QR_BG + (255,))     # opaque: it covers the dots drawn under it
+    d.rounded_rectangle([x, y, x + 7 * m - 1, y + 7 * m - 1], radius=2 * m, fill=QR_EYE_RING + (255,))
     d.rounded_rectangle([x + m, y + m, x + 6 * m - 1, y + 6 * m - 1], radius=1.5 * m, fill=QR_BG + (255,))
-    d.ellipse([x + 2 * m, y + 2 * m, x + 5 * m - 1, y + 5 * m - 1], fill=(125, 252, 255, 255))
+    d.rounded_rectangle([x + 2 * m, y + 2 * m, x + 5 * m - 1, y + 5 * m - 1], radius=m, fill=QR_EYE_CORE + (255,))
+
+
+def qr_eye_image():
+    """the finder pattern as its own opaque picture, placed over the QR strips"""
+    Image, ImageDraw, _, _ = _pil()
+    m = G.QR_MOD
+    SS = 4
+    im = Image.new("RGBA", (7 * m * SS, 7 * m * SS), (0, 0, 0, 255))
+    qr_eye(ImageDraw.Draw(im), 0, 0, m * SS)
+    return im.resize((7 * m, 7 * m), Image.LANCZOS)
+
+
+def logo_tile(size):
+    """the logo sketch (art/vader_logo_sketch.png, transparent) cropped square round its triangle, on black"""
+    Image, _, _, _ = _pil()
+    im = Image.open(os.path.join(ROOT, "art", "vader_logo_sketch.png")).convert("RGBA")
+    w, h = im.size
+    cx, cy = int(w * 0.51), int(h * 0.42)
+    side = min(w, int(h * 0.78))
+    x0 = max(0, min(w - side, cx - side // 2))
+    y0 = max(0, min(h - side, cy - side // 2))
+    sq = im.crop((x0, y0, x0 + side, y0 + side)).resize((size, size), Image.LANCZOS)
+    out = Image.new("RGBA", (size, size), (0, 0, 0, 255))
+    out.alpha_composite(sq)
+    return out
 
 
 def vader_mark(size):
@@ -609,13 +643,13 @@ def vader_mark(size):
     d = ImageDraw.Draw(im)
     d.rounded_rectangle([0, 0, s - 1, s - 1], radius=s * 0.18, fill=QR_BG + (255,))   # the dark ground, so no modules show through
     q0, q1 = s * 0.2, s * 0.8
-    d.rectangle([q0, q0, q1, q1], outline=(255, 255, 255, 255), width=max(1, s // 36))
-    r = s * 0.065
+    d.rectangle([q0, q0, q1, q1], outline=QR_MARK_INK + (255,), width=max(1, s // 22))
+    r = s * 0.085
     for (cx, cy) in ((q0, q0), (q1, q0), (q0, q1), (q1, q1)):
-        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(125, 252, 255, 255))
-    d.ellipse([s * 0.26, s * 0.37, s * 0.74, s * 0.63], outline=(90, 190, 255, 255), width=max(1, s // 40))
-    rr = s * 0.08
-    d.ellipse([s * 0.63 - rr, s * 0.41 - rr, s * 0.63 + rr, s * 0.41 + rr], fill=(255, 255, 255, 255))
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(125, 215, 255, 255))
+    d.ellipse([s * 0.26, s * 0.37, s * 0.74, s * 0.63], outline=QR_MARK_INK + (255,), width=max(1, s // 26))
+    rr = s * 0.09
+    d.ellipse([s * 0.63 - rr, s * 0.41 - rr, s * 0.63 + rr, s * 0.41 + rr], fill=(125, 215, 255, 255))
     return im.resize((size, size), Image.LANCZOS)
 
 
@@ -970,18 +1004,26 @@ def build_page(sk, page_no, comps):
             tx, ty = QR_XY
             mx, my = QR_MOD_XY
             d.rounded_rectangle([tx, ty, tx + QR_TILE - 1, ty + QR_TILE - 1], radius=16, fill=QR_BG + (255,))   # a quiet dark ground
-            for (ex, ey) in ((0, 0), (G.QR_N - 7, 0), (0, G.QR_N - 7)):   # the eyes, on the tile (the modules there repeat them)
-                qr_eye(d, mx + ex * m, my + ey * m, m)
             for r in range(G.QR_N):
                 strip = sk.save(qr_row_strip(r), "vd_qr_%02d.png" % r)
                 dk = define("vdQr_%02d" % r, [], [filmstrip(strip, 256, 8 * m, m, "Vertical")], ignore=True)
                 for b in range(G.QR_BYTES):
                     i = r * G.QR_BYTES + b
                     kids.append(placed(dk, "qr %d" % i, sk.index["q%03d" % i], (mx + b * 8 * m, my + r * m, 8 * m, m), False))
+            eye = sk.save(qr_eye_image(), "vd_qr_eye.png")     # the three finder patterns, opaque, over the strips
+            ek = define("vdQrEye", [], [image(eye, 0, 0, 7 * m, 7 * m)], ignore=True)
+            for n_, (ex, ey) in enumerate(((0, 0), (G.QR_N - 7, 0), (0, G.QR_N - 7))):
+                kids.append(placed(ek, "qr eye %d" % n_, sk.index["q000"], (mx + ex * m, my + ey * m, 7 * m, 7 * m), False))
             hole = G.QR_HOLE * m
             mark = sk.save(vader_mark(hole), "vd_mark.png")
             mk = define("vdMark", [], [image(mark, 0, 0, hole, hole)], ignore=True)
             kids.append(placed(mk, "mark", sk.index["q000"], (mx + (G.QR_N - G.QR_HOLE) // 2 * m, my + (G.QR_N - G.QR_HOLE) // 2 * m, hole, hole), False))
+            # 0.6.1: over all of it, the logo: SHOW QR = LOGO (0) draws the opaque logo, QR (1) nothing, so the code shows;
+            # a tap on it toggles (like any toggle button), and the setting is kept with the plugin
+            lg = sk.save(logo_tile(QR_TILE), "vd_logo_on.png")
+            lg_off = sk.save(Image.new("RGBA", (QR_TILE, QR_TILE), (0, 0, 0, 0)), "vd_logo_off.png")
+            lk = define("vdQrSwitch", TOGGLE_ACTIONS, [focus(QR_TILE, QR_TILE), button(lg_off, lg, 1, 1, QR_TILE, QR_TILE)])
+            kids.append(placed(lk, "qr show", sk.index["qr_show"], (QR_XY[0], QR_XY[1], QR_TILE, QR_TILE), True))
         elif k == "envwin":
             window(d, ENV_BOX, 8)
             strip = sk.save(env_strip(), "vd_env.png")

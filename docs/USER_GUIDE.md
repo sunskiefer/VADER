@@ -110,9 +110,10 @@ the rest of the delay and chorus is on the [FX page](#fx-page).
 
 **SHAPE** (middle, top): a list: tap it to open, tap a shape to pick.
 
-**The QR code** (middle): the companion screen's address, around the VADER mark. Point the phone's camera at it and
+**The logo / QR code** (middle): it starts as the VADER logo; tap it and it swaps to the QR code (the companion
+screen's address, neon blue on black), tap again for the logo. The last choice is remembered. With the QR code showing, point the phone's camera at it and
 tap the link it offers: the phone's browser opens VADER's screen (see [The companion screen](#the-companion-screen)).
-The code is drawn when the Force has a network address; without one the middle shows only the mark, and the ORBIT
+The code is drawn when the Force has a network address; without one it shows only the mark, and the ORBIT
 page's COMPANION SCREEN line says NO NETWORK.
 
 **CORNER SELECT**: A, B, C, D or ALL: the corner the five corner knobs under it edit. ALL sets all four at once (and
@@ -122,8 +123,7 @@ shows corner A's value).
 for the corner(s) picked with CORNER SELECT. With ALT on, the same knobs are **DRIVE**, **DRV COLOUR**, **REV SIZE**,
 **REV COLOUR** and **MSTR RESO** (resonance added to every corner's filter).
 
-**ALT** switches the second functions. **MOTION** turns the companion screen's movement on or off (the sound doesn't
-change).
+**ALT** switches the second functions.
 
 ORBIT SIZE, SUBORBIT SIZE and ROTATE glide to a new value in about 40 ms, so turning them never clicks.
 
@@ -389,7 +389,7 @@ Loading a timbre from a preset: presets set both timbres (most set B the same as
 | 14 | AIR SPIRO | airy spectra on a spirograph, long reverb |
 | 15 | SHAPE SCOPE | the SHAPE SOUND up front |
 
-A preset keeps what you are editing (timbre, corner), the ALT and MOTION switches, the file and the voice count.
+A preset keeps what you are editing (timbre, corner), the ALT switch, the file and the voice count.
 
 **MY PRESETS** (ORBIT page, bottom right): 999 slots for your own sounds.
 - **Save**: turn **SLOT** to a number (it shows `empty` or `saved`), press **SAVE**. It shows `SAVED`. Saving to a

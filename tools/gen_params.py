@@ -182,6 +182,7 @@ GLOBAL = [
 TRIGGERS = [("tap", "TAP"), ("load", "LOAD"), ("rescan", "RESCAN")]
 # 0.2.0, appended at the end (saved projects keep every earlier index)
 GLOBAL_LATE = [("user_slot", "MY PRESET", 1, 1, 999, None, True)]
+GLOBAL_LATE2 = [("qr_show", "SHOW QR", 0, 0, 0, ["LOGO", "QR"], False)]   # 0.6.1, appended last: the MAIN picture, tapped: the logo or the QR code
 TRIGGERS_LATE = [("save_user", "SAVE"), ("load_user", "LOAD PRESET")]
 
 # 0.4.0, appended: the IMAGE page. A picture file loaded as the shape is also the IMAGE; four MODs each read a SOURCE
@@ -234,7 +235,7 @@ def build():
             snd_slots.append("%s_%s" % (c, f))
     for k, *_ in SOUND + SOUND_LATE:
         snd_slots.append(k)
-    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE]
+    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2]
 
     # 1. the main page's corner knobs
     for i, (f, name) in enumerate(FRONT):
@@ -309,6 +310,9 @@ def build():
     add("web_url", "COMPANION SCREEN", 0, 0, 1, None, False, "STR", 1, {"display": "string"})
     for i in range(QR_N * QR_BYTES):
         add("q%03d" % i, "QR %d" % (i + 1), 0, 0, 255, None, True, "DISP", 7000 + i)
+    # 0.6.1 (appended): the logo / QR switch on MAIN
+    for k, name, d, lo, hi, opts, isint in GLOBAL_LATE2:
+        add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None)
     return params, rows, snd_slots, glob_slots
 
 

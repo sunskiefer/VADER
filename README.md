@@ -8,7 +8,7 @@ morphs. The shape can be one of fifteen built-in figures, or one you bring yours
 (OBJ) or a picture (PNG/JPG), traced into a line. The screen draws that line, the orbiter with its trail of dots and the envelope,
 live, as glowing lines.
 
-![VADER's main page, playing the GLASS STAR preset](docs/img/main_star.png)
+![VADER's main page, the logo in the middle (tap it for the QR code)](docs/img/main_star.png)
 
 ## The idea
 
@@ -81,10 +81,10 @@ browser:
 - **LOAD SHAPE** on the page sends a picture (PNG, JPG), an SVG or an OBJ from the phone to the Force: it lands in the
   Shapes folder and plays at once;
 - several devices can watch at the same time. The Force sends 30 small messages a second and draws nothing: the sound
-  gets the whole machine. **MOTION** switches the companion screen's motion.
+  gets the whole machine.
 
-On the Force, the MAIN page shows the QR code around the VADER mark where the screen was, with bigger controls around
-it; the envelope line stays, drawn by MPC from 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE.
+On the Force, the MAIN page shows the VADER logo where the screen was (tap it to swap it for the QR code, tap again for the
+logo), with bigger controls around it; the envelope line stays, drawn by MPC from 32 strokes that follow ATTACK, DECAY, SUSTAIN and RELEASE.
 
 | | |
 |---|---|
@@ -125,7 +125,7 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.6.0 has not been tested on a device yet.** Offline it passes the framework's VST2 host test, VADER's own engine
+**0.6.1 was tried on a Force.** Offline it passes the framework's VST2 host test, VADER's own engine
 test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
 round trip) and the companion screen's server test (the page, the WebSocket stream, an upload) on x86, and the engine
 test as ARM code; the release zip passes the catalog check. 0.4.5 and 0.5.0 were tried on a Force (the sound is clean

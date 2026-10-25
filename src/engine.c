@@ -465,10 +465,10 @@ static void load_preset(vader_t *s, int n) {
     release_all(s);   /* nothing keeps sounding from the sound before */
     const preset_t *P = &PRESETS[n];
     /* keep how the instance is being used: what's edited, the screen, the file */
-    float keep[] = {s->g[G_TIMBRE], s->g[G_CORNER], s->g[G_ALT], s->g[G_MOTION], s->g[G_FILE], s->g[G_VOICES]};
+    float keep[] = {s->g[G_TIMBRE], s->g[G_CORNER], s->g[G_ALT], s->g[G_MOTION], s->g[G_FILE], s->g[G_VOICES], s->g[G_QR_SHOW]};
     memcpy(s->g, GLOB_DEF, sizeof s->g);
     s->g[G_TIMBRE] = keep[0]; s->g[G_CORNER] = keep[1]; s->g[G_ALT] = keep[2]; s->g[G_MOTION] = keep[3];
-    s->g[G_FILE] = keep[4]; s->g[G_VOICES] = keep[5];
+    s->g[G_FILE] = keep[4]; s->g[G_VOICES] = keep[5]; s->g[G_QR_SHOW] = keep[6];
     memcpy(T(0), SND_DEF, sizeof(float) * NSND);
     apply_kv(s, 0, P->a);
     memcpy(T(1), T(0), sizeof(float) * NSND);
@@ -1366,10 +1366,11 @@ static void load_user(vader_t *s) {
     fclose(f);
     if (!buf) return;
     buf[got] = 0;
-    float keep_slot = s->g[G_USER_SLOT], keep_file = s->g[G_FILE];
+    float keep_slot = s->g[G_USER_SLOT], keep_file = s->g[G_FILE], keep_qr = s->g[G_QR_SHOW];
     restore_state(s, buf);
     s->g[G_USER_SLOT] = keep_slot;
     s->g[G_FILE] = keep_file;
+    s->g[G_QR_SHOW] = keep_qr;
     free(buf);
     snprintf(s->ustatus, sizeof s->ustatus, "LOADED");
 }

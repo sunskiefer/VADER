@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.1 (2026-10-25)
+
+Tested on an Akai Force.
+
+- **The MAIN page's middle is a switch**: it starts on the VADER logo; tap it and it swaps to the QR code of the
+  companion screen, tap again and it is the logo. The last choice is remembered (it is not part of a preset). The QR
+  code is now neon blue dots on black, with blue corner markers and a bolder VADER mark, so it blends with the panel.
+- The MOTION button is gone from MAIN (the companion screen's motion stays on).
+- The companion screen draws the shape bigger: the square now fills more of a long, short phone screen.
+
 ## 0.6.0 (2026-10-24)
 
 Not yet tested on a device.
