@@ -28,6 +28,17 @@ fine steps, click twice quickly to reset it. Lists (preset, shape, modes) open a
 layouts and the parameters come from the same sources as the Force build, so they never drift apart. See the
 [user guide](USER_GUIDE.md) for what every control does.
 
+## Presets, and moving them to the Force
+
+Save your own sounds with **MY PRESETS** (ORBIT page, bottom right): turn SLOT, press SAVE. They are files,
+`USER 001.vader` and so on, in the `User Presets` folder next to the `Shapes` folder:
+Windows `%APPDATA%\VADER\User Presets`, Linux `~/.local/share/VADER/User Presets`.
+
+The Force plugin uses the same files: copy them into `L'Cronx - VST - VADER/User Presets/` on the Force, turn SLOT to the
+number and press LOAD. If a sound uses your own shape file, copy that shape into the Force's `Shapes` folder too.
+Presets stored by a DAW (its own preset menu or the project) are not these files and do not load on the Force.
+This path has not been tried on a real Force yet.
+
 ## In the host
 
 - 147 automatable parameters (the global settings first, then the sound, then five momentary buttons).

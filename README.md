@@ -107,6 +107,9 @@ MPC OS 3.x. The skin uses the MPC OS 3 format.
 VADER also builds as a desktop plugin with the orbit screen drawn in its own window. Install steps, folders and
 limits are in **[docs/DESKTOP.md](docs/DESKTOP.md)**; build it with `desktop/build.sh linux|windows`.
 
+Presets you save on the desktop (MY PRESETS, the `USER ###.vader` files) also load on the Force; see the
+[user guide](docs/USER_GUIDE.md).
+
 ## Use
 
 Read the **[user guide](docs/USER_GUIDE.md)**. It covers every page, every control and every Q-Link, with recipes and

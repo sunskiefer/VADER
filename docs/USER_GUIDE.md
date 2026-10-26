@@ -398,6 +398,11 @@ A preset keeps what you are editing (timbre, corner), the ALT switch, the file a
 - A slot holds everything: both timbres, the effects, the arpeggiator and the name of the loaded shape file.
 - They are files in `L'Cronx - VST - VADER/User Presets/` (`USER 001.vader` ...): copy that folder to back them up
   or to take them to another Force.
+- **Between the Force and the desktop plugins (VST3/VST2, Windows and Linux):** the same files work in both. Copy the
+  `USER ###.vader` files across and load them with MY PRESETS. Desktop folders: Windows `%APPDATA%\VADER\User Presets`,
+  Linux `~/.local/share/VADER/User Presets`. A sound that uses your own shape file stores only the file's name, so copy
+  that shape into the other plugin's `Shapes` folder too. Presets saved in a DAW's own preset menu or project are not
+  these files and do not load on the Force.
 
 Your sound is also saved with the MPC project or program, as with any plugin.
 
