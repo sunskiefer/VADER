@@ -102,6 +102,11 @@ logo), with bigger controls around it; the envelope line stays, drawn by MPC fro
 
 MPC OS 3.x. The skin uses the MPC OS 3 format.
 
+### Desktop: VST3 + VST2 for Windows and Linux
+
+VADER also builds as a desktop plugin with the orbit screen drawn in its own window. Install steps, folders and
+limits are in **[docs/DESKTOP.md](docs/DESKTOP.md)**; build it with `desktop/build.sh linux|windows`.
+
 ## Use
 
 Read the **[user guide](docs/USER_GUIDE.md)**. It covers every page, every control and every Q-Link, with recipes and
@@ -135,4 +140,4 @@ moved to the phone).
 ## License
 
 VADER is MIT-licensed (see [LICENSE](LICENSE)). Bundled: [mpc-vst-plugins](third_party/mpc-vst-plugins) (MIT),
-[stb_image](third_party/stb) (public domain / MIT), Chakra Petch (SIL Open Font License, `art/fonts`).
+[stb_image](third_party/stb) (public domain / MIT), Chakra Petch (SIL Open Font License, `art/fonts`). The desktop plugins also bundle [DPF](third_party/DPF) (ISC) and what it carries; see [desktop/THIRD_PARTY.md](desktop/THIRD_PARTY.md).

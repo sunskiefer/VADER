@@ -25,6 +25,7 @@ typedef struct {
     float rot, yaw, tilt, size, sub_size;               /* ROTATE (turns), the 3D spin and tilt (radians), the sizes */
     float ot, oo, hz, sub;                              /* the orbit and suborbit phases and speeds (turns, turns/s) */
     float env, w[4];                                    /* the newest voice's envelope, the corners' weights (0..1) */
+    float im[4];                                        /* 0.7.0: the IMAGE page's four meters (0..1), for the desktop screen */
 } ovl_view_t;
 /* and the shape, published when it changes (overlay_publish_shape) */
 typedef struct {

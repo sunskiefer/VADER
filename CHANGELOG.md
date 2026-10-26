@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased: desktop plugins (planned 0.7.0)
+
+Desktop only; the Force plugin is unchanged. Tested on Linux, and on Windows under Wine only (not on real Windows).
+
+- **VADER as a VST3 and a VST2 plugin for Windows and Linux.** The same engine, with the orbit screen (shape glow,
+  orbit line, light trail, balls, corner bars) drawn in the plugin's own resizable window, and all six pages of the
+  Force's panel plus a full-size SCREEN page. 147 automatable parameters, 16 presets, sample-accurate MIDI, the
+  arpeggiator on the host's tempo, any host sample rate (the engine stays at 44.1 kHz behind a high-quality
+  resampler, with its latency reported). Shapes folder: `%APPDATA%\VADER\Shapes` or `~/.local/share/VADER/Shapes`.
+  See [docs/DESKTOP.md](docs/DESKTOP.md). Built with `desktop/build.sh`; no Steinberg SDK needed.
+- The engine publishes the corner weights and the IM meters in its live view (the Force build is unaffected).
+
 ## 0.6.1 (2026-10-25)
 
 Tested on an Akai Force.

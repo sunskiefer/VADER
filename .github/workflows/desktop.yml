@@ -1,0 +1,80 @@
+name: desktop
+
+# VADER as VST2 + VST3 for Linux and Windows. NOTE: written next to a local build that was tested on Linux and on
+# Windows under Wine; this workflow itself has not run yet.
+permissions:
+  contents: write
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev pkg-config
+          pip install pillow numpy
+      - name: Build
+        run: desktop/build.sh linux
+      - name: "Host test (VST2 identity, parameters, timing at 4 rates, state, CPU)"
+        run: test/desktop_test.sh
+      - name: Package
+        run: desktop/build.sh package "$(cat desktop/VERSION)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VADER-desktop-linux-x86_64
+          path: dist/*linux*.zip
+
+  windows:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++-mingw-w64-x86-64-posix gcc-mingw-w64-x86-64-posix
+          pip install pillow numpy
+      - name: Build (mingw-w64 cross-compile, statically linked)
+        run: desktop/build.sh windows
+      - name: Package
+        run: desktop/build.sh package "$(cat desktop/VERSION)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VADER-desktop-windows-x86_64
+          path: dist/*windows*.zip
+
+  # A pre-release is published once per version in desktop/VERSION (tag desktop-<version>: it does not start with "v",
+  # so the Force release workflow is not triggered). Not for the catalog.
+  release:
+    needs: [linux, windows]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Version
+        id: ver
+        run: |
+          V=$(cat desktop/VERSION)
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/desktop-$V" > /dev/null; then echo "new=0" >> "$GITHUB_OUTPUT"; else echo "new=1" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Release (created once; later pushes refresh its notes and files)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: desktop-${{ steps.ver.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          name: "VADER desktop ${{ steps.ver.outputs.version }} (VST3 + VST2, Windows + Linux)"
+          make_latest: false
+          prerelease: true
+          files: dist/*.zip
+          body_path: .github/DESKTOP_RELEASE_NOTES.md

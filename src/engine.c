@@ -1589,8 +1589,9 @@ static int get_param(void *p, const char *key, char *buf, int len) {
     return 0;
 }
 
-static void render(void *p, int16_t *out, int frames) {
-    vader_t *s = p;
+/* 0.7.0: one block. out (int16, interleaved) for the MPC/Force wrapper; fl/fr (float, -1..1) for the desktop plugin,
+ * which has no 16-bit stage. Exactly one of the two is used; the sound is the same. */
+static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames) {
     float L[128], R[128];
     collect_load(s);
     memset(L, 0, sizeof(float) * (size_t)frames);
@@ -1687,6 +1688,10 @@ static void render(void *p, int16_t *out, int frames) {
     fp.rev_mix = s->g[G_MIX_REV];
     fp.volume = s->g[G_VOLUME];
     fx_process(s->fx, &fp, L, R, frames);
+    if (fl) {
+        memcpy(fl, L, sizeof(float) * (size_t)frames);
+        memcpy(fr, R, sizeof(float) * (size_t)frames);
+    } else
     for (int i = 0; i < frames; i++) {
         float l = L[i] * 32767.0f, r = R[i] * 32767.0f;
         out[2 * i] = (int16_t)(l > 32767 ? 32767 : l < -32768 ? -32768 : l);
@@ -1761,9 +1766,21 @@ static void render(void *p, int16_t *out, int frames) {
             float u = (sx + 1) * 0.5f, ww = (sy + 1) * 0.5f;
             v.w[0] = (1 - u) * (1 - ww); v.w[1] = u * (1 - ww); v.w[2] = (1 - u) * ww; v.w[3] = u * ww;
         }
+        for (int k = 0; k < 4; k++) {   /* 0.7.0: the IMAGE page's meters, as the desktop screen shows them */
+            float x = best ? best->im_src[k] : 0;
+            int si = (int)T(t)[S_IM1_SRC + k * 4];
+            if (si == 3 || si == 5) x = 0.5f + 0.5f * x;
+            v.im[k] = clampf(x, 0, 1);
+        }
         overlay_publish(&s->ovl, &v);
     }
 }
+
+static void render(void *p, int16_t *out, int frames) { render_ex(p, out, NULL, NULL, frames); }
+
+/* ---- 0.7.0: the desktop plugin's doors (VST3 / VST2 for Windows and Linux, desktop/). Not used by the MPC build. */
+void vader_render_f(void *inst, float *l, float *r, int frames) { render_ex(inst, NULL, l, r, frames); }
+void *vader_view_bus(void *inst) { return &((vader_t *)inst)->ovl; }   /* the overlay_t the screen's data is published to */
 
 static const mpc_engine_t ENGINE = {create, destroy, midi, set_param, get_param, render, NULL};
 const mpc_engine_t *mpc_engine(void) { return &ENGINE; }
