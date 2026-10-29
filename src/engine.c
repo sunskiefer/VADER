@@ -8,6 +8,7 @@
  * Two TIMBREs (A and B) can play layered or split; an arpeggiator with a 16-step pattern; drive, chorus, delay and
  * reverb. The screen (screen.c) is drawn from parameters MPC swaps pictures for. */
 #define _GNU_SOURCE
+#include <ctype.h>
 #include <dirent.h>
 #include <math.h>
 #include <pthread.h>
@@ -361,6 +362,24 @@ static int is_wav_file(const char *n) {
     const char *e = strrchr(n, '.');
     return e && (!strcasecmp(e, ".wav") || !strcasecmp(e, ".wave"));
 }
+/* names in order, with numbers by value: "vader 2" before "vader 10" */
+static int cmp_nat(const void *a, const void *b) {
+    const shapefile_t *x = a, *y = b;
+    int ex = x->label[0] == '[', ey = y->label[0] == '[';
+    if (ex != ey) return ex - ey;
+    const char *p = x->label, *q = y->label;
+    while (*p && *q) {
+        if (*p >= '0' && *p <= '9' && *q >= '0' && *q <= '9') {
+            long m = strtol(p, (char **)&p, 10), n = strtol(q, (char **)&q, 10);
+            if (m != n) return m < n ? -1 : 1;
+        } else {
+            int cp = tolower((unsigned char)*p), cq = tolower((unsigned char)*q);
+            if (cp != cq) return cp - cq;
+            p++; q++;
+        }
+    }
+    return (*p != 0) - (*q != 0);
+}
 static int g_scan_wav;   /* 1: scan_dir lists WAV files into s->wavs instead of the shapes */
 static void scan_dir(vader_t *s, const char *root, const char *rel, const char *tag, int depth) {
     shapefile_t *arr = g_scan_wav ? s->wavs : s->files;
@@ -443,7 +462,7 @@ static void rescan(vader_t *s) {
         closedir(m2);
     }
     g_scan_wav = 0;
-    qsort(s->wavs, (size_t)s->nwavs, sizeof(shapefile_t), cmp_file);
+    qsort(s->wavs, (size_t)s->nwavs, sizeof(shapefile_t), cmp_nat);
     s->status[0] = 0;
     mark(s, P_FILE);
     for (int c = 0; c < 4; c++) mark(s, P_SMP_A + c);
@@ -549,7 +568,7 @@ static void smp_request(vader_t *s, int c) {
 static void smp_sync_all(vader_t *s) { for (int c = 0; c < 4; c++) smp_request(s, c); }
 
 /* a corner's sample for n frames: ONE SHOT follows the key (the ROOT NOTE plays it at its own speed); a LOOP runs the
- * whole sample over 1-4 sixteenth steps of the tempo and ignores the key. */
+ * whole sample over 1-4 bars (4/4) of the tempo and ignores the key. */
 static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, int n) {
     smp_t *sl = &s->smp[c];
     int cu = __atomic_load_n(&sl->cur, __ATOMIC_ACQUIRE), len = sl->n[cu];
@@ -560,7 +579,7 @@ static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, in
         float fr = 440.0f * powf(2.0f, (s->g[G_SMP_ROOT_A + c] - 69.0f) / 12.0f);
         rate = (double)sl->sr * INV_SR * freq / fr;
     } else {
-        rate = (double)len / ((double)mode * (60.0 / tempo_of(s) / 4.0) / INV_SR);
+        rate = (double)len / ((double)mode * (4.0 * 60.0 / tempo_of(s)) / INV_SR);
     }
     for (int i = 0; i < n; i++) {
         if (mode == 0 && p >= len - 1) { out[i] = 0; continue; }
@@ -681,6 +700,25 @@ static const preset_t PRESETS[] = {
                    {"release", 0.7f}, {"sub_size", 0.5f}, {"sub_speed", 0.3f}, END}, {END}, {{"mix_rev", 0.55f}, {"rev_size", 0.95f}, END}},
     {"SHAPE SCOPE", {{"shape", 2}, {"shape_osc", 0.7f}, {"a_level", 0.3f}, {"b_level", 0.3f}, {"c_level", 0.3f}, {"d_level", 0.3f},
                      {"orb_speed", 0.3f}, {"rotate", 0.1f}, END}, {END}, {{"mix_rev", 0.2f}, END}},
+    {"SAMPLE DRONES", {{"shape", 0}, {"a_level", 0.8f}, {"b_level", 0.8f}, {"c_level", 0.7f}, {"d_level", 0.7f}, {"orb_speed", 0.1f},
+                       {"sub_size", 0.3f}, {"attack", 0.6f}, {"release", 0.75f}, {"sustain", 1.0f}, END}, {END},
+     {{"smp_a", 39}, {"smp_b", 43}, {"smp_c", 44}, {"smp_d", 41}, {"smp_len_a", 4}, {"smp_len_b", 4}, {"smp_len_c", 4},
+      {"smp_len_d", 4}, {"mix_rev", 0.5f}, {"rev_size", 0.9f}, END}},
+    {"SAMPLE ATMOS", {{"shape", 2}, {"orb_speed", 0.15f}, {"sub_size", 0.35f}, {"attack", 0.5f}, {"release", 0.7f}, {"sustain", 1.0f}, END},
+     {END}, {{"smp_a", 46}, {"smp_b", 47}, {"smp_c", 48}, {"smp_d", 49}, {"smp_len_a", 4}, {"smp_len_b", 4}, {"smp_len_c", 4},
+             {"smp_len_d", 4}, {"mix_dly", 0.25f}, {"mix_rev", 0.4f}, END}},
+    {"SAMPLE PADS", {{"shape", 1}, {"orb_speed", 0.2f}, {"attack", 0.4f}, {"release", 0.6f}, {"sustain", 0.9f}, END}, {END},
+     {{"smp_a", 22}, {"smp_b", 23}, {"smp_c", 25}, {"smp_d", 35}, {"smp_len_a", 4}, {"smp_len_b", 4}, {"smp_len_c", 2},
+      {"smp_len_d", 4}, {"mix_ch", 0.3f}, {"mix_rev", 0.45f}, END}},
+    {"SAMPLE BELLS", {{"shape", 13}, {"orb_speed", 0.3f}, {"decay", 0.6f}, {"sustain", 0.4f}, {"release", 0.5f}, END}, {END},
+     {{"smp_a", 17}, {"smp_b", 26}, {"smp_c", 31}, {"smp_d", 38}, {"smp_root_a", 65}, {"smp_root_b", 71}, {"smp_root_c", 65},
+      {"smp_root_d", 65}, {"mix_rev", 0.5f}, END}},
+    {"SAMPLE PLAY", {{"shape", 5}, {"orb_speed", 0.35f}, {"decay", 0.4f}, {"sustain", 0.5f}, {"release", 0.4f}, END}, {END},
+     {{"smp_a", 28}, {"smp_b", 18}, {"smp_c", 29}, {"smp_d", 34}, {"smp_root_a", 60}, {"smp_root_b", 67}, {"smp_root_c", 67},
+      {"smp_root_d", 69}, {"mix_dly", 0.2f}, END}},
+    {"SAMPLE TEXTURES", {{"shape", 12}, {"orb_speed", 0.25f}, {"attack", 0.3f}, {"release", 0.6f}, {"sustain", 0.8f}, END}, {END},
+     {{"smp_a", 51}, {"smp_b", 52}, {"smp_c", 54}, {"smp_d", 27}, {"smp_len_a", 4}, {"smp_len_b", 2}, {"smp_len_c", 4},
+      {"smp_len_d", 2}, {"mix_rev", 0.5f}, {"mix_dly", 0.3f}, END}},
 };
 #define NPRESET ((int)(sizeof PRESETS / sizeof PRESETS[0]))
 
@@ -737,6 +775,7 @@ static void load_preset(vader_t *s, int n) {
     memcpy(T(1), T(0), sizeof(float) * NSND);
     apply_kv(s, 1, P->b);
     apply_kv(s, 0, P->g);   /* the globals (K_GLOB entries only) */
+    smp_sync_all(s);
     s->g[G_PRESET] = (float)n;
     s->preset = n;
     for (int t = 0; t < 2; t++) timbre_shape(s, t);

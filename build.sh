@@ -51,4 +51,5 @@ rm -rf build/package && mkdir -p "$PKG"
 cp -r "build/skin/$NAME/." "$PKG/"
 cp build/arm/vader.so "$PKG/"
 mkdir -p "$PKG/Shapes" && cp shapes/* "$PKG/Shapes/"
+mkdir -p "$PKG/Samples" && cp Samples/* "$PKG/Samples/"   # 0.8: example samples (vader 1..54)
 echo "-> $PKG"

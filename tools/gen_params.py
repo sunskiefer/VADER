@@ -180,7 +180,7 @@ GLOBAL = [
     ("mix_dly", "DELAY", 0.15, 0, 1, None, False),
     ("volume", "VOLUME", 0.75, 0, 1, None, False),
     ("file", "SHAPE FILE", 0, 0, 499, None, True),
-    ("preset", "PRESET", 0, 0, 15, None, True),
+    ("preset", "PRESET", 0, 0, 21, None, True),
 ]
 TRIGGERS = [("tap", "TAP"), ("load", "LOAD"), ("rescan", "RESCAN")]
 # 0.2.0, appended at the end (saved projects keep every earlier index)
@@ -248,7 +248,7 @@ GLOBAL_LATE3 = [("stepo%d" % (i + 1), "STEP %d OCTAVE" % (i + 1), 0, -2, 2, None
                 ("dly_add", "DELAY ADD", 0, 0, 0, ["OFF", "ON"], False),
                 ("dly_rev", "DELAY REVERSE", 0, 0, 0, ["OFF", "ON"], False)]
 # 0.8, appended: samples, one per corner (a WAV from the Samples folders; OFF = the corner's own voice)
-SMP_LENS = ["ONE SHOT", "LOOP 1 STEP", "LOOP 2 STEPS", "LOOP 3 STEPS", "LOOP 4 STEPS"]
+SMP_LENS = ["ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS"]
 GLOBAL_LATE4 = ([("smp_%s" % c, "SAMPLE %s" % c.upper(), 0, 0, 499, None, True) for c in "abcd"]
                 + [("smp_len_%s" % c, "SAMPLE %s MODE" % c.upper(), 0, 0, 0, SMP_LENS, False) for c in "abcd"]
                 + [("smp_root_%s" % c, "SAMPLE %s ROOT NOTE" % c.upper(), 60, 0, 127, None, True) for c in "abcd"])

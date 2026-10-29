@@ -86,7 +86,7 @@ static const char *const OPT24[] = {"ROOT", "ROOT + FIFTH", "ROOT + OCTAVE", "MI
 static const char *const OPT25[] = {"POLY", "DUAL", "MONO"};
 static const char *const OPT26[] = {"SPAN", "RISE", "RANDOM"};
 static const char *const OPT27[] = {"TAPE", "DIGITAL"};
-static const char *const OPT28[] = {"ONE SHOT", "LOOP 1 STEP", "LOOP 2 STEPS", "LOOP 3 STEPS", "LOOP 4 STEPS"};
+static const char *const OPT28[] = {"ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS"};
 typedef struct { const char *key; const char *name; unsigned char kind; short slot; float min, max, def; unsigned char nopts, isint; const char *const *opts; } vp_t;
 static const vp_t VP[NP] = {
     {"f_og1", "OVERTONE GEN 1", K_FRONT, 0, 0.0f, 1.0f, 0.0f, 0, 0, 0},
@@ -219,7 +219,7 @@ static const vp_t VP[NP] = {
     {"mix_dly", "DELAY", K_GLOB, 46, 0.0f, 1.0f, 0.15f, 0, 0, 0},
     {"volume", "VOLUME", K_GLOB, 47, 0.0f, 1.0f, 0.75f, 0, 0, 0},
     {"file", "SHAPE FILE", K_GLOB, 48, 0.0f, 499.0f, 0.0f, 0, 1, 0},
-    {"preset", "PRESET", K_GLOB, 49, 0.0f, 15.0f, 0.0f, 0, 1, 0},
+    {"preset", "PRESET", K_GLOB, 49, 0.0f, 21.0f, 0.0f, 0, 1, 0},
     {"tap", "TAP", K_TRIG, 0, 0.0f, 1.0f, 0.0f, 0, 0, 0},
     {"load", "LOAD", K_TRIG, 0, 0.0f, 1.0f, 0.0f, 0, 0, 0},
     {"rescan", "RESCAN", K_TRIG, 0, 0.0f, 1.0f, 0.0f, 0, 0, 0},

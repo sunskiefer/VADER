@@ -1231,7 +1231,7 @@
    "name": "PRESET",
    "default": 0,
    "min": 0,
-   "max": 15,
+   "max": 21,
    "display": "int",
    "dynamic_display": true
   },
@@ -17605,10 +17605,10 @@
    "name": "SAMPLE A MODE",
    "options": [
     "ONE SHOT",
-    "LOOP 1 STEP",
-    "LOOP 2 STEPS",
-    "LOOP 3 STEPS",
-    "LOOP 4 STEPS"
+    "LOOP 1 BAR",
+    "LOOP 2 BARS",
+    "LOOP 3 BARS",
+    "LOOP 4 BARS"
    ],
    "default": "ONE SHOT"
   },
@@ -17617,10 +17617,10 @@
    "name": "SAMPLE B MODE",
    "options": [
     "ONE SHOT",
-    "LOOP 1 STEP",
-    "LOOP 2 STEPS",
-    "LOOP 3 STEPS",
-    "LOOP 4 STEPS"
+    "LOOP 1 BAR",
+    "LOOP 2 BARS",
+    "LOOP 3 BARS",
+    "LOOP 4 BARS"
    ],
    "default": "ONE SHOT"
   },
@@ -17629,10 +17629,10 @@
    "name": "SAMPLE C MODE",
    "options": [
     "ONE SHOT",
-    "LOOP 1 STEP",
-    "LOOP 2 STEPS",
-    "LOOP 3 STEPS",
-    "LOOP 4 STEPS"
+    "LOOP 1 BAR",
+    "LOOP 2 BARS",
+    "LOOP 3 BARS",
+    "LOOP 4 BARS"
    ],
    "default": "ONE SHOT"
   },
@@ -17641,10 +17641,10 @@
    "name": "SAMPLE D MODE",
    "options": [
     "ONE SHOT",
-    "LOOP 1 STEP",
-    "LOOP 2 STEPS",
-    "LOOP 3 STEPS",
-    "LOOP 4 STEPS"
+    "LOOP 1 BAR",
+    "LOOP 2 BARS",
+    "LOOP 3 BARS",
+    "LOOP 4 BARS"
    ],
    "default": "ONE SHOT"
   },

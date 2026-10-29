@@ -302,7 +302,7 @@ def page_play():
 
 def page_samples():
     """0.8: one sample per corner (a WAV from the Samples folder, "VADER Samples" on a card or drive): played one-shot at the
-    root note, or as a loop over 1-4 steps of the tempo."""
+    root note, or as a loop over 1-4 bars of the tempo."""
     c, q = [], []
     for ci, cl in enumerate("abcd"):
         x = 16 + ci * 316
