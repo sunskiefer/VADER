@@ -210,11 +210,11 @@ def page_arp():
     c += [title("STEP OCTAVE  (-2 .. +2)", 16, 470, 1248)]
     for i in range(16):
         c += [hl("stepo%d" % (i + 1), 16 + i * 78, 494, 72, str(i + 1))]
-    c += [text("OCTAVE WALK", 16, 560, 18), radio("arp_walk", 150, 552, 420, h=42), hl("arp_human", 600, 548, 400, "HUMANIZE")]
+    c += [text("OCTAVE WALK", 16, 560, 18), radio("arp_walk", 150, 552, 420, h=42), hl("arp_human", 600, 548, 330, "HUMANIZE"), hl("arp_chain", 940, 548, 324, "CHAIN")]
     q = [("ARP", ["arp_on", "latch", "arp_mode", "arp_rate", "arp_oct", "note_len", "arp_steps", "arp_walk"]),
          ("STEPS 1-8", ["step%d" % (i + 1) for i in range(8)]), ("STEPS 9-16", ["step%d" % (i + 9) for i in range(8)]),
          ("STEP OCT 1-8", ["stepo%d" % (i + 1) for i in range(8)]), ("STEP OCT 9-16", ["stepo%d" % (i + 9) for i in range(8)]),
-         ("HUMAN", ["arp_human"])]
+         ("HUMAN", ["arp_human", "arp_chain"])]
     return c, q
 
 

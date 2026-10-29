@@ -56,6 +56,11 @@ protected:
     bool onScroll(const ScrollEvent &) override;
     bool onKeyboard(const KeyboardEvent &ev) override {
         if (ev.press && ev.key == 27 && fPop.open) { fPop.open = false; return true; }
+        if (ev.press && !fPop.open && (ev.key == kKeyLeft || ev.key == kKeyRight)) {   /* 0.8: arrow keys turn the pages */
+            fPage = (fPage + (ev.key == kKeyRight ? 1 : VG_NPAGES - 1)) % VG_NPAGES;
+            repaint();
+            return true;
+        }
         return false;
     }
 

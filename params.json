@@ -17855,6 +17855,15 @@
    "dynamic_display": true
   },
   {
+   "key": "arp_chain",
+   "name": "ARP CHAIN",
+   "default": 0,
+   "min": 0,
+   "max": 8,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
    "key": "cpu",
    "name": "CPU READOUT",
    "default": 0,

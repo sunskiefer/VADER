@@ -131,6 +131,7 @@ typedef struct {
     double arp_next;             /* beats: the next step */
     double arp_free_beats;       /* beats counted while MPC is stopped */
     int arp_count, arp_idx, arp_dir;
+    int chain_pos, chain_n;      /* 0.8: ARP CHAIN: which direction of the chain, notes played in it */
     int arp_sounding[MAXHELD], narp;    /* notes the arp is holding */
     long arp_off_at;             /* frames until they stop (-1: tied / none) */
     unsigned rng;
@@ -924,6 +925,9 @@ static void arp_step(vader_t *s, float step_frames) {
     int seq[128];
     int n = arp_order(s, seq), mode = (int)s->g[G_ARP_MODE];
     if (!n) return;
+    int chain = (int)s->g[G_ARP_CHAIN];
+    if (chain > 0 && mode < 4) mode = (mode + s->chain_pos) % 4;   /* ARP CHAIN: UP, DOWN, UP-DOWN, RANDOM, then round again */
+    else s->chain_pos = 0;
     float vel = st == 2 ? 1.0f : 0.75f;
     int walk = (int)s->g[G_ARP_WALK], octs = (int)s->g[G_ARP_OCT], so = (int)s->g[G_STEPO1 + ((s->arp_count - 1) % steps)];
     float hum = s->g[G_ARP_HUMAN];
@@ -958,6 +962,10 @@ static void arp_step(vader_t *s, float step_frames) {
         if (note > 127) note = 127;
         s->arp_sounding[s->narp++] = note;
         play_on(s, note, vel);
+    }
+    if (chain > 0 && mode < 4) {
+        int per = mode == 2 && n > 1 ? 2 * n - 2 : n;
+        if (++s->chain_n >= chain * per) { s->chain_n = 0; s->chain_pos = (s->chain_pos + 1) % 4; s->arp_idx = 0; }
     }
     float len = s->g[G_NOTE_LEN];
     if (hum > 0.001f) { s->rng = s->rng * 1664525u + 1013904223u; len = clampf(len * (1 + (((s->rng >> 8) & 1023) / 1023.0f - 0.5f) * 0.6f * hum), 0.02f, 1.0f); }

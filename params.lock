@@ -2174,6 +2174,7 @@ smp_root_b
 smp_root_c
 smp_root_d
 voice_cap
+arp_chain
 cpu
 cn1
 cn2
