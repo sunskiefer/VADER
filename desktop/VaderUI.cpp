@@ -2,6 +2,7 @@
  * through desktop/gen/vader_gen.h) in a 1280 x 628 space under a tab row, scaled to the window; the orbit screen is
  * drawn here in full quality from the engine's live view (the same drawing as the companion page, web/index.html,
  * with real glow). Everything the user changes goes to the host as a parameter edit. */
+#include <climits>
 #include "DistrhoUI.hpp"
 #include "VaderPlugin.hpp"
 #include "gen/vader_res.h"
@@ -100,6 +101,7 @@ private:
     std::chrono::steady_clock::time_point fLastClickT, fT0;
     float fReadLine = 0;
     ovl_view_t fView;
+    int fPgSeen = INT_MIN;
     ovl_shape_t fShape;
     unsigned fShapeVer;
     float fx2[256], fy2[256], fz2[256];
@@ -330,6 +332,12 @@ void VaderUI::prepareScreenData() {
     overlay_t *bus = fP ? fP->uiViewBus() : nullptr;
     if (!bus) return;
     overlay_read_view(bus, &fView);
+    if (fPgSeen == INT_MIN) fPgSeen = fView.pgctr;
+    if (fView.pgctr != fPgSeen) {   // 0.8: MIDI CC 22 / 23 turn the pages
+        const int d = fView.pgctr - fPgSeen; fPgSeen = fView.pgctr;
+        fPage = ((fPage + d) % VG_NPAGES + VG_NPAGES) % VG_NPAGES;
+        repaint();
+    }
     const unsigned ver = overlay_shape_version(bus);
     if (ver != fShapeVer && !(ver & 1)) {
         overlay_read_shape(bus, &fShape);

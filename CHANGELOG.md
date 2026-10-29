@@ -254,3 +254,4 @@ First release: not yet tested on a device.
 - Kaleidoscope: every second copy is now mirrored (not only rotated), in the sound and on the screens.
 - IMAGE page: new sources LINE COLOUR and LINE WAVE (colour along the line, for spirographs).
 - FOURIER shape: new LOADED option rebuilds your loaded shape from circles.
+- Desktop: MIDI CC 22 / CC 23 turn to the previous / next page.

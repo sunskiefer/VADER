@@ -198,6 +198,7 @@ typedef struct {
     char pdir[600];
     unsigned char uknown[1000];   /* 0 not looked at yet, 1 empty, 2 saved */
     char ustatus[48];
+    int page_ctr;   /* 0.8: net MIDI page presses */
 } vader_t;
 
 /* ------------------------------------------------------------------------------------------------ helpers */
@@ -1853,6 +1854,7 @@ static void midi(void *p, const uint8_t *m, int len) {
                 if (t == edit(s)) mark(s, SND_P[sl]);
             }
         }
+        else if ((d1 == 22 || d1 == 23) && d2 >= 64) s->page_ctr += d1 == 23 ? 1 : -1;   /* prev / next page (the desktop turns its pages) */
         else if (d1 == 64) {
             s->pedal = d2 >= 64;
             if (!s->pedal)
@@ -2485,6 +2487,7 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
         v.fx = best ? best->fx : 0; v.fy = best ? best->fy : 0;
         v.ox = best ? best->ox : 0; v.oy = best ? best->oy : 0;
         v.style = s->g[G_SCREEN_DOTS];
+        v.pgctr = s->page_ctr;
         v.ps = T(t)[S_PATH_START]; v.pe = T(t)[S_PATH_END];
         v.nballs = 0;
         if ((int)T(t)[S_SIM_MODE] > 0) {
