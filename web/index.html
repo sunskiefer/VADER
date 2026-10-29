@@ -115,7 +115,7 @@ function frame(now) {
   g.addColorStop(0, 'rgba(14,24,48,0.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   // the Force's screen box proportions (640 x 288, the square in the middle): the square as big as the height allows
-  S = Math.min(H * 0.84, W * 0.46); CX = W / 2; CY = H / 2 - S * 0.03;
+  S = Math.min(H * 0.9, W * 0.62); CX = W / 2; CY = H / 2 - S * 0.03;
   // the corners
   ctx.strokeStyle = 'rgba(70,120,180,0.9)'; ctx.lineWidth = 2 * DPR; ctx.lineCap = 'round';
   const L = S * 0.06, c0 = CX - S / 2, c1 = CX + S / 2, r0 = CY - S / 2, r1 = CY + S / 2;
@@ -124,8 +124,9 @@ function frame(now) {
   }
   ctx.fillStyle = 'rgba(90,140,200,0.9)'; ctx.font = `600 ${Math.round(S * 0.055)}px system-ui, sans-serif`;
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  ctx.fillText('A', c0 - S * 0.09, r0 + S * 0.05); ctx.fillText('B', c1 + S * 0.035, r0 + S * 0.05);
-  ctx.fillText('C', c0 - S * 0.09, r1); ctx.fillText('D', c1 + S * 0.035, r1);
+  // the corner names sit on the side walls of the screen
+  ctx.fillText('A', W * 0.012, r0 + S * 0.05); ctx.textAlign = 'right'; ctx.fillText('B', W * 0.988, r0 + S * 0.05);
+  ctx.fillText('D', W * 0.988, r1); ctx.textAlign = 'left'; ctx.fillText('C', W * 0.012, r1);
   if (!shape || !v) return;
   // the phases, moved on between the Force's messages so the motion is smooth
   const age = (now - vAt) / 1000;

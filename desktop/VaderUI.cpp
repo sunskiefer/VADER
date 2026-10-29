@@ -370,7 +370,7 @@ void VaderUI::drawScreen(const R &r) {
     intersectScissor(r.x, r.y, r.w, r.h);
     prepareScreenData();
     const float barsH = std::max(22.f, r.h * 0.07f);
-    const float S = std::max(40.f, std::min(r.w - 2 * std::max(28.f, r.w * 0.06f), r.h - barsH - 22.f));
+    const float S = std::max(40.f, std::min(r.w - 2 * std::max(20.f, r.w * 0.045f), r.h - barsH - 22.f));
     const float CX = r.x + r.w / 2, CY = r.y + 10 + (r.h - barsH - 12 - 10) / 2;
     const float k = std::max(0.8f, S / 400.f);   // line weights follow the picture's size
     auto sx = [&](float x) { return CX + x * S * 0.5f; };
@@ -390,10 +390,10 @@ void VaderUI::drawScreen(const R &r) {
             stroke();
         }
         const float fs = std::max(13.f, S * 0.055f);
-        text_(c0 - S * 0.03f, r0 + fs * 0.4f, "A", fs, ALIGN_RIGHT | ALIGN_MIDDLE, Col{90, 140, 200});
-        text_(c1 + S * 0.03f, r0 + fs * 0.4f, "B", fs, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});
-        text_(c0 - S * 0.03f, r1 - fs * 0.4f, "C", fs, ALIGN_RIGHT | ALIGN_MIDDLE, Col{90, 140, 200});
-        text_(c1 + S * 0.03f, r1 - fs * 0.4f, "D", fs, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});
+        text_(r.x + 8.f, r0 + fs * 0.4f, "A", fs, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});   // on the side walls
+        text_(r.x + r.w - 8.f, r0 + fs * 0.4f, "B", fs, ALIGN_RIGHT | ALIGN_MIDDLE, Col{90, 140, 200});
+        text_(r.x + 8.f, r1 - fs * 0.4f, "C", fs, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});
+        text_(r.x + r.w - 8.f, r1 - fs * 0.4f, "D", fs, ALIGN_RIGHT | ALIGN_MIDDLE, Col{90, 140, 200});
     }
     const bool haveShape = fShapeVer != ~0u;
     if (haveShape) {
