@@ -27,7 +27,7 @@ add_subdirectory("${DPF_ROOT}" dpf)
 
 # ---- the engine (C)
 set(ENGINE_SRCS
-  ${VADER_ROOT}/src/tables.c ${VADER_ROOT}/src/shape.c ${VADER_ROOT}/src/shapefile.c ${VADER_ROOT}/src/screen.c
+  ${VADER_ROOT}/src/tables.c ${VADER_ROOT}/src/shape.c ${VADER_ROOT}/src/paths.c ${VADER_ROOT}/src/shapefile.c ${VADER_ROOT}/src/screen.c
   ${VADER_ROOT}/src/fx.c ${VADER_ROOT}/src/pictures.c ${VADER_ROOT}/src/qr.c ${VADER_ROOT}/src/engine.c
   ${CMAKE_CURRENT_SOURCE_DIR}/view_bus.c)
 add_library(vader_engine STATIC ${ENGINE_SRCS})

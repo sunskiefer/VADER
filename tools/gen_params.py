@@ -22,6 +22,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SHAPES = ["CIRCLE", "FIGURE 8", "STAR", "SQUARE", "TRIANGLE", "LISSA 3:2", "LISSA 5:4", "ROSE 3", "ROSE 5",
           "SPIRAL", "HEART", "ZIGZAG", "SPIRO", "CUBE", "ICOSA", "USER"]
+SHAPES += ["N-GON", "BUTTERFLY", "SUPERFORMULA", "LISSAJOUS", "ROSE", "LIMACON", "CARDIOID", "SPIROGRAPH", "ARCHIMEDES",
+           "FERMAT", "HYPERBOLIC", "LITUUS", "LOG SPIRAL", "GOLDEN SPIRAL", "EULER SPIRAL", "TORUS KNOT", "MOBIUS",
+           "HARMONOGRAPH", "PI LISSAJOUS", "EPICYCLES", "PULSE", "ADSR PATH"]
 MODES = ["MIX", "AM", "PM", "AM+PM", "PD", "RING", "FOLD"]
 FTYPES = ["LP12", "LP24", "BP", "HP", "LADDER"]
 FPOS = ["POST", "GEN 1", "GEN 2"]
@@ -199,7 +202,13 @@ for i, (src, to) in enumerate(IMG_DEF):
                    ("im%d_to" % n, "MOD %d TO" % n, to, 0, 0, IMG_TO, False),
                    ("im%d_amt" % n, "MOD %d AMOUNT" % n, 0.0, -1, 1, None, False),
                    ("im%d_smooth" % n, "MOD %d SMOOTH" % n, 0.3, 0, 1, None, False)]
-POPUPS_LATE = ["im%d_%s" % (i + 1, f) for i in range(4) for f in ("src", "to")]
+# 0.8 (appended): the shape numbers of the maths shapes and the orbiter's way of travelling
+DIRS = ["FORWARD", "REVERSE", "PING-PONG", "LOOP BACK"]
+SOUND_LATE2 = [("sh_a", "SHAPE A", 0.5, 0, 1, None, False), ("sh_b", "SHAPE B", 0.5, 0, 1, None, False),
+               ("sh_c", "SHAPE C", 0.5, 0, 1, None, False), ("sh_d", "SHAPE D", 0.0, 0, 1, None, False),
+               ("orb_dir", "ORBIT DIRECTION", 0, 0, 0, DIRS, False)]
+POPUPS_LATE = ["im%d_%s" % (i + 1, f) for i in range(4) for f in ("src", "to")] 
+POPUPS_LATE2 = ["orb_dir"]
 
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
 POPUPS = ["shape", "orb_div", "arp_mode", "arp_rate", "dly_div"] + ["%s_%s" % (c, f) for c in "abcd" for f in ("mode", "ftype")]
@@ -233,7 +242,7 @@ def build():
     for c in "abcd":
         for f, *_ in CORNER:
             snd_slots.append("%s_%s" % (c, f))
-    for k, *_ in SOUND + SOUND_LATE:
+    for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2:
         snd_slots.append(k)
     glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2]
 
@@ -313,6 +322,13 @@ def build():
     # 0.6.1 (appended): the logo / QR switch on MAIN
     for k, name, d, lo, hi, opts, isint in GLOBAL_LATE2:
         add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None)
+    # 0.8 (appended): shape numbers, direction
+    for k, name, d, lo, hi, opts, isint in SOUND_LATE2:
+        extra = {"dynamic_display": True} if not opts else None
+        add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), extra)
+    for k in POPUPS_LATE2:
+        params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
+        rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
     return params, rows, snd_slots, glob_slots
 
 

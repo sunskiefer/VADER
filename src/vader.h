@@ -52,6 +52,11 @@ typedef struct {
     char name[64];
 } path_t;
 void shape_builtin(int idx, path_t *p);
+/* 0.8: maths shapes (src/paths.c), indices SHAPE_FIRST_MATH.., drawn from four shape numbers 0..1 */
+#define SHAPE_FIRST_MATH 16
+#define NMATH 22
+extern const char *const MATH_NAMES[NMATH];
+void paths_gen(int m, const float *k, path_t *p);
 void path_resample(const float *x, const float *y, const float *z, int n, int closed, int is3d, path_t *out);
 /* the 2D path the orbiter follows: rotated (in plane, or in 3D: yaw/pitch), fitted to -1..1 */
 void path_project(const path_t *p, float rot, float yaw, float pitch, float *x2, float *y2);

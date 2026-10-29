@@ -218,9 +218,19 @@ static void mark_sound(vader_t *s) {
 }
 
 /* ------------------------------------------------------------------------------------------------ shapes */
+/* 0.8: the orbiter's way of travelling: the running phase 0..1 -> the place on the path */
+static inline float dir_t(const float *P, float ph) {
+    switch ((int)P[S_ORB_DIR]) {
+    case 1: return 1.0f - ph;                                   /* REVERSE */
+    case 2: return 1.0f - fabsf(2.0f * ph - 1.0f);              /* PING-PONG: out and back */
+    default: return ph;                                         /* FORWARD, LOOP BACK */
+    }
+}
+
 static void timbre_shape(vader_t *s, int t) {
     int idx = (int)T(t)[S_SHAPE];
     if (idx == SHAPE_USER && s->has_user) s->tm[t].base = s->user;
+    else if (idx >= SHAPE_FIRST_MATH) paths_gen(idx - SHAPE_FIRST_MATH, &T(t)[S_SH_A], &s->tm[t].base);
     else shape_builtin(idx == SHAPE_USER ? 0 : idx, &s->tm[t].base);
     s->tm[t].shape_built = 1;
     s->tm[t].last_rot = -99;   /* project again */
@@ -799,7 +809,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         oo = v->orb_o;
     }
     float px, py;
-    path_at(m->x2, m->y2, ot, &px, &py);
+    path_at(m->x2, m->y2, dir_t(P, ot), &px, &py);
     px *= size;
     py *= size;
     float sr_ = m->sub_s * 0.6f;
@@ -1015,7 +1025,7 @@ static void screen_update(vader_t *s, int force_shape) {
     voice_t *best = NULL;
     for (int i = 0; i < MAXV; i++)
         if (s->v[i].active && s->v[i].timbre == t && (!best || s->v[i].age > best->age)) best = &s->v[i];
-    float ot = best ? best->shown_t : m->orb_t, oo = best ? best->shown_o : m->orb_o;
+    float ot = dir_t(P, best ? best->shown_t : m->orb_t), oo = best ? best->shown_o : m->orb_o;
     float sr_ = m->sub_s * 0.6f, size = P[S_ORB_SIZE];
     static float qx[PATHN], qy[PATHN];
     int frame = 0, fparam = -1, pic = shape_picture(s, t, &frame, &fparam, qx, qy);
@@ -1415,7 +1425,7 @@ static void set_param(void *p, const char *key, const char *val) {
     }
     case K_SND:
         T(t)[q->slot] = v;
-        if (q->slot == S_SHAPE) timbre_shape(s, t);
+        if (q->slot == S_SHAPE || (q->slot >= S_SH_A && q->slot <= S_SH_D)) timbre_shape(s, t);
         if (q->slot < 4 * NCF) mark_corner_view(s);
         if (q->slot == S_ORB_SIZE || q->slot == S_ROTATE || q->slot == S_TILT) s->shape_wait = 0;
         if (q->slot >= S_ATTACK && q->slot <= S_RELEASE) env_update(s);
@@ -1756,7 +1766,7 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
         v.tilt = T(t)[S_TILT] * 1.5707963f;
         v.size = m->size_s < 0 ? T(t)[S_ORB_SIZE] : m->size_s;
         v.sub_size = m->sub_s < 0 ? T(t)[S_SUB_SIZE] : m->sub_s;
-        v.ot = best ? best->shown_t : m->orb_t;
+        v.ot = dir_t(T(t), best ? best->shown_t : m->orb_t);
         v.oo = best ? best->shown_o : m->orb_o;
         v.hz = m->hz_now;
         v.sub = m->sub_now;
