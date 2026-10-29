@@ -37,7 +37,7 @@ GROUND = (0, 0, 0)
 BTN_ON = (0, 0, 0)
 BTN_OFF = (0, 0, 0)
 
-TABS = ["MAIN", "CORNERS", "ORBIT", "IMAGE", "ARP", "FX", "MODE", "VOICES", "PLAY", "TRAVEL", "SAMPLES"]
+TABS = ["MAIN", "CORNERS", "ORBIT", "IMAGE", "ARP", "FX", "MODE", "VOICES", "PLAY", "TRAVEL", "SAMPLES", "SAMPLE EDIT"]
 HL = 50          # a line control's height: name row, then the line
 LINE_H = 16      # its line's strip frame height
 LINE_Y = 30      # where the line sits inside the control
@@ -321,6 +321,18 @@ def page_samples():
     return c, q
 
 
+def page_sample_edit():
+    """0.8: three controls for the sample of whichever corner is selected: where it starts, where it ends, and how much of
+    that part plays."""
+    c = [title("CORNER SELECT", 16, 70, 600), radio("corner", 16, 92, 600, h=48),
+         title("SAMPLE WINDOW  (THE SELECTED CORNER)", 16, 170, 1248),
+         hl("smp_st", 16, 196, 400, "START", big=True), hl("smp_en", 432, 196, 400, "END", big=True),
+         hl("smp_ln", 848, 196, 400, "LENGTH", big=True),
+         text("START and END cut the sample; LENGTH plays only that part of the cut (loops fit it to the bars).", 16, 290, 22)]
+    q = [("SAMPLE", ["smp_st", "smp_en", "smp_ln", "corner"])]
+    return c, q
+
+
 def page_travel():
     """0.8: how the orbiter travels and how its shape is bent: speed shaping, the part of the path used, stretch, skew, the
     centre point, the Warp pad, Focus (steer by hand), aftertouch."""
@@ -356,7 +368,7 @@ def page_travel():
     return c, q
 
 
-PAGES = [page_main, page_corners, page_orbit, page_image, page_arp, page_fx, page_mode, page_voices, page_play, page_travel, page_samples]
+PAGES = [page_main, page_corners, page_orbit, page_image, page_arp, page_fx, page_mode, page_voices, page_play, page_travel, page_samples, page_sample_edit]
 
 
 def stripe():

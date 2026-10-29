@@ -240,11 +240,23 @@ static float front_value(vader_t *s, int field) {
     return T(edit(s))[c * NCF + field];
 }
 
+/* 0.8: the three sample-window knobs show (and write) the selected corner's: ALL writes every corner */
+static void smp_front_sync(vader_t *s) {
+    int c = (int)s->g[G_CORNER];
+    if (c > 3) c = 0;
+    const float *P = T(edit(s));
+    s->g[G_SMP_ST] = P[S_A_SSTART + c * 3];
+    s->g[G_SMP_EN] = P[S_A_SSTART + c * 3 + 1];
+    s->g[G_SMP_LN] = P[S_A_SSTART + c * 3 + 2];
+    mark(s, P_SMP_ST); mark(s, P_SMP_EN); mark(s, P_SMP_LN);
+}
 static void mark_corner_view(vader_t *s) {
+    smp_front_sync(s);
     for (int p = 0; p < NP; p++)
         if (VP[p].kind == K_FRONT) mark(s, p);
 }
 static void mark_sound(vader_t *s) {
+    smp_front_sync(s);
     for (int p = 0; p < NP; p++)
         if (VP[p].kind == K_SND || VP[p].kind == K_FRONT) mark(s, p);
     for (int i = 0; i < 8; i++) mark(s, P_MN1 + i);
@@ -585,15 +597,24 @@ static void smp_request(vader_t *s, int c) {
     }
     pthread_mutex_unlock(&sl->lk);
 }
-static void smp_sync_all(vader_t *s) { for (int c = 0; c < 4; c++) smp_request(s, c); }
+static void smp_front_sync(vader_t *s);
+static void smp_sync_all(vader_t *s) { for (int c = 0; c < 4; c++) smp_request(s, c); smp_front_sync(s); }
 
 /* a corner's sample for n frames: ONE SHOT follows the key (the ROOT NOTE plays it at its own speed); a LOOP runs the
  * whole sample over 1-4 bars (4/4) of the tempo at the root note, and the keys pitch it from there. */
-static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, int n) {
+static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, int n, const float *P) {
     smp_t *sl = &s->smp[c];
     int cu = __atomic_load_n(&sl->cur, __ATOMIC_ACQUIRE), len = sl->n[cu];
-    const float *d = sl->d[cu];
     int mode = (int)s->g[G_SMP_LEN_A + c];
+    /* the window: START..END of the file, and LENGTH of that part */
+    float st = P[S_A_SSTART + c * 3], en = P[S_A_SSTART + c * 3 + 1], ln = P[S_A_SSTART + c * 3 + 2];
+    if (en < st + 0.002f) en = st + 0.002f;
+    int w0 = (int)(st * (float)(len - 2)), wl = (int)((en - st) * ln * (float)len);
+    if (wl < 8) wl = 8;
+    if (w0 + wl > len) wl = len - w0;
+    if (wl < 2) { w0 = 0; wl = len; }
+    const float *d = sl->d[cu] + w0;
+    len = wl;
     double rate, p = v->sp[c];
     float fr = 440.0f * powf(2.0f, (s->g[G_SMP_ROOT_A + c] - 69.0f) / 12.0f);
     if (mode == 0) rate = (double)sl->sr * INV_SR * freq / fr;
@@ -601,10 +622,14 @@ static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, in
     for (int i = 0; i < n; i++) {
         if (mode == 0 && p >= len - 1) { out[i] = 0; continue; }
         while (p >= len) p -= len;
-        int i0 = (int)p, i1 = i0 + 1;
+        int i0 = (int)p, i1 = i0 + 1, im = i0 - 1, i2 = i0 + 2;
         float fr = (float)(p - i0);
-        if (i1 >= len) i1 = mode ? 0 : i0;
-        out[i] = (d[i0] + (d[i1] - d[i0]) * fr) * 0.8f;
+        if (mode) { if (i1 >= len) i1 -= len; if (i2 >= len) i2 -= len; if (im < 0) im += len; }
+        else { if (i1 >= len) i1 = len - 1; if (i2 >= len) i2 = len - 1; if (im < 0) im = 0; }
+        /* four-point Hermite: cleaner than a straight line when a sample is pitched or its rate differs from the host's */
+        float y0 = d[im], y1 = d[i0], y2 = d[i1], y3 = d[i2];
+        float c1 = 0.5f * (y2 - y0), c2 = y0 - 2.5f * y1 + 2.0f * y2 - 0.5f * y3, c3 = 0.5f * (y3 - y0) + 1.5f * (y1 - y2);
+        out[i] = (((c3 * fr + c2) * fr + c1) * fr + y1) * 0.8f;
         p += rate;
     }
     v->sp[c] = p;
@@ -1402,7 +1427,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         float cfreq = base * powf(2.0f, P[c * NCF + CF_OCT]);
         if ((int)s->g[G_SMP_A + c] > 0 && on[c] && s->smp[c].n[__atomic_load_n(&s->smp[c].cur, __ATOMIC_ACQUIRE)] > 1) {
             eng_on[c] = 1;   /* a sample: through the corner's filter like a voice */
-            smp_render(s, v, c, cfreq, ebuf[c], n);
+            smp_render(s, v, c, cfreq, ebuf[c], n, P);
         } else if (ei > 0 && on[c]) {
             eng_on[c] = 1;
             corner_engine(s, v, c, P, ei, base * powf(2.0f, P[c * NCF + CF_OCT]), ebuf[c], n);
@@ -2017,6 +2042,11 @@ static void set_param(void *p, const char *key, const char *val) {
         if (q->slot == G_CORNER) mark_corner_view(s);
         if (q->slot == G_VOICES) all_off(s, 1);
         if (q->slot == G_FILE) s->status[0] = 0;
+        if (q->slot >= G_SMP_ST && q->slot <= G_SMP_LN) {
+            int cc = (int)s->g[G_CORNER];
+            for (int k = 0; k < 4; k++)
+                if (cc > 3 || cc == k) { T(t)[S_A_SSTART + k * 3 + (q->slot - G_SMP_ST)] = v; mark(s, SND_P[S_A_SSTART + k * 3 + (q->slot - G_SMP_ST)]); }
+        }
         if (q->slot >= G_SMP_A && q->slot <= G_SMP_D) smp_request(s, q->slot - G_SMP_A);
         if (q->slot == G_USER_SLOT) s->ustatus[0] = 0;
         if (q->slot == G_ARP_ON && !(int)v) { s->nheld = 0; arp_release(s); }

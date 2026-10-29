@@ -17453,6 +17453,102 @@
    "default": "CIRCLE"
   },
   {
+   "key": "a_sstart",
+   "name": "A SAMPLE START",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_send",
+   "name": "A SAMPLE END",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_slen",
+   "name": "A SAMPLE LENGTH",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_sstart",
+   "name": "B SAMPLE START",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_send",
+   "name": "B SAMPLE END",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_slen",
+   "name": "B SAMPLE LENGTH",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_sstart",
+   "name": "C SAMPLE START",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_send",
+   "name": "C SAMPLE END",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_slen",
+   "name": "C SAMPLE LENGTH",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_sstart",
+   "name": "D SAMPLE START",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_send",
+   "name": "D SAMPLE END",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_slen",
+   "name": "D SAMPLE LENGTH",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
    "key": "warp_reset",
    "name": "WARP RESET",
    "default": 0,
@@ -17892,6 +17988,30 @@
    "min": 0,
    "max": 8,
    "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_st",
+   "name": "SAMPLE START",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_en",
+   "name": "SAMPLE END",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_ln",
+   "name": "SAMPLE LENGTH",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
    "dynamic_display": true
   },
   {
