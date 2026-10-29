@@ -355,7 +355,7 @@ static inline void orb_xform(const float *P, float *x, float *y) {
 static void timbre_shape(vader_t *s, int t) {
     int idx = (int)T(t)[S_SHAPE];
     if (idx == SHAPE_USER && s->has_user) s->tm[t].base = s->user;
-    else if (idx >= SHAPE_FIRST_MATH) paths_gen(idx - SHAPE_FIRST_MATH, &T(t)[S_SH_A], &s->tm[t].base);
+    else if (idx >= SHAPE_FIRST_MATH) { paths_user = s->has_user ? &s->user : 0; paths_gen(idx - SHAPE_FIRST_MATH, &T(t)[S_SH_A], &s->tm[t].base); }
     else shape_builtin(idx == SHAPE_USER ? 0 : idx, &s->tm[t].base);
     s->tm[t].shape_built = 1;
     s->tm[t].last_rot = -99;   /* project again */
@@ -1210,6 +1210,8 @@ static float img_at(const float *g, float x, float y) {   /* x, y: -1..1 over th
 /* the six sources at the orbiter (ox, oy: on the square) for a voice: BRIGHT, HUE, COLOUR 0..1; DEPTH -1..1 (the slope
  * it travels on); TURN 0..1 (how sharply the outline turns at the path point, t); HEADING -1..1 (up +1, down -1) */
 static void img_sources(vader_t *s, voice_t *v, timbre_t *m, float size, float rot, float ox, float oy, float t, float *src) {
+    /* 0.8: the colour along the line (a spirograph's rainbow): 6 = hue round the path, 7 = a sine round it */
+    { float tf = t - floorf(t); src[6] = tf; src[7] = 0.5f + 0.5f * sinf(TWO_PI * tf); }
     float x = ox, y = oy;
     if (!m->base.is3d) {   /* back onto the picture: undo ROTATE and ORBIT SIZE */
         float c = cosf(-rot * TWO_PI), sn = sinf(-rot * TWO_PI);
@@ -1322,13 +1324,13 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     /* the IMAGE page: four MODs, each a source under the orbiter moving a sound control */
     float im_cut = 0, im_res = 0, im_oct = 0, im_semi = 0, im_og1 = 0, im_og2 = 0, im_blend = 0, im_lvl = 1;
     {
-        float src[6];
+        float src[8];
         img_sources(s, v, m, size, m->rot_s, ox, oy, ot, src);
         for (int k = 0; k < 4; k++) {
             const float *Q = &P[S_IM1_SRC + k * 4];   /* SRC, TO, AMT, SMOOTH */
             int si = (int)Q[0], to = (int)Q[1];
-            float amt = Q[2], target = amt * src[si < 0 ? 0 : si > 5 ? 5 : si];
-            v->im_src[k] = src[si < 0 ? 0 : si > 5 ? 5 : si];
+            float amt = Q[2], target = amt * src[si < 0 ? 0 : si > 7 ? 7 : si];
+            v->im_src[k] = src[si < 0 ? 0 : si > 7 ? 7 : si];
             float tau = 0.003f + 1.2f * Q[3] * Q[3];
             if (!v->im_init) v->im[k] = target;
             else v->im[k] += (1 - expf(-dt / tau)) * (target - v->im[k]);

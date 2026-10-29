@@ -29,7 +29,7 @@ static const char *const VG_OPT18[] = {"1", "2", "4", "8"};
 static const char *const VG_OPT19[] = {"MIX", "AM", "PM", "AM+PM", "PD", "RING", "FOLD"};
 static const char *const VG_OPT20[] = {"LP12", "LP24", "BP", "HP", "LADDER"};
 static const char *const VG_OPT21[] = {"POST", "GEN 1", "GEN 2"};
-static const char *const VG_OPT22[] = {"BRIGHT", "HUE", "COLOUR", "DEPTH", "TURN", "HEADING"};
+static const char *const VG_OPT22[] = {"BRIGHT", "HUE", "COLOUR", "DEPTH", "TURN", "HEADING", "LINE COLOUR", "LINE WAVE"};
 static const char *const VG_OPT23[] = {"CUTOFF", "RESO", "OCTAVE", "PITCH", "GEN 1", "GEN 2", "BLEND", "LEVEL"};
 static const char *const VG_OPT24[] = {"FORWARD", "REVERSE", "PING-PONG", "LOOP BACK"};
 static const char *const VG_OPT25[] = {"PATH", "CHASE", "RECAMAN", "METEOR RAIN", "KEPLER", "ROSETTE", "FIGURE 8", "LORENZ", "ROSSLER", "THOMAS", "AIZAWA", "PENDULUM", "BOUNCE", "RIPPLE", "MAGNET", "BOIDS", "PARTICLE WAVE", "OPTIMIZE", "TRANSFER ORBIT", "GRAVITY WELLS", "SERPENTINE DRAGON", "PARAMECIA", "MEDUSA", "FLATWORMS", "ETHEREAL RAY", "CLUMP SWARM", "THUNDER"};
@@ -215,19 +215,19 @@ static const VgPar VG_PARS[VG_NEXP] = {
     {"d_ftype", "D FILTER", VG_SND, 5, 0, 78, 0.0f, 0.0f, 4.0f, VG_OPT20},
     {"d_fpos", "D FILTER ON", VG_SND, 3, 0, 79, 0.0f, 0.0f, 2.0f, VG_OPT21},
     {"d_level", "D LEVEL", VG_SND, 0, 0, 80, 0.8f, 0.0f, 1.0f, 0},
-    {"im1_src", "MOD 1 SOURCE", VG_SND, 6, 0, 704, 0.0f, 0.0f, 5.0f, VG_OPT22},
+    {"im1_src", "MOD 1 SOURCE", VG_SND, 8, 0, 704, 0.0f, 0.0f, 7.0f, VG_OPT22},
     {"im1_to", "MOD 1 TO", VG_SND, 8, 0, 705, 0.0f, 0.0f, 7.0f, VG_OPT23},
     {"im1_amt", "MOD 1 AMOUNT", VG_SND, 0, 0, 706, 0.0f, -1.0f, 1.0f, 0},
     {"im1_smooth", "MOD 1 SMOOTH", VG_SND, 0, 0, 707, 0.3f, 0.0f, 1.0f, 0},
-    {"im2_src", "MOD 2 SOURCE", VG_SND, 6, 0, 708, 4.0f, 0.0f, 5.0f, VG_OPT22},
+    {"im2_src", "MOD 2 SOURCE", VG_SND, 8, 0, 708, 4.0f, 0.0f, 7.0f, VG_OPT22},
     {"im2_to", "MOD 2 TO", VG_SND, 8, 0, 709, 0.0f, 0.0f, 7.0f, VG_OPT23},
     {"im2_amt", "MOD 2 AMOUNT", VG_SND, 0, 0, 710, 0.0f, -1.0f, 1.0f, 0},
     {"im2_smooth", "MOD 2 SMOOTH", VG_SND, 0, 0, 711, 0.3f, 0.0f, 1.0f, 0},
-    {"im3_src", "MOD 3 SOURCE", VG_SND, 6, 0, 712, 1.0f, 0.0f, 5.0f, VG_OPT22},
+    {"im3_src", "MOD 3 SOURCE", VG_SND, 8, 0, 712, 1.0f, 0.0f, 7.0f, VG_OPT22},
     {"im3_to", "MOD 3 TO", VG_SND, 8, 0, 713, 6.0f, 0.0f, 7.0f, VG_OPT23},
     {"im3_amt", "MOD 3 AMOUNT", VG_SND, 0, 0, 714, 0.0f, -1.0f, 1.0f, 0},
     {"im3_smooth", "MOD 3 SMOOTH", VG_SND, 0, 0, 715, 0.3f, 0.0f, 1.0f, 0},
-    {"im4_src", "MOD 4 SOURCE", VG_SND, 6, 0, 716, 3.0f, 0.0f, 5.0f, VG_OPT22},
+    {"im4_src", "MOD 4 SOURCE", VG_SND, 8, 0, 716, 3.0f, 0.0f, 7.0f, VG_OPT22},
     {"im4_to", "MOD 4 TO", VG_SND, 8, 0, 717, 3.0f, 0.0f, 7.0f, VG_OPT23},
     {"im4_amt", "MOD 4 AMOUNT", VG_SND, 0, 0, 718, 0.0f, -1.0f, 1.0f, 0},
     {"im4_smooth", "MOD 4 SMOOTH", VG_SND, 0, 0, 719, 0.3f, 0.0f, 1.0f, 0},

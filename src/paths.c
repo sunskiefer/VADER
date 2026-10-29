@@ -20,6 +20,8 @@ static float mp(float v, float lo, float hi) { return lo + (hi - lo) * v; }
 /* the toy spirograph's gcd */
 static int gcd_i(int a, int b) { return b ? gcd_i(b, a % b) : a; }
 
+const path_t *paths_user = 0;   /* 0.8: the loaded shape, for FOURIER to rebuild from circles */
+
 void paths_gen(int m, const float *k, path_t *p) {
     static float x[NPTS], y[NPTS], z[NPTS];
     int n = NPTS, closed = 1, is3d = 0;
@@ -295,8 +297,8 @@ void paths_gen(int m, const float *k, path_t *p) {
         for (int i = 0; i < n; i++) { x[i] = kx[i]; y[i] = ky[i]; }
         break;
     }
-    case 25: {   /* FOURIER DRAWING: a shape rebuilt from its first circles. A: square, triangle, star, heart; B: how many circles */
-        int kind = (int)lroundf(A * 3), keep = 1 + (int)lroundf(B * 23);
+    case 25: {   /* FOURIER DRAWING: a shape rebuilt from its first circles. A: square, triangle, star, heart, LOADED shape; B: how many circles */
+        int kind = (int)lroundf(A * 4), keep = 1 + (int)lroundf(B * 23);
         enum { M = 256 };
         static float sx_[M], sy_[M];
         for (int i = 0; i < M; i++) {
@@ -304,6 +306,7 @@ void paths_gen(int m, const float *k, path_t *p) {
             if (kind == 0) { float seg = u * 4; int e = (int)seg; float f = seg - e; static const float cx[5] = {-1, 1, 1, -1, -1}, cy[5] = {-1, -1, 1, 1, -1}; sx_[i] = cx[e] + (cx[e + 1] - cx[e]) * f; sy_[i] = cy[e] + (cy[e + 1] - cy[e]) * f; }
             else if (kind == 1) { float seg = u * 3; int e = (int)seg; float f = seg - e; float ax = cosf(-PI / 2 + TWO_PI * e / 3), ay = sinf(-PI / 2 + TWO_PI * e / 3), bx = cosf(-PI / 2 + TWO_PI * (e + 1) / 3), by = sinf(-PI / 2 + TWO_PI * (e + 1) / 3); sx_[i] = ax + (bx - ax) * f; sy_[i] = ay + (by - ay) * f; }
             else if (kind == 2) { float seg = u * 10; int e = (int)seg; float f = seg - e; float r0 = (e & 1) ? 0.4f : 1.0f, r1 = ((e + 1) & 1) ? 0.4f : 1.0f; float a0 = -PI / 2 + TWO_PI * e / 10, a1 = -PI / 2 + TWO_PI * (e + 1) / 10; float ax = r0 * cosf(a0), ay = r0 * sinf(a0), bx = r1 * cosf(a1), by = r1 * sinf(a1); sx_[i] = ax + (bx - ax) * f; sy_[i] = ay + (by - ay) * f; }
+            else if (kind == 4 && paths_user) { int j = (int)(u * PATHN) % PATHN; sx_[i] = paths_user->x[j]; sy_[i] = paths_user->y[j]; }
             else { sx_[i] = 16 * powf(sinf(t), 3) / 16; sy_[i] = -(13 * cosf(t) - 5 * cosf(2 * t) - 2 * cosf(3 * t) - cosf(4 * t)) / 16; }
         }
         static float cre[64], cim[64];

@@ -73,7 +73,7 @@ static const char *const OPT11[] = {"A", "B", "C", "D", "ALL"};
 static const char *const OPT12[] = {"UP", "DOWN", "UP-DOWN", "RANDOM", "ORDER", "CHORD"};
 static const char *const OPT13[] = {"1/4", "1/8", "1/8T", "1/16", "1/16T", "1/32"};
 static const char *const OPT14[] = {"OFF", "ON", "ACCENT", "TIE"};
-static const char *const OPT15[] = {"BRIGHT", "HUE", "COLOUR", "DEPTH", "TURN", "HEADING"};
+static const char *const OPT15[] = {"BRIGHT", "HUE", "COLOUR", "DEPTH", "TURN", "HEADING", "LINE COLOUR", "LINE WAVE"};
 static const char *const OPT16[] = {"CUTOFF", "RESO", "OCTAVE", "PITCH", "GEN 1", "GEN 2", "BLEND", "LEVEL"};
 static const char *const OPT17[] = {"LOGO", "QR"};
 static const char *const OPT18[] = {"FORWARD", "REVERSE", "PING-PONG", "LOOP BACK"};
@@ -797,19 +797,19 @@ static const vp_t VP[NP] = {
     {"pic_r6", "PICTURE TURN 6", K_DISP, 2106, 0.0f, 5.0f, 0.0f, 0, 1, 0},
     {"pic_r8", "PICTURE TURN 8", K_DISP, 2108, 0.0f, 7.0f, 0.0f, 0, 1, 0},
     {"pic_r12", "PICTURE TURN 12", K_DISP, 2112, 0.0f, 11.0f, 0.0f, 0, 1, 0},
-    {"im1_src", "MOD 1 SOURCE", K_SND, 76, 0.0f, 5.0f, 0.0f, 6, 0, OPT15},
+    {"im1_src", "MOD 1 SOURCE", K_SND, 76, 0.0f, 7.0f, 0.0f, 8, 0, OPT15},
     {"im1_to", "MOD 1 TO", K_SND, 77, 0.0f, 7.0f, 0.0f, 8, 0, OPT16},
     {"im1_amt", "MOD 1 AMOUNT", K_SND, 78, -1.0f, 1.0f, 0.0f, 0, 0, 0},
     {"im1_smooth", "MOD 1 SMOOTH", K_SND, 79, 0.0f, 1.0f, 0.3f, 0, 0, 0},
-    {"im2_src", "MOD 2 SOURCE", K_SND, 80, 0.0f, 5.0f, 4.0f, 6, 0, OPT15},
+    {"im2_src", "MOD 2 SOURCE", K_SND, 80, 0.0f, 7.0f, 4.0f, 8, 0, OPT15},
     {"im2_to", "MOD 2 TO", K_SND, 81, 0.0f, 7.0f, 0.0f, 8, 0, OPT16},
     {"im2_amt", "MOD 2 AMOUNT", K_SND, 82, -1.0f, 1.0f, 0.0f, 0, 0, 0},
     {"im2_smooth", "MOD 2 SMOOTH", K_SND, 83, 0.0f, 1.0f, 0.3f, 0, 0, 0},
-    {"im3_src", "MOD 3 SOURCE", K_SND, 84, 0.0f, 5.0f, 1.0f, 6, 0, OPT15},
+    {"im3_src", "MOD 3 SOURCE", K_SND, 84, 0.0f, 7.0f, 1.0f, 8, 0, OPT15},
     {"im3_to", "MOD 3 TO", K_SND, 85, 0.0f, 7.0f, 6.0f, 8, 0, OPT16},
     {"im3_amt", "MOD 3 AMOUNT", K_SND, 86, -1.0f, 1.0f, 0.0f, 0, 0, 0},
     {"im3_smooth", "MOD 3 SMOOTH", K_SND, 87, 0.0f, 1.0f, 0.3f, 0, 0, 0},
-    {"im4_src", "MOD 4 SOURCE", K_SND, 88, 0.0f, 5.0f, 3.0f, 6, 0, OPT15},
+    {"im4_src", "MOD 4 SOURCE", K_SND, 88, 0.0f, 7.0f, 3.0f, 8, 0, OPT15},
     {"im4_to", "MOD 4 TO", K_SND, 89, 0.0f, 7.0f, 3.0f, 8, 0, OPT16},
     {"im4_amt", "MOD 4 AMOUNT", K_SND, 90, -1.0f, 1.0f, 0.0f, 0, 0, 0},
     {"im4_smooth", "MOD 4 SMOOTH", K_SND, 91, 0.0f, 1.0f, 0.3f, 0, 0, 0},

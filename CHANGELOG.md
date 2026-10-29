@@ -252,3 +252,5 @@ First release: not yet tested on a device.
 
 - Suborbit shape MOBIUS: swings across the path with a half turn per lap (twisted ribbon).
 - Kaleidoscope: every second copy is now mirrored (not only rotated), in the sound and on the screens.
+- IMAGE page: new sources LINE COLOUR and LINE WAVE (colour along the line, for spirographs).
+- FOURIER shape: new LOADED option rebuilds your loaded shape from circles.

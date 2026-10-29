@@ -193,7 +193,7 @@ TRIGGERS_LATE = [("save_user", "SAVE"), ("load_user", "LOAD PRESET")]
 # under the orbiter (BRIGHT: the picture's brightness on a spectrogram colour scale; HUE: its colour round the colour
 # wheel; COLOUR: how colourful; DEPTH: the slope the orbiter travels on, bright = high; TURN: how sharply the outline
 # turns there; HEADING: which way the outline runs) and move a sound control (TO) by AMOUNT, glided by SMOOTH.
-IMG_SRC = ["BRIGHT", "HUE", "COLOUR", "DEPTH", "TURN", "HEADING"]
+IMG_SRC = ["BRIGHT", "HUE", "COLOUR", "DEPTH", "TURN", "HEADING", "LINE COLOUR", "LINE WAVE"]
 IMG_TO = ["CUTOFF", "RESO", "OCTAVE", "PITCH", "GEN 1", "GEN 2", "BLEND", "LEVEL"]
 IMG_DEF = [(0, 0), (4, 0), (1, 6), (3, 3)]   # (source, to) of MOD 1..4
 SOUND_LATE = []

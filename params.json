@@ -5843,7 +5843,9 @@
     "COLOUR",
     "DEPTH",
     "TURN",
-    "HEADING"
+    "HEADING",
+    "LINE COLOUR",
+    "LINE WAVE"
    ],
    "default": "BRIGHT"
   },
@@ -5887,7 +5889,9 @@
     "COLOUR",
     "DEPTH",
     "TURN",
-    "HEADING"
+    "HEADING",
+    "LINE COLOUR",
+    "LINE WAVE"
    ],
    "default": "TURN"
   },
@@ -5931,7 +5935,9 @@
     "COLOUR",
     "DEPTH",
     "TURN",
-    "HEADING"
+    "HEADING",
+    "LINE COLOUR",
+    "LINE WAVE"
    ],
    "default": "HUE"
   },
@@ -5975,7 +5981,9 @@
     "COLOUR",
     "DEPTH",
     "TURN",
-    "HEADING"
+    "HEADING",
+    "LINE COLOUR",
+    "LINE WAVE"
    ],
    "default": "DEPTH"
   },

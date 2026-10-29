@@ -56,6 +56,7 @@ void shape_builtin(int idx, path_t *p);
 #define SHAPE_FIRST_MATH 16
 #define NMATH 35
 extern const char *const MATH_NAMES[NMATH];
+extern const path_t *paths_user;
 void paths_gen(int m, const float *k, path_t *p);
 void path_resample(const float *x, const float *y, const float *z, int n, int closed, int is3d, path_t *out);
 /* the 2D path the orbiter follows: rotated (in plane, or in 3D: yaw/pitch), fitted to -1..1 */
