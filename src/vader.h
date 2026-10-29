@@ -71,6 +71,26 @@ static inline void path_at(const float *x2, const float *y2, float t, float *ox,
     *oy = y2[i] + (y2[j] - y2[i]) * f;
 }
 
+/* ---- modes.c (0.8): simulations that move the orbiter instead of a shape's path */
+#define NMODES 14
+#define SIM_N 64
+typedef struct {
+    int mode, n, last, alive;
+    unsigned rng;
+    float t, yaw, spawn;
+    float px[SIM_N], py[SIM_N], pz[SIM_N], vx[SIM_N], vy[SIM_N], life[SIM_N];
+    float cx[8], cy[8];             /* true state of the 3-body balls */
+    float sx[SIM_N], sy[SIM_N];     /* the balls as drawn and played, -1..1 */
+    float a1, a2, w1, w2;           /* double pendulum */
+    float a_prev, a_from, a_dir;    /* Recaman */
+    int a_n;
+    unsigned char used[256];
+} sim_t;
+extern const char *const MODE_NAMES[NMODES];
+extern const char *const MODE_KNOBS[NMODES][8];
+void sim_reset(sim_t *s, int mode, const float *k);
+void sim_step(sim_t *s, const float *k, float dt);
+
 /* ---- shapefile.c: SVG, OBJ, PNG/JPG -> a path. 0 on success, else -1 with err filled. A PNG/JPG also fills img (when
  * given): its colours as values 0..1 on a spectrogram's scale, IMG_N x IMG_N over the same -1..1 as the path */
 #define IMG_N 64

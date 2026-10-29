@@ -91,6 +91,8 @@ typedef struct {
     float snd[2][NSND];
     float g[NGLOB];
     timbre_t tm[2];
+    sim_t sim[2];
+    float mv[2][NMODES][3][8];   /* 0.8: each mode's knobs, per timbre and layer */
     voice_t v[MAXV];
     unsigned age;
     fx_t *fx;
@@ -215,6 +217,22 @@ static void mark_corner_view(vader_t *s) {
 static void mark_sound(vader_t *s) {
     for (int p = 0; p < NP; p++)
         if (VP[p].kind == K_SND || VP[p].kind == K_FRONT) mark(s, p);
+}
+
+/* 0.8: the mode knobs show the knobs of the current mode and layer */
+static void mv_defaults(vader_t *s) {
+    for (int t = 0; t < 2; t++)
+        for (int m = 0; m < NMODES; m++)
+            for (int l = 0; l < 3; l++)
+                for (int i = 0; i < 8; i++) s->mv[t][m][l][i] = 0.5f;
+}
+static void mode_load(vader_t *s, int t, int reset) {
+    int m = (int)T(t)[S_SIM_MODE], l = (int)T(t)[S_SIM_LAYER];
+    for (int i = 0; i < 8; i++) {
+        T(t)[S_MK1 + i] = s->mv[t][m][l][i];
+        if (t == edit(s)) mark(s, SND_P[S_MK1 + i]);
+    }
+    if (reset) sim_reset(&s->sim[t], m, s->mv[t][m][0]);
 }
 
 /* ------------------------------------------------------------------------------------------------ shapes */
@@ -479,6 +497,8 @@ static void load_preset(vader_t *s, int n) {
     memcpy(s->g, GLOB_DEF, sizeof s->g);
     s->g[G_TIMBRE] = keep[0]; s->g[G_CORNER] = keep[1]; s->g[G_ALT] = keep[2]; s->g[G_MOTION] = keep[3];
     s->g[G_FILE] = keep[4]; s->g[G_VOICES] = keep[5]; s->g[G_QR_SHOW] = keep[6];
+    mv_defaults(s);
+    memset(s->sim, 0, sizeof s->sim);
     memcpy(T(0), SND_DEF, sizeof(float) * NSND);
     apply_kv(s, 0, P->a);
     memcpy(T(1), T(0), sizeof(float) * NSND);
@@ -809,7 +829,8 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         oo = v->orb_o;
     }
     float px, py;
-    path_at(m->x2, m->y2, dir_t(P, ot), &px, &py);
+    if ((int)P[S_SIM_MODE] > 0) { px = s->sim[v->timbre].sx[0]; py = s->sim[v->timbre].sy[0]; }
+    else path_at(m->x2, m->y2, dir_t(P, ot), &px, &py);
     px *= size;
     py *= size;
     float sr_ = m->sub_s * 0.6f;
@@ -1212,6 +1233,7 @@ static void *create(const char *data_dir) {
         if (s->skin_dir[0]) snprintf(s->base_dir, sizeof s->base_dir, "%s", base);
     }
     memcpy(s->g, GLOB_DEF, sizeof s->g);
+    mv_defaults(s);
     memcpy(T(0), SND_DEF, sizeof(float) * NSND);
     memcpy(T(1), SND_DEF, sizeof(float) * NSND);
     s->tempo = 120;
@@ -1306,6 +1328,7 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
         char line[1100];
         const char *q = val;
         char user[1024] = "";
+        mv_defaults(s);
         while (*q) {
             int n = 0;
             while (q[n] && q[n] != '\n' && n < (int)sizeof line - 1) { line[n] = q[n]; n++; }
@@ -1315,6 +1338,14 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
             char k[96];
             float v;
             if (!strncmp(line, "user ", 5)) { snprintf(user, sizeof user, "%s", line + 5); continue; }
+            if (line[0] == 'v') {
+                int vt, vm, vl, vi;
+                float vv;
+                if (sscanf(line + 1, "%d %d %d %d %f", &vt, &vm, &vl, &vi, &vv) == 5 && vt >= 0 && vt < 2 && vm >= 0 &&
+                    vm < NMODES && vl >= 0 && vl < 3 && vi >= 0 && vi < 8)
+                    s->mv[vt][vm][vl][vi] = vv;
+                continue;
+            }
             if (sscanf(line + 2, "%95s %f", k, &v) != 2) continue;
             int i = find(k);
             if (i < 0) continue;
@@ -1324,7 +1355,7 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
         s->has_user = 0;
         s->load_select = 0;
         if (user[0]) start_load(s, user);   /* the shape file again, by name */
-        for (int t = 0; t < 2; t++) timbre_shape(s, t);
+        for (int t = 0; t < 2; t++) { timbre_shape(s, t); mode_load(s, t, 1); }
         release_all(s);
         all_off(s, 1);
         all_dirty(s);
@@ -1427,6 +1458,10 @@ static void set_param(void *p, const char *key, const char *val) {
         T(t)[q->slot] = v;
         if (q->slot == S_SHAPE || (q->slot >= S_SH_A && q->slot <= S_SH_D)) timbre_shape(s, t);
         if (q->slot < 4 * NCF) mark_corner_view(s);
+        if (q->slot >= S_MK1 && q->slot <= S_MK8)
+            s->mv[t][(int)T(t)[S_SIM_MODE]][(int)T(t)[S_SIM_LAYER]][q->slot - S_MK1] = v;
+        if (q->slot == S_SIM_MODE) { T(t)[S_SIM_LAYER] = 0; mark(s, P_SIM_LAYER); mode_load(s, t, 1); }
+        if (q->slot == S_SIM_LAYER) mode_load(s, t, 0);
         if (q->slot == S_ORB_SIZE || q->slot == S_ROTATE || q->slot == S_TILT) s->shape_wait = 0;
         if (q->slot >= S_ATTACK && q->slot <= S_RELEASE) env_update(s);
         break;
@@ -1480,6 +1515,12 @@ static int state_text(vader_t *s, char *buf, int len) {
             for (int t = 0; t < 2 && n < len; t++)
                 n += snprintf(buf + n, (size_t)(len - n), "%c %s %.5g\n", 'a' + t, q->key, s->snd[t][q->slot]);
     }
+    for (int t = 0; t < 2; t++)
+        for (int m = 0; m < NMODES; m++)
+            for (int l = 0; l < 3; l++)
+                for (int i = 0; i < 8; i++)
+                    if (fabsf(s->mv[t][m][l][i] - 0.5f) > 1e-6f && n < len)
+                        n += snprintf(buf + n, (size_t)(len - n), "v%d %d %d %d %.5g\n", t, m, l, i, s->mv[t][m][l][i]);
     if (s->has_user && n < len) n += snprintf(buf + n, (size_t)(len - n), "user %s\n", s->user_file);
     return n + 1;   /* with its NUL: the wrapper asks again with a bigger buffer when this is larger */
 }
@@ -1643,6 +1684,13 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
             m->orb_t = fmodf(m->orb_t + hz * dt, 1.0f);
         }
         m->orb_o = fmodf(m->orb_o + sub * dt, 1.0f);
+        {
+            int sm = (int)P[S_SIM_MODE];
+            if (sm > 0) {
+                if (s->sim[t].mode != sm) sim_reset(&s->sim[t], sm, s->mv[t][sm][0]);
+                sim_step(&s->sim[t], s->mv[t][sm][0], dt);
+            }
+        }
         m->hz_now = hz;
         m->sub_now = sub;
         float vr, tr;

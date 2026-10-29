@@ -16706,12 +16706,115 @@
    "default": "FORWARD"
   },
   {
+   "key": "sim_mode",
+   "name": "MODE",
+   "options": [
+    "PATH",
+    "CHASE",
+    "RECAMAN",
+    "METEOR RAIN",
+    "KEPLER",
+    "ROSETTE",
+    "FIGURE 8",
+    "LORENZ",
+    "ROSSLER",
+    "THOMAS",
+    "AIZAWA",
+    "PENDULUM",
+    "BOUNCE",
+    "RIPPLE"
+   ],
+   "default": "PATH"
+  },
+  {
+   "key": "sim_layer",
+   "name": "LAYER",
+   "options": [
+    "1",
+    "2",
+    "3"
+   ],
+   "default": "1"
+  },
+  {
+   "key": "mk1",
+   "name": "MODE KNOB 1",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mk2",
+   "name": "MODE KNOB 2",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mk3",
+   "name": "MODE KNOB 3",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mk4",
+   "name": "MODE KNOB 4",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mk5",
+   "name": "MODE KNOB 5",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mk6",
+   "name": "MODE KNOB 6",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mk7",
+   "name": "MODE KNOB 7",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "mk8",
+   "name": "MODE KNOB 8",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
    "key": "orb_dir__open",
    "name": "orb_dir list",
    "default": 0,
    "min": 0,
    "max": 1,
    "popup_of": "orb_dir"
+  },
+  {
+   "key": "sim_mode__open",
+   "name": "sim_mode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "sim_mode"
   }
  ]
 }

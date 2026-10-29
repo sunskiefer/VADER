@@ -203,12 +203,17 @@ for i, (src, to) in enumerate(IMG_DEF):
                    ("im%d_amt" % n, "MOD %d AMOUNT" % n, 0.0, -1, 1, None, False),
                    ("im%d_smooth" % n, "MOD %d SMOOTH" % n, 0.3, 0, 1, None, False)]
 # 0.8 (appended): the shape numbers of the maths shapes and the orbiter's way of travelling
+SIM_MODES = ["PATH", "CHASE", "RECAMAN", "METEOR RAIN", "KEPLER", "ROSETTE", "FIGURE 8", "LORENZ", "ROSSLER", "THOMAS",
+             "AIZAWA", "PENDULUM", "BOUNCE", "RIPPLE"]
 DIRS = ["FORWARD", "REVERSE", "PING-PONG", "LOOP BACK"]
 SOUND_LATE2 = [("sh_a", "SHAPE A", 0.5, 0, 1, None, False), ("sh_b", "SHAPE B", 0.5, 0, 1, None, False),
                ("sh_c", "SHAPE C", 0.5, 0, 1, None, False), ("sh_d", "SHAPE D", 0.0, 0, 1, None, False),
-               ("orb_dir", "ORBIT DIRECTION", 0, 0, 0, DIRS, False)]
+               ("orb_dir", "ORBIT DIRECTION", 0, 0, 0, DIRS, False),
+               ("sim_mode", "MODE", 0, 0, 0, SIM_MODES, False),
+               ("sim_layer", "LAYER", 0, 0, 0, ["1", "2", "3"], False)] + [
+               ("mk%d" % (i + 1), "MODE KNOB %d" % (i + 1), 0.5, 0, 1, None, False) for i in range(8)]
 POPUPS_LATE = ["im%d_%s" % (i + 1, f) for i in range(4) for f in ("src", "to")] 
-POPUPS_LATE2 = ["orb_dir"]
+POPUPS_LATE2 = ["orb_dir", "sim_mode"]
 
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
 POPUPS = ["shape", "orb_div", "arp_mode", "arp_rate", "dly_div"] + ["%s_%s" % (c, f) for c in "abcd" for f in ("mode", "ftype")]
