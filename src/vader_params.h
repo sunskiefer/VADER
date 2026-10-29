@@ -83,7 +83,7 @@ static const char *const OPT21[] = {"SYNTH", "ANALOG", "TRIO", "WAVE", "CHIP", "
 static const char *const OPT22[] = {"LINEAR", "SLOW MIDDLE", "FAST MIDDLE", "PULSE"};
 static const char *const OPT23[] = {"OFF", "MUSICAL", "PRIME"};
 static const char *const OPT24[] = {"FORWARD", "REVERSE", "PING-PONG"};
-static const char *const OPT25[] = {"CIRCLE", "ELLIPSE", "FIGURE 8", "SQUARE", "LINE"};
+static const char *const OPT25[] = {"CIRCLE", "ELLIPSE", "FIGURE 8", "SQUARE", "LINE", "MOBIUS"};
 static const char *const OPT26[] = {"MAJOR", "MINOR", "DORIAN", "PENTATONIC", "MINOR PENT", "WHOLE TONE", "BLUES", "CHROMATIC"};
 static const char *const OPT27[] = {"ROOT", "ROOT + FIFTH", "ROOT + OCTAVE", "MINOR", "MAJOR", "SUS 4"};
 static const char *const OPT28[] = {"POLY", "DUAL", "MONO"};
@@ -2225,7 +2225,7 @@ static const vp_t VP[NP] = {
     {"kal_sound", "KALEIDOSCOPE SOUND", K_SND, 160, 0.0f, 1.0f, 0.0f, 2, 0, OPT1},
     {"sub_dir", "SUBORBIT DIRECTION", K_SND, 161, 0.0f, 2.0f, 0.0f, 3, 0, OPT24},
     {"sub_link", "SUBORBIT LINK", K_SND, 162, 0.0f, 1.0f, 1.0f, 2, 0, OPT1},
-    {"sub_shape", "SUBORBIT SHAPE", K_SND, 163, 0.0f, 4.0f, 0.0f, 5, 0, OPT25},
+    {"sub_shape", "SUBORBIT SHAPE", K_SND, 163, 0.0f, 5.0f, 0.0f, 6, 0, OPT25},
     {"a_sstart", "A SAMPLE START", K_SND, 164, 0.0f, 1.0f, 0.0f, 0, 0, 0},
     {"a_send", "A SAMPLE END", K_SND, 165, 0.0f, 1.0f, 1.0f, 0, 0, 0},
     {"a_slen", "A SAMPLE LENGTH", K_SND, 166, 0.0f, 1.0f, 1.0f, 0, 0, 0},

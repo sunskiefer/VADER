@@ -17448,7 +17448,8 @@
     "ELLIPSE",
     "FIGURE 8",
     "SQUARE",
-    "LINE"
+    "LINE",
+    "MOBIUS"
    ],
    "default": "CIRCLE"
   },

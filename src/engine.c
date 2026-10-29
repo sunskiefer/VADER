@@ -306,7 +306,7 @@ static inline float dir_t(const float *P, float ph) {
 }
 
 /* 0.8: the suborbit: its own direction (or the orbiter's, when linked) and its own shape (circle, ellipse, figure 8, square, line) */
-static inline void sub_pos(const float *P, float ph, float *cx, float *cy) {
+static inline void sub_pos(const float *P, float ph, float *cx, float *cy, float tx, float ty, float u) {
     int d = (int)P[S_SUB_LINK] ? (int)P[S_ORB_DIR] : (int)P[S_SUB_DIR];
     if (d == 1) ph = 1.0f - ph;
     else if (d == 2) ph = 1.0f - fabsf(2.0f * ph - 1.0f);
@@ -316,6 +316,9 @@ static inline void sub_pos(const float *P, float ph, float *cx, float *cy) {
     case 2: *cx = sn; *cy = sinf(2.0f * a) * 0.5f; break;                              /* FIGURE 8 */
     case 3: *cx = clampf(1.35f * c, -1, 1); *cy = clampf(1.35f * sn, -1, 1); break;   /* SQUARE-ish */
     case 4: *cx = c; *cy = 0; break;                                                   /* LINE */
+    case 5: {   /* MOBIUS: swings across the path (its normal) with a half turn per lap, so it crosses over like a twisted ribbon */
+        float w = cosf(a * 0.5f + 3.14159265f * u) , l = sinf(a) * 0.35f;
+        *cx = -ty * w + tx * l; *cy = tx * w + ty * l; break; }
     default: *cx = c; *cy = sn; break;
     }
 }
@@ -1312,7 +1315,9 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     py *= size;
     float sr_ = m->sub_s * 0.6f;
     float sc_, ss_;
-    sub_pos(P, oo, &sc_, &ss_);
+    float tgx = 1, tgy = 0;
+    if ((int)P[S_SUB_SHAPE] == 5) { float ax_, ay_, bx_, by_, u_ = path_u(P, ot); path_at(m->x2, m->y2, u_ - 2.0f / PATHN, &ax_, &ay_); path_at(m->x2, m->y2, u_ + 2.0f / PATHN, &bx_, &by_); tgx = bx_ - ax_; tgy = by_ - ay_; float ln_ = sqrtf(tgx * tgx + tgy * tgy); if (ln_ > 1e-6f) { tgx /= ln_; tgy /= ln_; } else { tgx = 1; tgy = 0; } }
+    sub_pos(P, oo, &sc_, &ss_, tgx, tgy, ot);
     float ox = clampf(px + sr_ * sc_, -1, 1), oy = clampf(py + sr_ * ss_, -1, 1);
     /* the IMAGE page: four MODs, each a source under the orbiter moving a sound control */
     float im_cut = 0, im_res = 0, im_oct = 0, im_semi = 0, im_og1 = 0, im_og2 = 0, im_blend = 0, im_lvl = 1;
@@ -1583,7 +1588,9 @@ static void screen_update(vader_t *s, int force_shape) {
         fy *= size;
     }
     float sc_, ss_;
-    sub_pos(P, oo, &sc_, &ss_);
+    float tgx = 1, tgy = 0;
+    if ((int)P[S_SUB_SHAPE] == 5) { float ax_, ay_, bx_, by_; path_at(m->x2, m->y2, ot - 2.0f / PATHN, &ax_, &ay_); path_at(m->x2, m->y2, ot + 2.0f / PATHN, &bx_, &by_); tgx = bx_ - ax_; tgy = by_ - ay_; float ln_ = sqrtf(tgx * tgx + tgy * tgy); if (ln_ > 1e-6f) { tgx /= ln_; tgy /= ln_; } else { tgx = 1; tgy = 0; } }
+    sub_pos(P, oo, &sc_, &ss_, tgx, tgy, ot);
     float ox = clampf(fx + sr_ * sc_, -1, 1), oy = clampf(fy + sr_ * ss_, -1, 1);
     if (overlay_live(&s->ovl)) {   /* 0.5.0: the live screen draws it all: the tiles, balls and picture rest (empty) */
         if (!s->rested) {

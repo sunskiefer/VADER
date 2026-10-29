@@ -249,3 +249,5 @@ First release: not yet tested on a device.
 - 16 presets in MPC's PRESET menu.
 - Five pages (MAIN, CORNERS, ORBIT, ARP, FX) with line controls, a strip showing the last control touched, and a live
   line screen: the shape, the orbiter's trail and the envelope.
+
+- Suborbit shape MOBIUS: swings across the path with a half turn per lap (twisted ribbon).

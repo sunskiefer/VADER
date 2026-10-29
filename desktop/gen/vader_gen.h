@@ -38,7 +38,7 @@ static const char *const VG_OPT27[] = {"SYNTH", "ANALOG", "TRIO", "WAVE", "CHIP"
 static const char *const VG_OPT28[] = {"LINEAR", "SLOW MIDDLE", "FAST MIDDLE", "PULSE"};
 static const char *const VG_OPT29[] = {"OFF", "MUSICAL", "PRIME"};
 static const char *const VG_OPT30[] = {"FORWARD", "REVERSE", "PING-PONG"};
-static const char *const VG_OPT31[] = {"CIRCLE", "ELLIPSE", "FIGURE 8", "SQUARE", "LINE"};
+static const char *const VG_OPT31[] = {"CIRCLE", "ELLIPSE", "FIGURE 8", "SQUARE", "LINE", "MOBIUS"};
 typedef struct { const char *key, *name; uint8_t kind, nopts, isint; int16_t eng; float def, mn, mx; const char *const *opts; } VgPar;
 static const VgPar VG_PARS[VG_NEXP] = {
     {"preset", "PRESET", VG_GLOB, 0, 1, 130, 0.0f, 0.0f, 21.0f, 0},
@@ -302,7 +302,7 @@ static const VgPar VG_PARS[VG_NEXP] = {
     {"kal_sound", "KALEIDOSCOPE SOUND", VG_SND, 2, 0, 2129, 0.0f, 0.0f, 1.0f, VG_OPT5},
     {"sub_dir", "SUBORBIT DIRECTION", VG_SND, 3, 0, 2130, 0.0f, 0.0f, 2.0f, VG_OPT30},
     {"sub_link", "SUBORBIT LINK", VG_SND, 2, 0, 2131, 1.0f, 0.0f, 1.0f, VG_OPT5},
-    {"sub_shape", "SUBORBIT SHAPE", VG_SND, 5, 0, 2132, 0.0f, 0.0f, 4.0f, VG_OPT31},
+    {"sub_shape", "SUBORBIT SHAPE", VG_SND, 6, 0, 2132, 0.0f, 0.0f, 5.0f, VG_OPT31},
     {"a_sstart", "A SAMPLE START", VG_SND, 0, 0, 2133, 0.0f, 0.0f, 1.0f, 0},
     {"a_send", "A SAMPLE END", VG_SND, 0, 0, 2134, 1.0f, 0.0f, 1.0f, 0},
     {"a_slen", "A SAMPLE LENGTH", VG_SND, 0, 0, 2135, 1.0f, 0.0f, 1.0f, 0},

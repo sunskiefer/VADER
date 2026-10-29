@@ -274,7 +274,7 @@ SOUND_LATE6 = [("sound_balls", "SOUND BALLS", 1, 1, 4, None, True), ("kal_n", "K
                ("kal_sound", "KALEIDOSCOPE SOUND", 0, 0, 0, ["OFF", "ON"], False),
                ("sub_dir", "SUBORBIT DIRECTION", 0, 0, 0, ["FORWARD", "REVERSE", "PING-PONG"], False),
                ("sub_link", "SUBORBIT LINK", 1, 0, 0, ["OFF", "ON"], False),
-               ("sub_shape", "SUBORBIT SHAPE", 0, 0, 0, ["CIRCLE", "ELLIPSE", "FIGURE 8", "SQUARE", "LINE"], False)]
+               ("sub_shape", "SUBORBIT SHAPE", 0, 0, 0, ["CIRCLE", "ELLIPSE", "FIGURE 8", "SQUARE", "LINE", "MOBIUS"], False)]
 for _c in "abcd":   # each corner's sample window: start, end, and how much of that window plays (stride 3)
     SOUND_LATE6 += [("%s_sstart" % _c, "%s SAMPLE START" % _c.upper(), 0.0, 0, 1, None, False), ("%s_send" % _c, "%s SAMPLE END" % _c.upper(), 1.0, 0, 1, None, False),
                     ("%s_slen" % _c, "%s SAMPLE LENGTH" % _c.upper(), 1.0, 0, 1, None, False)]
