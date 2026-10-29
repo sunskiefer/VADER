@@ -37,7 +37,7 @@ GROUND = (0, 0, 0)
 BTN_ON = (0, 0, 0)
 BTN_OFF = (0, 0, 0)
 
-TABS = ["MAIN", "CORNERS", "ORBIT", "IMAGE", "ARP", "FX"]
+TABS = ["MAIN", "CORNERS", "ORBIT", "IMAGE", "ARP", "FX", "MODE", "VOICES", "PLAY", "TRAVEL"]
 HL = 50          # a line control's height: name row, then the line
 LINE_H = 16      # its line's strip frame height
 LINE_Y = 30      # where the line sits inside the control
@@ -242,7 +242,80 @@ def page_image():
     return c, q
 
 
-PAGES = [page_main, page_corners, page_orbit, page_image, page_arp, page_fx]
+def page_mode():
+    """0.8: the MODE page. Its eight knobs are named by the current mode (live text); LAYER picks the next eight."""
+    c = [title("MODE", 16, 70, 608), popup("sim_mode", 16, 92, 400, "MODE", h=48, list_at=(16, 144), cols=4, ow=158, oh=44),
+         text("LAYER", 440, 104, 22), radio("sim_layer", 520, 92, 168, h=48)]
+    for i in range(8):
+        x, y = 16 + (i % 4) * 316, 168 + (i // 4) * 84
+        c += [{"kind": "livetext", "key": "mn%d" % (i + 1), "x": x, "y": y, "w": 300}, hl("mk%d" % (i + 1), x, y + 6, 300, " ", big=True)]
+    c += [title("TRAVEL", 16, 350, 608), popup("orb_dir", 16, 372, 300, "DIRECTION", h=48, list_at=(16, 424), cols=2, ow=150, oh=44)]
+    c += [title("SHAPE NUMBERS  (MATHS SHAPES)", 16, 440, 1248)]
+    c += [hl("sh_a", 16, 466, 300, "SHAPE A", big=True), hl("sh_b", 332, 466, 300, "SHAPE B", big=True),
+          hl("sh_c", 648, 466, 300, "SHAPE C", big=True), hl("sh_d", 964, 466, 300, "SHAPE D", big=True)]
+    q = [("MODE", ["mk%d" % (i + 1) for i in range(8)]), ("SHAPE", ["sh_a", "sh_b", "sh_c", "sh_d", "orb_dir", "sim_mode",
+                                                                  "sim_layer"])]
+    return c, q
+
+
+def page_voices():
+    """0.8: each corner's voice: VADER's own overtone generators (SYNTH) or one of the 14 voices from LXRXXL ZYNTH, with its
+    four character controls (named live by the voice)."""
+    c, q = [], []
+    for ci, cl in enumerate("abcd"):
+        x = 16 + ci * 316
+        c += [title("CORNER " + cl.upper(), x, 70, 300), popup(cl + "_eng", x, 92, 300, "VOICE", h=48,
+                                                              list_at=(x if ci < 2 else x - 100, 144), cols=3, ow=100, oh=44)]
+        for k in range(4):
+            y = 160 + k * 84
+            c += [{"kind": "livetext", "key": "cn%d" % (ci * 4 + k + 1), "x": x, "y": y, "w": 300},
+                  hl("%s_v%d" % (cl, k + 1), x, y + 6, 300, " ", big=True)]
+        q.append(("VOICE " + cl.upper(), [cl + "_eng"] + ["%s_v%d" % (cl, k + 1) for k in range(4)]))
+    return c, q
+
+
+def page_play():
+    """0.8: playing without keys: SELF PLAY (the orbiter picks notes from a scale) and the DRONE (a chord held on)."""
+    A, B = 16, 440
+    c = [title("SELF PLAY", A, 70, 400), tog("self_play", A, 92, 400, "SELF PLAY", h=48),
+         text("SCALE", A, 156, 22), popup("self_scale", A + 110, 146, 290, "", h=48, list_at=(A, 198), cols=2, ow=200, oh=44),
+         hl("self_root", A, 260, 400, "ROOT NOTE", big=True), hl("self_range", A, 330, 400, "OCTAVES", big=True),
+         text("RATE", A, 408, 22), text("(the ARP RATE sets the speed)", A + 90, 410, 18)]
+    c += [title("DRONE", B, 70, 400), tog("drone", B, 92, 400, "DRONE", h=48),
+          text("CHORD", B, 156, 22), popup("drone_chord", B + 110, 146, 290, "", h=48, list_at=(B, 198), cols=2, ow=200, oh=44)]
+    q = [("PLAY", ["self_play", "self_scale", "self_root", "self_range", "drone", "drone_chord"])]
+    return c, q
+
+
+def page_travel():
+    """0.8: how the orbiter travels and how its shape is bent: speed shaping, the part of the path used, stretch, skew, the
+    centre point, the Warp pad, Focus (steer by hand), aftertouch."""
+    A, B, C = 16, 440, 864
+    c = [title("SPEED", A, 70, 400),
+         hl("spd_lfo_rate", A, 92, 192, "LFO RATE", big=True), hl("spd_lfo_depth", A + 208, 92, 192, "LFO DEPTH", big=True),
+         text("CURVE", A, 166, 22), popup("spd_curve", A + 110, 156, 290, "", h=48, list_at=(A, 208), cols=2, ow=200, oh=44),
+         hl("corner_stop", A, 268, 400, "STOP AT CORNERS", big=True),
+         title("PART OF THE PATH", A, 340, 400),
+         hl("path_start", A, 362, 192, "START", big=True), hl("path_end", A + 208, 362, 192, "END", big=True),
+         hl("soft_turn", A, 424, 400, "SOFT TURN", big=True)]
+    c += [title("BEND THE SHAPE", B, 70, 400),
+          hl("stretch_x", B, 92, 192, "STRETCH X", big=True), hl("stretch_y", B + 208, 92, 192, "STRETCH Y", big=True),
+          hl("skew", B, 154, 192, "SKEW", big=True), hl("morph", B + 208, 154, 192, "MORPH ROUND", big=True),
+          title("CENTRE POINT  (MIDI CC 20, 21)", B, 232, 400),
+          hl("centre_x", B, 254, 192, "CENTRE X", big=True), hl("centre_y", B + 208, 254, 192, "CENTRE Y", big=True)]
+    c += [title("WARP PAD", C, 70, 400),
+          hl("warp_x", C, 92, 192, "WARP X", big=True), hl("warp_y", C + 208, 92, 192, "WARP Y", big=True),
+          btn("warp_reset", C, 154, 400, "WARP RESET", h=48),
+          title("FOCUS  (STEER BY HAND)", C, 224, 400), tog("focus", C, 246, 400, "FOCUS", h=48),
+          hl("focus_x", C, 308, 192, "FOCUS X", big=True), hl("focus_y", C + 208, 308, 192, "FOCUS Y", big=True),
+          title("PLAYING", C, 386, 400), hl("at_sub", C, 408, 400, "AFTERTOUCH > SUBORBIT", big=True)]
+    q = [("SPEED", ["spd_lfo_rate", "spd_lfo_depth", "spd_curve", "corner_stop", "path_start", "path_end", "soft_turn", "at_sub"]),
+         ("BEND", ["stretch_x", "stretch_y", "skew", "morph", "centre_x", "centre_y", "warp_x", "warp_y"]),
+         ("FOCUS", ["focus", "focus_x", "focus_y", "warp_reset"])]
+    return c, q
+
+
+PAGES = [page_main, page_corners, page_orbit, page_image, page_arp, page_fx, page_mode, page_voices, page_play, page_travel]
 
 
 def stripe():
@@ -900,6 +973,10 @@ def build_page(sk, page_no, comps):
             strip = sk.save(meter_strip(470, 12), "vd_rdline.png")
             dk = define("vdRdLine", [], [filmstrip(strip, 101, 470, 12)], ignore=True)
             kids.append(placed(dk, "readout line", sk.index["rd_line"], (196, 40, 470, 12), False))
+        elif k == "livetext":
+            dk = define("vdLive_%s_%d" % (c["key"], c["w"]), [], [text_label("Value", 0, 0, c["w"], 28, 22.0, "ffffff",
+                                                                          "left verticallyCentred", style="Bold")])
+            kids.append(placed(dk, c["key"], sk.index[c["key"]], (c["x"], c["y"], c["w"], 28), False))
         elif k == "hline":
             x, y, w = c["x"], c["y"], c["w"]
             lab = c["label"] or sk.params[key]["name"]

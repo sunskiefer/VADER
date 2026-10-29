@@ -11,23 +11,6 @@ const char *const MODE_NAMES[NMODES] = {
     "PATH", "CHASE", "RECAMAN", "METEOR RAIN", "KEPLER", "ROSETTE", "FIGURE 8", "LORENZ", "ROSSLER", "THOMAS",
     "AIZAWA", "PENDULUM", "BOUNCE", "RIPPLE"};
 
-/* what the eight knobs of a layer-1 do, per mode (shown as the knobs' names) */
-const char *const MODE_KNOBS[NMODES][8] = {
-    {"", "", "", "", "", "", "", ""},
-    {"SPEED", "BALLS", "DIRECTION", "PULL", "SPREAD", "TURN", "SIZE", "RESET"},
-    {"STEPS/S", "SCALE", "AXIS", "ARC", "RANGE", "SEED", "SIZE", "RESET"},
-    {"FALL", "RATE", "SPREAD", "SPEED", "LIFE", "SEED", "SIZE", "TURN"},
-    {"SPEED", "ECCENTRIC", "PRECESS", "SIZE", "TILT", "WELL", "TURN", "PHASE"},
-    {"SPEED", "ECCENTRIC", "PRECESS", "SIZE", "TILT", "WELL", "TURN", "PHASE"},
-    {"SPEED", "SIZE", "TURN", "OFFSET", "BALLS", "SEED", "SPREAD", "RESET"},
-    {"SPEED", "SIGMA", "RHO", "BETA", "SIZE", "TURN", "BALLS", "SEED"},
-    {"SPEED", "A", "B", "C", "SIZE", "TURN", "BALLS", "SEED"},
-    {"SPEED", "DAMP", "SIZE", "TURN", "BALLS", "SEED", "SPREAD", "RESET"},
-    {"SPEED", "A", "B", "C", "SIZE", "TURN", "BALLS", "SEED"},
-    {"SPEED", "LENGTH 1", "LENGTH 2", "MASS", "DAMP", "SEED", "SIZE", "KICK"},
-    {"SPEED", "GRAVITY", "ELASTIC", "BALLS", "ANGLE", "SEED", "SIZE", "KICK"},
-    {"SPEED", "WAVES", "DECAY", "SPREAD", "RATE", "SEED", "SIZE", "TURN"},
-};
 
 static float frand(sim_t *s) {   /* 0..1 */
     s->rng = s->rng * 1664525u + 1013904223u;

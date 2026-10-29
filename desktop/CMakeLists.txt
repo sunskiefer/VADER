@@ -30,7 +30,24 @@ set(ENGINE_SRCS
   ${VADER_ROOT}/src/tables.c ${VADER_ROOT}/src/shape.c ${VADER_ROOT}/src/paths.c ${VADER_ROOT}/src/modes.c ${VADER_ROOT}/src/shapefile.c ${VADER_ROOT}/src/screen.c
   ${VADER_ROOT}/src/fx.c ${VADER_ROOT}/src/pictures.c ${VADER_ROOT}/src/qr.c ${VADER_ROOT}/src/engine.c
   ${CMAKE_CURRENT_SOURCE_DIR}/view_bus.c)
+# ---- the ZYNTH voices (C) and the Mutable Instruments engines (C++), 0.8
+set(M ${VADER_ROOT}/third_party/mutable)
+add_library(vader_zynth STATIC
+  ${VADER_ROOT}/src/zynth/engines.c ${VADER_ROOT}/src/zynth/eng_osc.c ${VADER_ROOT}/src/zynth/eng_fm.c
+  ${VADER_ROOT}/src/zynth/eng_more.c ${VADER_ROOT}/src/zynth/eng_new.c
+  ${VADER_ROOT}/third_party/lxr02open/Core/DSPAudio/wavetable.c
+  ${VADER_ROOT}/src/zynth/mi_bridge.cc
+  ${M}/braids/macro_oscillator.cc ${M}/braids/digital_oscillator.cc ${M}/braids/analog_oscillator.cc ${M}/braids/resources.cc
+  ${M}/plaits/dsp/engine/wavetable_engine.cc ${M}/plaits/dsp/physical_modelling/modal_voice.cc
+  ${M}/plaits/dsp/physical_modelling/resonator.cc ${M}/plaits/dsp/physical_modelling/string.cc
+  ${M}/plaits/dsp/physical_modelling/string_voice.cc ${M}/plaits/resources.cc ${M}/stmlib/dsp/units.cc ${M}/stmlib/utils/random.cc)
+target_include_directories(vader_zynth PUBLIC ${VADER_ROOT}/src/zynth)
+target_include_directories(vader_zynth PRIVATE ${VADER_ROOT}/src/zynth/shim ${VADER_ROOT}/third_party/lxr02open
+  ${VADER_ROOT}/third_party/lxr02open/Core ${VADER_ROOT}/third_party/lxr02open/Core/DSPAudio ${M})
+target_compile_definitions(vader_zynth PRIVATE TEST=1)
+target_compile_options(vader_zynth PRIVATE -w -O2 -ffp-contract=off $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-rtti -fno-threadsafe-statics -std=c++11>)
 add_library(vader_engine STATIC ${ENGINE_SRCS})
+target_link_libraries(vader_engine PUBLIC vader_zynth)
 target_include_directories(vader_engine PUBLIC
   ${VADER_ROOT}/src ${VADER_ROOT}/third_party/stb ${VADER_ROOT}/third_party/mpc-vst-plugins/wrapper)
 target_compile_definitions(vader_engine PRIVATE VADER_DESKTOP=1 _GNU_SOURCE=1)

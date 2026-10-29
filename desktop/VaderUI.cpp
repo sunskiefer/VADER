@@ -608,6 +608,22 @@ void VaderUI::drawCtl(const VgCtl &c) {
         text_(c.x, c.y + c.size * 0.55f, c.label, (float)c.size, ALIGN_LEFT | ALIGN_MIDDLE, col);
         break;
     }
+    case VGK_LIVETEXT: {   // 0.8: the name of a mode knob follows the mode and the layer
+        char nm[48] = "";
+        if (c.aux >= 100) {   // a corner's character control: named by the corner's voice
+            const int idx = c.aux - 101, corner_ = idx / 4, k = idx % 4;
+            const int eng = (int)lroundf(fv[VGP_A_ENG + 0 + corner_ * 5]);
+            if (eng > 0 && eng <= VG_NENG) snprintf(nm, sizeof nm, "%s", VG_ENG_KNOBS[eng - 1][k]);
+        } else {
+            const int mode = (int)lroundf(fv[VGP_SIM_MODE]), layer = (int)lroundf(fv[VGP_SIM_LAYER]);
+            if (mode > 0 && mode < VG_NMODES) {
+                if (layer == 0) snprintf(nm, sizeof nm, "%s", VG_MODE_KNOBS[mode][c.aux - 1]);
+                else snprintf(nm, sizeof nm, "L%d K%d", layer + 1, c.aux);
+            }
+        }
+        fitText(c.x, c.y + 13, c.w - 8, nm, 22.f, ALIGN_LEFT | ALIGN_MIDDLE, INK);
+        break;
+    }
     case VGK_ENVWIN:
         drawEnv(r);
         break;
@@ -827,7 +843,7 @@ const VgCtl *VaderUI::hit(double x, double y, bool *stripe) const {
     const VgCtl *page = VG_PAGE[fPage];
     for (int i = VG_PAGE_N[fPage] - 1; i >= 0; i--) {
         const VgCtl &c = page[i];
-        if (c.kind == VGK_TITLE || c.kind == VGK_TEXT || c.kind == VGK_ENVWIN || c.kind == VGK_SCREEN || c.kind == VGK_METER) continue;
+        if (c.kind == VGK_TITLE || c.kind == VGK_TEXT || c.kind == VGK_ENVWIN || c.kind == VGK_SCREEN || c.kind == VGK_METER || c.kind == VGK_LIVETEXT) continue;
         if (!visible(c)) continue;
         if (c.kind == VGK_RADIO) {
             for (int s = 0; s < c.nlab; s++) if (inside(radioSlot(c, s), x, y)) return &c;

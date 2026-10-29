@@ -16742,7 +16742,8 @@
    "default": 0.5,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "mk2",
@@ -16750,7 +16751,8 @@
    "default": 0.5,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "mk3",
@@ -16758,7 +16760,8 @@
    "default": 0.5,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "mk4",
@@ -16766,7 +16769,8 @@
    "default": 0.5,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "mk5",
@@ -16774,7 +16778,8 @@
    "default": 0.5,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "mk6",
@@ -16782,7 +16787,8 @@
    "default": 0.5,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "mk7",
@@ -16790,7 +16796,8 @@
    "default": 0.5,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "mk8",
@@ -16798,7 +16805,660 @@
    "default": 0.5,
    "min": 0,
    "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "mn1",
+   "name": "MODE KNOB 1 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "mn2",
+   "name": "MODE KNOB 2 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "mn3",
+   "name": "MODE KNOB 3 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "mn4",
+   "name": "MODE KNOB 4 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "mn5",
+   "name": "MODE KNOB 5 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "mn6",
+   "name": "MODE KNOB 6 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "mn7",
+   "name": "MODE KNOB 7 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "mn8",
+   "name": "MODE KNOB 8 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "a_eng",
+   "name": "A ENGINE",
+   "options": [
+    "SYNTH",
+    "ANALOG",
+    "TRIO",
+    "WAVE",
+    "CHIP",
+    "MACRO",
+    "WHEEL",
+    "VOICE",
+    "NOISE",
+    "TONE",
+    "METAL",
+    "BAZZ",
+    "DRONE",
+    "TEXTURE",
+    "FX"
+   ],
+   "default": "SYNTH"
+  },
+  {
+   "key": "a_v1",
+   "name": "A CHARACTER 1",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "a_v2",
+   "name": "A CHARACTER 2",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "a_v3",
+   "name": "A CHARACTER 3",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "a_v4",
+   "name": "A CHARACTER 4",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "b_eng",
+   "name": "B ENGINE",
+   "options": [
+    "SYNTH",
+    "ANALOG",
+    "TRIO",
+    "WAVE",
+    "CHIP",
+    "MACRO",
+    "WHEEL",
+    "VOICE",
+    "NOISE",
+    "TONE",
+    "METAL",
+    "BAZZ",
+    "DRONE",
+    "TEXTURE",
+    "FX"
+   ],
+   "default": "SYNTH"
+  },
+  {
+   "key": "b_v1",
+   "name": "B CHARACTER 1",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "b_v2",
+   "name": "B CHARACTER 2",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "b_v3",
+   "name": "B CHARACTER 3",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "b_v4",
+   "name": "B CHARACTER 4",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "c_eng",
+   "name": "C ENGINE",
+   "options": [
+    "SYNTH",
+    "ANALOG",
+    "TRIO",
+    "WAVE",
+    "CHIP",
+    "MACRO",
+    "WHEEL",
+    "VOICE",
+    "NOISE",
+    "TONE",
+    "METAL",
+    "BAZZ",
+    "DRONE",
+    "TEXTURE",
+    "FX"
+   ],
+   "default": "SYNTH"
+  },
+  {
+   "key": "c_v1",
+   "name": "C CHARACTER 1",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "c_v2",
+   "name": "C CHARACTER 2",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "c_v3",
+   "name": "C CHARACTER 3",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "c_v4",
+   "name": "C CHARACTER 4",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "d_eng",
+   "name": "D ENGINE",
+   "options": [
+    "SYNTH",
+    "ANALOG",
+    "TRIO",
+    "WAVE",
+    "CHIP",
+    "MACRO",
+    "WHEEL",
+    "VOICE",
+    "NOISE",
+    "TONE",
+    "METAL",
+    "BAZZ",
+    "DRONE",
+    "TEXTURE",
+    "FX"
+   ],
+   "default": "SYNTH"
+  },
+  {
+   "key": "d_v1",
+   "name": "D CHARACTER 1",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "d_v2",
+   "name": "D CHARACTER 2",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "d_v3",
+   "name": "D CHARACTER 3",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "d_v4",
+   "name": "D CHARACTER 4",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true,
+   "dynamic_name": true
+  },
+  {
+   "key": "spd_lfo_rate",
+   "name": "SPEED LFO RATE",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
    "dynamic_display": true
+  },
+  {
+   "key": "spd_lfo_depth",
+   "name": "SPEED LFO DEPTH",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "spd_curve",
+   "name": "SPEED CURVE",
+   "options": [
+    "LINEAR",
+    "SLOW MIDDLE",
+    "FAST MIDDLE",
+    "PULSE"
+   ],
+   "default": "LINEAR"
+  },
+  {
+   "key": "corner_stop",
+   "name": "STOP AT CORNERS",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "path_start",
+   "name": "PATH START",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "path_end",
+   "name": "PATH END",
+   "default": 1.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "soft_turn",
+   "name": "SOFT TURN",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "stretch_x",
+   "name": "STRETCH X",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "stretch_y",
+   "name": "STRETCH Y",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "skew",
+   "name": "SKEW",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "morph",
+   "name": "MORPH TO ROUND",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "centre_x",
+   "name": "CENTRE X",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "centre_y",
+   "name": "CENTRE Y",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "warp_x",
+   "name": "WARP X",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "warp_y",
+   "name": "WARP Y",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "focus",
+   "name": "FOCUS",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "focus_x",
+   "name": "FOCUS X",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "focus_y",
+   "name": "FOCUS Y",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "at_sub",
+   "name": "AFTERTOUCH TO SUBORBIT",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "warp_reset",
+   "name": "WARP RESET",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "self_play",
+   "name": "SELF PLAY",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "self_scale",
+   "name": "SELF SCALE",
+   "options": [
+    "MAJOR",
+    "MINOR",
+    "DORIAN",
+    "PENTATONIC",
+    "MINOR PENT",
+    "WHOLE TONE",
+    "BLUES",
+    "CHROMATIC"
+   ],
+   "default": "MAJOR"
+  },
+  {
+   "key": "self_root",
+   "name": "SELF ROOT NOTE",
+   "default": 0,
+   "min": 0,
+   "max": 11,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "self_range",
+   "name": "SELF OCTAVES",
+   "default": 2,
+   "min": 1,
+   "max": 4,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "drone",
+   "name": "DRONE",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "drone_chord",
+   "name": "DRONE CHORD",
+   "options": [
+    "ROOT",
+    "ROOT + FIFTH",
+    "ROOT + OCTAVE",
+    "MINOR",
+    "MAJOR",
+    "SUS 4"
+   ],
+   "default": "ROOT + FIFTH"
+  },
+  {
+   "key": "cn1",
+   "name": "CORNER CHARACTER 1 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn2",
+   "name": "CORNER CHARACTER 2 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn3",
+   "name": "CORNER CHARACTER 3 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn4",
+   "name": "CORNER CHARACTER 4 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn5",
+   "name": "CORNER CHARACTER 5 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn6",
+   "name": "CORNER CHARACTER 6 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn7",
+   "name": "CORNER CHARACTER 7 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn8",
+   "name": "CORNER CHARACTER 8 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn9",
+   "name": "CORNER CHARACTER 9 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn10",
+   "name": "CORNER CHARACTER 10 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn11",
+   "name": "CORNER CHARACTER 11 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn12",
+   "name": "CORNER CHARACTER 12 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn13",
+   "name": "CORNER CHARACTER 13 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn14",
+   "name": "CORNER CHARACTER 14 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn15",
+   "name": "CORNER CHARACTER 15 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "cn16",
+   "name": "CORNER CHARACTER 16 NAME",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
   },
   {
    "key": "orb_dir__open",
@@ -16815,6 +17475,62 @@
    "min": 0,
    "max": 1,
    "popup_of": "sim_mode"
+  },
+  {
+   "key": "a_eng__open",
+   "name": "a_eng list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "a_eng"
+  },
+  {
+   "key": "b_eng__open",
+   "name": "b_eng list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "b_eng"
+  },
+  {
+   "key": "c_eng__open",
+   "name": "c_eng list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "c_eng"
+  },
+  {
+   "key": "d_eng__open",
+   "name": "d_eng list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "d_eng"
+  },
+  {
+   "key": "self_scale__open",
+   "name": "self_scale list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "self_scale"
+  },
+  {
+   "key": "drone_chord__open",
+   "name": "drone_chord list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "drone_chord"
+  },
+  {
+   "key": "spd_curve__open",
+   "name": "spd_curve list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "spd_curve"
   }
  ]
 }

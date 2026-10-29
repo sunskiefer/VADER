@@ -18,6 +18,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "engine.h"
+#include "eng.h"   /* 0.8: the ZYNTH voice engines (src/zynth) */
 #include "vader.h"
 #include "overlay.h"
 #include "web.h"
@@ -73,6 +74,9 @@ typedef struct {
     float shown_t, shown_o;      /* the orbit and suborbit phases it last played (for the screen) */
     float im[4], im_src[4];      /* the IMAGE mods: glided value; the source as last read (for the page's meters) */
     int im_init;
+    Eng eng[4];                  /* 0.8: a ZYNTH voice engine per corner (when its ENGINE is not SYNTH) */
+    unsigned char eng_type[4];   /* the engine type + 1 each runs (0: none yet) */
+    unsigned char eng_new[4];
     unsigned age;
 } voice_t;
 
@@ -85,6 +89,7 @@ typedef struct {
     float size_s, sub_s, rot_s;  /* ORBIT SIZE, SUBORBIT SIZE, ROTATE, glided (-1: not yet) */
     float hz_now, sub_now;       /* orbit and suborbit turns per second, as last played (for the light trail) */
     float vib_ph, trem_ph;
+    float lfo_ph, spd_mul;       /* 0.8: the orbit speed's LFO phase; the speed factor now */
 } timbre_t;
 
 typedef struct {
@@ -101,7 +106,7 @@ typedef struct {
     double ppq;                  /* at the start of the current render() */
     float tempo;
     /* MIDI */
-    float bend, modwheel;
+    float bend, modwheel, aftertouch;
     int pedal;
     /* arpeggiator */
     int held[MAXHELD], nheld;
@@ -112,6 +117,8 @@ typedef struct {
     int arp_sounding[MAXHELD], narp;    /* notes the arp is holding */
     long arp_off_at;             /* frames until they stop (-1: tied / none) */
     unsigned rng;
+    double self_next;            /* 0.8: SELF PLAY's next step (beats) */
+    int drone_notes[4], ndrone;  /* 0.8: the DRONE's held notes */
     /* screen */
     screen_t scr;
     unsigned short sent_tiles[TILE_COLS * TILE_ROWS], sent_trail[TILE_COLS * TILE_ROWS], sent_orbit[TILE_COLS * TILE_ROWS];
@@ -217,6 +224,8 @@ static void mark_corner_view(vader_t *s) {
 static void mark_sound(vader_t *s) {
     for (int p = 0; p < NP; p++)
         if (VP[p].kind == K_SND || VP[p].kind == K_FRONT) mark(s, p);
+    for (int i = 0; i < 8; i++) mark(s, P_MN1 + i);
+    for (int i = 0; i < 16; i++) mark(s, P_CN1 + i);
 }
 
 /* 0.8: the mode knobs show the knobs of the current mode and layer */
@@ -230,9 +239,25 @@ static void mode_load(vader_t *s, int t, int reset) {
     int m = (int)T(t)[S_SIM_MODE], l = (int)T(t)[S_SIM_LAYER];
     for (int i = 0; i < 8; i++) {
         T(t)[S_MK1 + i] = s->mv[t][m][l][i];
-        if (t == edit(s)) mark(s, SND_P[S_MK1 + i]);
+        if (t == edit(s)) { mark(s, SND_P[S_MK1 + i]); mark(s, P_MN1 + i); }
     }
     if (reset) sim_reset(&s->sim[t], m, s->mv[t][m][0]);
+}
+
+/* the name of a corner's character control k (0..3): the ZYNTH voice's own */
+static const char *cn_name(vader_t *s, int t, int c, int k, char *buf, int len) {
+    int ei = (int)T(t)[S_A_ENG + c * 5];
+    if (ei > 0) snprintf(buf, (size_t)len, "%s", ENG_KNOBS[ei - 1][k]);
+    else buf[0] = 0;
+    return buf;
+}
+
+static const char *mk_name(vader_t *s, int t, int i, char *buf, int len) {
+    int m = (int)T(t)[S_SIM_MODE], l = (int)T(t)[S_SIM_LAYER];
+    if (m > 0 && l == 0 && MODE_KNOBS[m][i][0]) snprintf(buf, (size_t)len, "%s", MODE_KNOBS[m][i]);
+    else if (m > 0) snprintf(buf, (size_t)len, "L%d K%d", l + 1, i + 1);
+    else buf[0] = 0;
+    return buf;
 }
 
 /* ------------------------------------------------------------------------------------------------ shapes */
@@ -243,6 +268,35 @@ static inline float dir_t(const float *P, float ph) {
     case 2: return 1.0f - fabsf(2.0f * ph - 1.0f);              /* PING-PONG: out and back */
     default: return ph;                                         /* FORWARD, LOOP BACK */
     }
+}
+
+/* 0.8: the part of the path used (PATH START..END), turning softly (SOFT TURN) */
+static inline float path_u(const float *P, float ph) {
+    float u = dir_t(P, ph);
+    float soft = P[S_SOFT_TURN];
+    if (soft > 0.001f && (int)P[S_ORB_DIR] == 2) {   /* PING-PONG turning on a cosine instead of a point */
+        float c = 0.5f - 0.5f * cosf(TWO_PI * ph);
+        u = u * (1 - soft) + c * soft;
+    }
+    float a = P[S_PATH_START], b = P[S_PATH_END];
+    if (a != 0.0f || b != 1.0f) u = a + (b - a) * u;
+    return u;
+}
+
+/* 0.8: stretch, skew, morph to round, the centre point and the Warp pad on the orbiter's place (-1..1) */
+static inline void orb_xform(const float *P, float *x, float *y) {
+    float px = *x, py = *y;
+    float mo = P[S_MORPH];
+    if (mo > 0.001f) {
+        float r = sqrtf(px * px + py * py);
+        if (r > 0.05f) { float k = (1 - mo) + mo * 0.85f / r; px *= k; py *= k; }
+    }
+    float sx = powf(2.0f, (P[S_STRETCH_X] - 0.5f) * 2 + (P[S_WARP_X] - 0.5f) * 2);
+    float sy = powf(2.0f, (P[S_STRETCH_Y] - 0.5f) * 2);
+    float sk = (P[S_SKEW] - 0.5f) * 2 + (P[S_WARP_Y] - 0.5f) * 2;
+    float nx = px * sx + sk * py, ny = py * sy;
+    *x = clampf(nx + (P[S_CENTRE_X] - 0.5f) * 2, -1, 1);
+    *y = clampf(ny + (P[S_CENTRE_Y] - 0.5f) * 2, -1, 1);
 }
 
 static void timbre_shape(vader_t *s, int t) {
@@ -499,6 +553,8 @@ static void load_preset(vader_t *s, int n) {
     s->g[G_FILE] = keep[4]; s->g[G_VOICES] = keep[5]; s->g[G_QR_SHOW] = keep[6];
     mv_defaults(s);
     memset(s->sim, 0, sizeof s->sim);
+    s->ndrone = 0;
+    s->self_next = -1;
     memcpy(T(0), SND_DEF, sizeof(float) * NSND);
     apply_kv(s, 0, P->a);
     memcpy(T(1), T(0), sizeof(float) * NSND);
@@ -557,7 +613,10 @@ static void voice_on(vader_t *s, int t, int note, int key, float vel) {
         float prev = v->freq;
         float ph[4][2];
         memcpy(ph, v->ph, sizeof ph);
+        void *keep_mi[4];
+        for (int c = 0; c < 4; c++) keep_mi[c] = v->eng[c].mi;
         memset(v, 0, sizeof *v);
+        for (int c = 0; c < 4; c++) v->eng[c].mi = keep_mi[c];
         v->active = 1;
         v->timbre = t;
         v->note = note;
@@ -668,6 +727,51 @@ static void arp_step(vader_t *s, float step_frames) {
         play_on(s, note, vel);
     }
     s->arp_off_at = (long)(step_frames * (0.05f + 0.93f * s->g[G_NOTE_LEN]));
+}
+
+/* ------------------------------------------------------------------------------------------------ 0.8 self play, drone */
+static const unsigned char SC_DEG[8][12] = {{0, 2, 4, 5, 7, 9, 11}, {0, 2, 3, 5, 7, 8, 10}, {0, 2, 3, 5, 7, 9, 10}, {0, 2, 4, 7, 9},
+                                           {0, 3, 5, 7, 10}, {0, 2, 4, 6, 8, 10}, {0, 3, 5, 6, 7, 10}, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}};
+static const unsigned char SC_N[8] = {7, 7, 7, 5, 5, 6, 6, 12};
+
+static void orbiter_pos(vader_t *s, int t, float *x, float *y) {
+    timbre_t *m = &s->tm[t];
+    if ((int)T(t)[S_SIM_MODE] > 0) { *x = s->sim[t].sx[0]; *y = s->sim[t].sy[0]; }
+    else path_at(m->x2, m->y2, path_u(T(t), m->orb_t), x, y);
+    orb_xform(T(t), x, y);
+    *x *= m->size_s < 0 ? T(t)[S_ORB_SIZE] : m->size_s;
+    *y *= m->size_s < 0 ? T(t)[S_ORB_SIZE] : m->size_s;
+}
+
+/* SELF PLAY: a note from the scale on the orbiter's place: x picks the degree, y the velocity */
+static void self_step(vader_t *s, float step_frames) {
+    arp_release(s);
+    int sc = (int)s->g[G_SELF_SCALE] & 7, span = (int)s->g[G_SELF_RANGE];
+    if (span < 1) span = 1;
+    float x, y;
+    orbiter_pos(s, 0, &x, &y);
+    int total = SC_N[sc] * span;
+    int idx = (int)floorf((clampf(x, -1, 1) * 0.5f + 0.5f) * total);
+    if (idx >= total) idx = total - 1;
+    int note = 36 + (int)s->g[G_SELF_ROOT] + 12 * (idx / SC_N[sc]) + SC_DEG[sc][idx % SC_N[sc]];
+    float vel = 0.45f + 0.5f * (clampf(y, -1, 1) * 0.5f + 0.5f);
+    if (s->narp < MAXHELD) { s->arp_sounding[s->narp++] = note; play_on(s, note, vel); }
+    s->arp_off_at = (long)(step_frames * (0.05f + 0.93f * s->g[G_NOTE_LEN]));
+}
+
+/* DRONE: the chord's notes held on until it is switched off */
+static void drone_apply(vader_t *s) {
+    for (int i = 0; i < s->ndrone; i++) play_off(s, s->drone_notes[i]);
+    s->ndrone = 0;
+    if (!(int)s->g[G_DRONE]) return;
+    static const signed char CH[6][3] = {{0, -1, -1}, {0, 7, -1}, {0, 12, -1}, {0, 3, 7}, {0, 4, 7}, {0, 5, 7}};
+    int root = 36 + (int)s->g[G_SELF_ROOT], ch = (int)s->g[G_DRONE_CHORD] % 6;
+    for (int k = 0; k < 3; k++)
+        if (CH[ch][k] >= 0) {
+            int n = root + CH[ch][k];
+            s->drone_notes[s->ndrone++] = n;
+            play_on(s, n, 0.7f);
+        }
 }
 
 /* every note lets go (they fade with their release), the arpeggiator forgets its keys */
@@ -796,6 +900,37 @@ static void img_sources(vader_t *s, voice_t *v, timbre_t *m, float size, float r
     src[5] = (fabsf(cx - ax) + fabsf(cy - ay)) > 1e-6f ? -sinf(atan2f(cy - ay, cx - ax)) : 0;
 }
 
+/* 0.8: render a corner's ZYNTH voice engine for n frames (blocks of 8) */
+static void corner_engine(vader_t *s, voice_t *v, int c, const float *P, int ei, float freq, float *out, int n) {
+    int type = ENG_ZID[ei - 1];
+    Eng *en = &v->eng[c];
+    if (v->eng_type[c] != type + 1) {
+        if ((type == ENG_MACRO || type == ENG_WAVE) && !en->mi) en->mi = mi_new();
+        eng_reset(en, type);
+        v->eng_type[c] = (unsigned char)(type + 1);
+        v->eng_new[c] = 1;
+    }
+    EngIn in;
+    memset(&in, 0, sizeof in);
+    for (int j = 0; j < ENG_SLIDERS; j++) in.p[j] = ENG_DEFS[type].def[j];
+    for (int k = 0; k < 4; k++) in.p[ENG_SL[ei - 1][k]] = P[S_A_V1 + c * 5 + k];
+    in.freq = freq;
+    in.note = 69.0f + 12.0f * log2f(freq / 440.0f);
+    in.vel = v->vel;
+    in.env = v->env;
+    in.bpm = tempo_of(s);
+    in.gate = v->stage != 3;
+    in.wave = 1;
+    in.fmRatio = 1.0f;
+    in.trig = v->eng_new[c];
+    v->eng_new[c] = 0;
+    for (int i = 0; i < n; i += ENG_MAX_BLOCK) {
+        int m = n - i < ENG_MAX_BLOCK ? n - i : ENG_MAX_BLOCK;
+        eng_render(en, &in, out + i, m);
+        in.trig = 0;
+    }
+}
+
 static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, float vib, float trem) {
     int t = v->timbre;
     const float *P = T(t);
@@ -823,14 +958,18 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         float hz, sub;
         if ((int)P[S_ORB_SYNC]) { hz = tempo_of(s) / 60.0f / div_beats((int)P[S_ORB_DIV]); sub = hz * (1 + floorf(P[S_SUB_SPEED] * 15)); }
         else { hz = 0.02f * powf(1000.0f, P[S_ORB_SPEED]); sub = 0.05f * powf(600.0f, P[S_SUB_SPEED]); }
-        v->orb_t = fmodf(v->orb_t + hz * dt, 1.0f);
+        v->orb_t = fmodf(v->orb_t + hz * dt * m->spd_mul, 1.0f);
         v->orb_o = fmodf(v->orb_o + sub * dt, 1.0f);
         ot = v->orb_t;
         oo = v->orb_o;
     }
     float px, py;
-    if ((int)P[S_SIM_MODE] > 0) { px = s->sim[v->timbre].sx[0]; py = s->sim[v->timbre].sy[0]; }
-    else path_at(m->x2, m->y2, dir_t(P, ot), &px, &py);
+    if ((int)P[S_FOCUS]) { px = (P[S_FOCUS_X] - 0.5f) * 2; py = (P[S_FOCUS_Y] - 0.5f) * 2; }   /* steered by hand */
+    else {
+        if ((int)P[S_SIM_MODE] > 0) { px = s->sim[v->timbre].sx[0]; py = s->sim[v->timbre].sy[0]; }
+        else path_at(m->x2, m->y2, path_u(P, ot), &px, &py);
+        orb_xform(P, &px, &py);
+    }
     px *= size;
     py *= size;
     float sr_ = m->sub_s * 0.6f;
@@ -912,6 +1051,15 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     float sh_lvl = P[S_SHAPE_OSC], sh_inc = base * INV_SR, sh_lp = clampf(base * 40 * INV_SR * TWO_PI, 0.05f, 1);
     float amp = (1 - P[S_VELOCITY] * (1 - v->vel)) * P[S_T_VOLUME] * 0.6f * (1 - trem) * im_lvl;
     float gl = sqrtf(0.5f * (1 - v->pan)), gr = sqrtf(0.5f * (1 + v->pan));
+    static float ebuf[4][128];
+    int eng_on[4] = {0, 0, 0, 0};
+    for (int c = 0; c < 4; c++) {
+        int ei = (int)P[S_A_ENG + c * 5];
+        if (ei > 0 && on[c]) {
+            eng_on[c] = 1;
+            corner_engine(s, v, c, P, ei, base * powf(2.0f, P[c * NCF + CF_OCT]), ebuf[c], n);
+        }
+    }
     for (int i = 0; i < n; i++) {
         /* envelope */
         switch (v->stage) {
@@ -923,6 +1071,10 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         for (int c = 0; c < 4; c++) {
             float wc = w0[c] + wd[c] * i;
             if (!on[c]) continue;
+            if (eng_on[c]) {   /* a ZYNTH voice: its tone through the corner's filter */
+                out += corner_filter(v, c, &F[c], ebuf[c][i]) * wc * level[c];
+                continue;
+            }
             float p1 = v->ph[c][0], p2 = v->ph[c][1];
             float o2 = og_read(og[c][1], mip[c][1], p2);
             float o1, x, b = blend[c];
@@ -1203,6 +1355,10 @@ static void set_readout(vader_t *s, int p, float v) {
     if (k == K_FRONT) {
         int c = (int)s->g[G_CORNER];
         snprintf(name, sizeof name, "%s %s", VP[p].name, c > 3 ? "ALL" : (const char *[]){"A", "B", "C", "D"}[c]);
+    } else if (k == K_SND && VP[p].slot >= S_MK1 && VP[p].slot <= S_MK8) {
+        char nm[32];
+        mk_name(s, edit(s), VP[p].slot - S_MK1, nm, sizeof nm);
+        snprintf(name, sizeof name, "%s", nm[0] ? nm : VP[p].name);
     } else snprintf(name, sizeof name, "%s", VP[p].name);
     int timbre = k == K_SND || k == K_FRONT;
     snprintf(s->readout, sizeof s->readout, "%s%s   %s", name, timbre ? (edit(s) ? "  [B]" : "  [A]") : "", val);
@@ -1214,6 +1370,7 @@ static void set_readout(vader_t *s, int p, float v) {
 /* ------------------------------------------------------------------------------------------------ the engine API */
 static void *create(const char *data_dir) {
     tables_init();
+    eng_tables_init();
     pthread_once(&g_hash_once, hash_build);
     vader_t *s = calloc(1, sizeof *s);
     if (!s) return NULL;
@@ -1272,6 +1429,8 @@ static void destroy(void *p) {
     if (s->loader_joinable) pthread_join(s->loader, NULL);
     for (int i = 0; i < s->nfiles; i++) { free(s->files[i].path); free(s->files[i].label); }
     fx_free(s->fx);
+    for (int i = 0; i < MAXV; i++)
+        for (int c = 0; c < 4; c++) if (s->v[i].eng[c].mi) mi_free(s->v[i].eng[c].mi);
     free(s);
 }
 
@@ -1285,9 +1444,18 @@ static void midi(void *p, const uint8_t *m, int len) {
         if (d2) { key_on(s, d1, d2 / 127.0f); break; }
         /* fall through: velocity 0 is a note off */
     case 0x80: key_off(s, d1); break;
+    case 0xD0: s->aftertouch = d1 / 127.0f; break;   /* channel pressure */
+    case 0xA0: s->aftertouch = d2 / 127.0f; break;   /* polyphonic pressure (MPE pressure comes the same way) */
     case 0xE0: s->bend = (((d2 << 7) | d1) - 8192) / 8192.0f; break;
     case 0xB0:
         if (d1 == 1) s->modwheel = d2 / 127.0f;
+        else if (d1 == 20 || d1 == 21) {   /* CC 20 / 21: the centre point of the orbit (both timbres) */
+            for (int t = 0; t < 2; t++) {
+                int sl = d1 == 20 ? S_CENTRE_X : S_CENTRE_Y;
+                T(t)[sl] = d2 / 127.0f;
+                if (t == edit(s)) mark(s, SND_P[sl]);
+            }
+        }
         else if (d1 == 64) {
             s->pedal = d2 >= 64;
             if (!s->pedal)
@@ -1358,6 +1526,9 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
         for (int t = 0; t < 2; t++) { timbre_shape(s, t); mode_load(s, t, 1); }
         release_all(s);
         all_off(s, 1);
+        s->ndrone = 0;
+        s->self_next = -1;
+        drone_apply(s);
         all_dirty(s);
         screen_forget(s);
         }
@@ -1460,6 +1631,14 @@ static void set_param(void *p, const char *key, const char *val) {
         if (q->slot < 4 * NCF) mark_corner_view(s);
         if (q->slot >= S_MK1 && q->slot <= S_MK8)
             s->mv[t][(int)T(t)[S_SIM_MODE]][(int)T(t)[S_SIM_LAYER]][q->slot - S_MK1] = v;
+        if (q->slot >= S_A_ENG && q->slot <= S_D_V4 && (q->slot - S_A_ENG) % 5 == 0) {   /* a corner's ENGINE: its characters start at the voice's own */
+            int c = (q->slot - S_A_ENG) / 5, ei = (int)v;
+            for (int k = 0; k < 4; k++) {
+                T(t)[S_A_V1 + c * 5 + k] = ei > 0 ? ENG_DEFS[ENG_ZID[ei - 1]].def[ENG_SL[ei - 1][k]] : 0.5f;
+                mark(s, SND_P[S_A_V1 + c * 5 + k]);
+            }
+            for (int k = 0; k < 4; k++) mark(s, P_CN1 + c * 4 + k);
+        }
         if (q->slot == S_SIM_MODE) { T(t)[S_SIM_LAYER] = 0; mark(s, P_SIM_LAYER); mode_load(s, t, 1); }
         if (q->slot == S_SIM_LAYER) mode_load(s, t, 0);
         if (q->slot == S_ORB_SIZE || q->slot == S_ROTATE || q->slot == S_TILT) s->shape_wait = 0;
@@ -1478,6 +1657,8 @@ static void set_param(void *p, const char *key, const char *val) {
         if (q->slot == G_USER_SLOT) s->ustatus[0] = 0;
         if (q->slot == G_ARP_ON && !(int)v) { s->nheld = 0; arp_release(s); }
         if (q->slot == G_MOTION) s->shape_wait = 0;
+        if (q->slot == G_SELF_PLAY) { s->self_next = -1; if (!(int)v) arp_release(s); }
+        if (q->slot == G_DRONE || q->slot == G_DRONE_CHORD || (q->slot == G_SELF_ROOT && (int)s->g[G_DRONE])) drone_apply(s);
         break;
     case K_TRIG:
         if (v > 0.5f) {
@@ -1488,6 +1669,10 @@ static void set_param(void *p, const char *key, const char *val) {
                 if (f) start_load(s, f->path);
                 else snprintf(s->status, sizeof s->status, "NO SHAPE FILES FOUND");
                 mark(s, P_FILE);
+            }
+            else if (i == P_WARP_RESET) {
+                for (int t = 0; t < 2; t++) { T(t)[S_WARP_X] = 0.5f; T(t)[S_WARP_Y] = 0.5f; }
+                mark(s, SND_P[S_WARP_X]); mark(s, SND_P[S_WARP_Y]);
             }
             else if (i == P_RESCAN) { rescan(s); memset(s->uknown, 0, sizeof s->uknown); }
             else if (i == P_SAVE_USER) { save_user(s); mark(s, P_USER_SLOT); }
@@ -1540,7 +1725,10 @@ static int get_param(void *p, const char *key, char *buf, int len) {
         case K_SND: return put_num(buf, len, T(edit(s))[q->slot], q);
         case K_GLOB: return put_num(buf, len, s->g[q->slot], q);
         case K_TRIG: return snprintf(buf, (size_t)len, "0");
-        case K_STR: return snprintf(buf, (size_t)len, "%s", i == P_WEB_URL ? s->web_text : s->readout);
+        case K_STR:
+            if (q->slot >= 10 && q->slot < 26) { char nm[32]; cn_name(s, edit(s), (q->slot - 10) / 4, (q->slot - 10) % 4, nm, sizeof nm); return snprintf(buf, (size_t)len, "%s", nm) + 1; }
+            if (q->slot >= 2 && q->slot < 10) { char nm[32]; mk_name(s, edit(s), q->slot - 2, nm, sizeof nm); return snprintf(buf, (size_t)len, "%s", nm) + 1; }
+            return snprintf(buf, (size_t)len, "%s", i == P_WEB_URL ? s->web_text : s->readout);
         case K_DISP:
             if (i >= P_Q000 && i < P_Q000 + QR_N * QR_BYTES) return snprintf(buf, (size_t)len, "%d", s->sent_qr[i - P_Q000]);
             /* fall through */
@@ -1627,6 +1815,17 @@ static int get_param(void *p, const char *key, char *buf, int len) {
     }
     if (kl > 5 && !strcmp(key + kl - 5, "_name")) {
         int j = find_n(key, (int)kl - 5);
+        if (j >= 0 && VP[j].kind == K_SND && VP[j].slot >= S_A_ENG && VP[j].slot <= S_D_V4 && (VP[j].slot - S_A_ENG) % 5) {
+            char nm[32];
+            int off = VP[j].slot - S_A_ENG;
+            cn_name(s, edit(s), off / 5, off % 5 - 1, nm, sizeof nm);
+            return snprintf(buf, (size_t)len, "%s", nm[0] ? nm : VP[j].name) + 1;
+        }
+        if (j >= 0 && VP[j].kind == K_SND && VP[j].slot >= S_MK1 && VP[j].slot <= S_MK8) {
+            char nm[32];
+            mk_name(s, edit(s), VP[j].slot - S_MK1, nm, sizeof nm);
+            return snprintf(buf, (size_t)len, "%s", nm[0] ? nm : VP[j].name) + 1;
+        }
         if (j < 0 || VP[j].kind != K_FRONT) return 0;
         int c = (int)s->g[G_CORNER];
         return snprintf(buf, (size_t)len, "%s %s", VP[j].name, c > 3 ? "ALL" : (const char *[]){"A", "B", "C", "D"}[c]) + 1;
@@ -1660,6 +1859,15 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
             s->arp_next += step;
         }
     }
+    if ((int)s->g[G_SELF_PLAY] && !((int)s->g[G_ARP_ON] && s->nheld > 0)) {
+        double now = s->playing ? s->ppq : s->arp_free_beats;
+        double step = arp_step_beats(s), end = now + frames * bps * INV_SR;
+        if (s->self_next < 0 || s->self_next < now - step) s->self_next = ceil(now / step) * step;
+        while (s->self_next < end) {
+            self_step(s, (float)(step / bps * SR));
+            s->self_next += step;
+        }
+    }
     if (s->narp && s->arp_off_at >= 0) {
         s->arp_off_at -= frames;
         if (s->arp_off_at <= 0) arp_release(s);
@@ -1680,8 +1888,25 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
             else m->orb_t = fmodf(m->orb_t + hz * dt, 1.0f);
         } else {
             hz = 0.02f * powf(1000.0f, P[S_ORB_SPEED]);
-            sub = 0.05f * powf(600.0f, P[S_SUB_SPEED]);
-            m->orb_t = fmodf(m->orb_t + hz * dt, 1.0f);
+            sub = 0.05f * powf(600.0f, P[S_SUB_SPEED]) * (1.0f + s->aftertouch * P[S_AT_SUB] * 6.0f);
+            /* 0.8: the speed's shape: LFO, curve, a pause near the corners */
+            float mul = 1.0f;
+            m->lfo_ph = fmodf(m->lfo_ph + 0.05f * powf(100.0f, P[S_SPD_LFO_RATE]) * dt, 1.0f);
+            mul += P[S_SPD_LFO_DEPTH] * 0.9f * sinf(TWO_PI * m->lfo_ph);
+            int crv = (int)P[S_SPD_CURVE];
+            float cx_, cy_;
+            path_at(m->x2, m->y2, path_u(P, m->orb_t), &cx_, &cy_);
+            if (crv == 1) mul *= 0.35f + 0.65f * fminf(1.0f, sqrtf(cx_ * cx_ + cy_ * cy_));
+            else if (crv == 2) mul *= 1.6f - 0.6f * fminf(1.0f, sqrtf(cx_ * cx_ + cy_ * cy_));
+            else if (crv == 3) mul *= 0.25f + 1.5f * (0.5f + 0.5f * sinf(TWO_PI * 4 * m->orb_t));
+            float cs = P[S_CORNER_STOP];
+            if (cs > 0.001f) {
+                float dx = 1 - fabsf(cx_), dy = 1 - fabsf(cy_), d = sqrtf(dx * dx + dy * dy);   /* distance to the nearest corner */
+                float prox = fmaxf(0.0f, 1.0f - d / 0.5f);
+                mul *= 1 - cs * 0.95f * prox;
+            }
+            m->spd_mul = mul < 0.02f ? 0.02f : mul;
+            m->orb_t = fmodf(m->orb_t + hz * dt * m->spd_mul, 1.0f);
         }
         m->orb_o = fmodf(m->orb_o + sub * dt, 1.0f);
         {

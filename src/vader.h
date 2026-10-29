@@ -87,7 +87,6 @@ typedef struct {
     unsigned char used[256];
 } sim_t;
 extern const char *const MODE_NAMES[NMODES];
-extern const char *const MODE_KNOBS[NMODES][8];
 void sim_reset(sim_t *s, int mode, const float *k);
 void sim_step(sim_t *s, const float *k, float dt);
 

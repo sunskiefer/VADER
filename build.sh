@@ -32,6 +32,17 @@ for f in $PLUGIN_SRCS src/wrapper/vst2_wrap.c; do
   $ZIG cc $TGT $COMMON -Ibuild -I"$MPC_VST/wrapper" $INCS -c "$f" -o "$o"
   OBJS="$OBJS $o"
 done
+for f in $ZYN_SRCS; do   # the ZYNTH voices (own include paths)
+  o="build/arm/$(echo "$f" | tr / _).o"
+  $ZIG cc $TGT $COMMON $ZINCS -c "$f" -o "$o"
+  OBJS="$OBJS $o"
+done
+CXXCOMMON="-O2 -fPIC -fvisibility=hidden -ffunction-sections -fdata-sections -DNDEBUG -w $CXXFLAGS_MI"
+for f in $CXX_SRCS; do   # the Mutable Instruments engines
+  o="build/arm/$(echo "$f" | tr / _).o"
+  $ZIG c++ $TGT $CXXCOMMON $CXXINCS -c "$f" -o "$o"
+  OBJS="$OBJS $o"
+done
 printf '{\n  global: VSTPluginMain;\n  local: *;\n};\n' > build/arm/exports.map
 $ZIG cc $TGT -shared -fPIC -Wl,--no-undefined -Wl,--version-script=build/arm/exports.map -Wl,--gc-sections -Wl,-s \
   $OBJS -lm -ldl -lpthread -o build/arm/vader.so

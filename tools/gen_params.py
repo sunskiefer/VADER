@@ -205,6 +205,54 @@ for i, (src, to) in enumerate(IMG_DEF):
 # 0.8 (appended): the shape numbers of the maths shapes and the orbiter's way of travelling
 SIM_MODES = ["PATH", "CHASE", "RECAMAN", "METEOR RAIN", "KEPLER", "ROSETTE", "FIGURE 8", "LORENZ", "ROSSLER", "THOMAS",
              "AIZAWA", "PENDULUM", "BOUNCE", "RIPPLE"]
+# what the eight knobs of a mode's first layer do (the knobs' live names); src/modes.c reads the same
+MODE_KNOBS = [['', '', '', '', '', '', '', ''], ['SPEED', 'BALLS', 'DIRECTION', 'PULL', 'SPREAD', 'TURN', 'SIZE', 'RESET'], ['STEPS/S', 'SCALE', 'AXIS', 'ARC', 'RANGE', 'SEED', 'SIZE', 'RESET'], ['FALL', 'RATE', 'SPREAD', 'SPEED', 'LIFE', 'SEED', 'SIZE', 'TURN'], ['SPEED', 'ECCENTRIC', 'PRECESS', 'SIZE', 'TILT', 'WELL', 'TURN', 'PHASE'], ['SPEED', 'ECCENTRIC', 'PRECESS', 'SIZE', 'TILT', 'WELL', 'TURN', 'PHASE'], ['SPEED', 'SIZE', 'TURN', 'OFFSET', 'BALLS', 'SEED', 'SPREAD', 'RESET'], ['SPEED', 'SIGMA', 'RHO', 'BETA', 'SIZE', 'TURN', 'BALLS', 'SEED'], ['SPEED', 'A', 'B', 'C', 'SIZE', 'TURN', 'BALLS', 'SEED'], ['SPEED', 'DAMP', 'SIZE', 'TURN', 'BALLS', 'SEED', 'SPREAD', 'RESET'], ['SPEED', 'A', 'B', 'C', 'SIZE', 'TURN', 'BALLS', 'SEED'], ['SPEED', 'LENGTH 1', 'LENGTH 2', 'MASS', 'DAMP', 'SEED', 'SIZE', 'KICK'], ['SPEED', 'GRAVITY', 'ELASTIC', 'BALLS', 'ANGLE', 'SEED', 'SIZE', 'KICK'], ['SPEED', 'WAVES', 'DECAY', 'SPREAD', 'RATE', 'SEED', 'SIZE', 'TURN']]
+# 0.8: the corners' voice engines from LXRXXL ZYNTH. (name, ZYNTH engine id, the four ZYNTH controls (0-based V index) shown
+# per corner, their names). "SYNTH" (0) is VADER's own two overtone generators.
+ENGINE_TAB = [
+    ("ANALOG", 0, [0, 1, 4, 2], ["WAVE", "PULSE WIDTH", "SYNC", "DETUNE"]),
+    ("TRIO", 1, [0, 3, 4, 1], ["WAVE", "DETUNE", "LEVEL 2", "OSC 2 INTERVAL"]),
+    ("WAVE", 5, [0, 1, 4, 3], ["BANK", "POS X", "WARP AMOUNT", "WARP TYPE"]),
+    ("CHIP", 6, [0, 1, 5, 3], ["WAVE", "BITS", "SWEEP", "ARP"]),
+    ("MACRO", 7, [0, 1, 2, 7], ["SHAPE", "TIMBRE", "COLOR", "CRUSH"]),
+    ("WHEEL", 8, [0, 2, 3, 5], ["BASS", "BRIGHT", "PERC", "LESLIE"]),
+    ("VOICE", 9, [0, 1, 2, 5], ["VOWEL", "FORMANT", "BREATH", "TONE"]),
+    ("NOISE", 12, [0, 1, 2, 5], ["TYPE", "COLOR", "RESO", "GRIT"]),
+    ("TONE", 13, [0, 1, 11, 5], ["WAVE", "FM AMOUNT", "FOLD", "DECIMATE"]),
+    ("METAL", 14, [0, 1, 2, 4], ["CHARACTER", "SPREAD", "FM AMOUNT", "BAND"]),
+    ("BAZZ", 15, [0, 1, 5, 6], ["OSC MODE", "WAVE POS", "TONE", "OSC 2 LEVEL"]),
+    ("DRONE", 16, [0, 3, 2, 5], ["WAVE", "STACK", "DETUNE", "MOTION"]),
+    ("TEXTURE", 17, [0, 1, 3, 4], ["SOURCE", "DENSITY", "COLOR", "RESO"]),
+    ("FX", 18, [0, 2, 4, 5], ["TYPE", "SWEEP DEPTH", "CHAOS", "WOBBLE"]),
+]
+ENGINES = ["SYNTH"] + [e[0] for e in ENGINE_TAB]
+SOUND_LATE3 = []
+for _c in "abcd":
+    SOUND_LATE3 += [("%s_eng" % _c, "%s ENGINE" % _c.upper(), 0, 0, 0, ENGINES, False)]
+    SOUND_LATE3 += [("%s_v%d" % (_c, _k + 1), "%s CHARACTER %d" % (_c.upper(), _k + 1), 0.5, 0, 1, None, False) for _k in range(4)]
+# 0.8, appended: the self-playing switch and the drone
+SELF_SCALES = ["MAJOR", "MINOR", "DORIAN", "PENTATONIC", "MINOR PENT", "WHOLE TONE", "BLUES", "CHROMATIC"]
+DRONE_CHORDS = ["ROOT", "ROOT + FIFTH", "ROOT + OCTAVE", "MINOR", "MAJOR", "SUS 4"]
+GLOBAL_LATE3 = [("self_play", "SELF PLAY", 0, 0, 0, ["OFF", "ON"], False),
+                ("self_scale", "SELF SCALE", 0, 0, 0, SELF_SCALES, False),
+                ("self_root", "SELF ROOT NOTE", 0, 0, 11, None, True),
+                ("self_range", "SELF OCTAVES", 2, 1, 4, None, True),
+                ("drone", "DRONE", 0, 0, 0, ["OFF", "ON"], False),
+                ("drone_chord", "DRONE CHORD", 1, 0, 0, DRONE_CHORDS, False)]
+# 0.8, appended: the orbiter's travel (speed shaping, the part of the path used), its transform, the Warp pad, Focus
+CURVES = ["LINEAR", "SLOW MIDDLE", "FAST MIDDLE", "PULSE"]
+SOUND_LATE4 = [
+    ("spd_lfo_rate", "SPEED LFO RATE", 0.3, 0, 1, None, False), ("spd_lfo_depth", "SPEED LFO DEPTH", 0.0, 0, 1, None, False),
+    ("spd_curve", "SPEED CURVE", 0, 0, 0, CURVES, False), ("corner_stop", "STOP AT CORNERS", 0.0, 0, 1, None, False),
+    ("path_start", "PATH START", 0.0, 0, 1, None, False), ("path_end", "PATH END", 1.0, 0, 1, None, False),
+    ("soft_turn", "SOFT TURN", 0.0, 0, 1, None, False),
+    ("stretch_x", "STRETCH X", 0.5, 0, 1, None, False), ("stretch_y", "STRETCH Y", 0.5, 0, 1, None, False),
+    ("skew", "SKEW", 0.5, 0, 1, None, False), ("morph", "MORPH TO ROUND", 0.0, 0, 1, None, False),
+    ("centre_x", "CENTRE X", 0.5, 0, 1, None, False), ("centre_y", "CENTRE Y", 0.5, 0, 1, None, False),
+    ("warp_x", "WARP X", 0.5, 0, 1, None, False), ("warp_y", "WARP Y", 0.5, 0, 1, None, False),
+    ("focus", "FOCUS", 0, 0, 0, ["OFF", "ON"], False), ("focus_x", "FOCUS X", 0.5, 0, 1, None, False),
+    ("focus_y", "FOCUS Y", 0.5, 0, 1, None, False), ("at_sub", "AFTERTOUCH TO SUBORBIT", 0.0, 0, 1, None, False)]
+TRIGGERS_LATE3 = [("warp_reset", "WARP RESET")]
 DIRS = ["FORWARD", "REVERSE", "PING-PONG", "LOOP BACK"]
 SOUND_LATE2 = [("sh_a", "SHAPE A", 0.5, 0, 1, None, False), ("sh_b", "SHAPE B", 0.5, 0, 1, None, False),
                ("sh_c", "SHAPE C", 0.5, 0, 1, None, False), ("sh_d", "SHAPE D", 0.0, 0, 1, None, False),
@@ -214,6 +262,7 @@ SOUND_LATE2 = [("sh_a", "SHAPE A", 0.5, 0, 1, None, False), ("sh_b", "SHAPE B", 
                ("mk%d" % (i + 1), "MODE KNOB %d" % (i + 1), 0.5, 0, 1, None, False) for i in range(8)]
 POPUPS_LATE = ["im%d_%s" % (i + 1, f) for i in range(4) for f in ("src", "to")] 
 POPUPS_LATE2 = ["orb_dir", "sim_mode"]
+POPUPS_LATE3 = ["%s_eng" % c for c in "abcd"] + ["self_scale", "drone_chord", "spd_curve"]
 
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
 POPUPS = ["shape", "orb_div", "arp_mode", "arp_rate", "dly_div"] + ["%s_%s" % (c, f) for c in "abcd" for f in ("mode", "ftype")]
@@ -247,9 +296,9 @@ def build():
     for c in "abcd":
         for f, *_ in CORNER:
             snd_slots.append("%s_%s" % (c, f))
-    for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2:
+    for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2 + SOUND_LATE3 + SOUND_LATE4:
         snd_slots.append(k)
-    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2]
+    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3]
 
     # 1. the main page's corner knobs
     for i, (f, name) in enumerate(FRONT):
@@ -330,8 +379,28 @@ def build():
     # 0.8 (appended): shape numbers, direction
     for k, name, d, lo, hi, opts, isint in SOUND_LATE2:
         extra = {"dynamic_display": True} if not opts else None
+        if k.startswith("mk"):
+            extra["dynamic_name"] = True
         add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), extra)
+    for i in range(8):   # the live names of the mode knobs (text on the MODE page)
+        add("mn%d" % (i + 1), "MODE KNOB %d NAME" % (i + 1), 0, 0, 1, None, False, "STR", 2 + i, {"display": "string"})
+    for k, name, d, lo, hi, opts, isint in SOUND_LATE3:
+        extra = {"dynamic_display": True} if not opts else None
+        if k[2:4] == "v" + k[3:4] and not opts:
+            extra["dynamic_name"] = True
+        add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), extra)
+    for k, name, d, lo, hi, opts, isint in SOUND_LATE4:
+        add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), None if opts else {"dynamic_display": True})
+    for k, name in TRIGGERS_LATE3:
+        add(k, name, 0, 0, 1, None, False, "TRIG", 0, {"momentary": True})
+    for k, name, d, lo, hi, opts, isint in GLOBAL_LATE3:
+        add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None if opts else {"dynamic_display": True})
+    for i in range(16):   # the live names of the corners' character controls
+        add("cn%d" % (i + 1), "CORNER CHARACTER %d NAME" % (i + 1), 0, 0, 1, None, False, "STR", 10 + i, {"display": "string"})
     for k in POPUPS_LATE2:
+        params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
+        rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
+    for k in POPUPS_LATE3:
         params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
         rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
     return params, rows, snd_slots, glob_slots
@@ -399,6 +468,14 @@ def write():
             sdef[r[2]] = float(r[5])
         elif r[1] == "GLOB":
             gdef[r[2]] = float(r[5])
+    L.append("#define NENG %d" % len(ENGINE_TAB))
+    L.append("static const signed char ENG_ZID[NENG] = {%s};" % ", ".join(str(e[1]) for e in ENGINE_TAB))
+    L.append("static const signed char ENG_SL[NENG][4] = {%s};" % ", ".join("{" + ", ".join(map(str, e[2])) + "}" for e in ENGINE_TAB))
+    L.append("static const char *const ENG_KNOBS[NENG][4] = {%s};" % ", ".join(
+        "{" + ", ".join('"%s"' % n for n in e[3]) + "}" for e in ENGINE_TAB))
+    L.append("#define NMODES_G %d" % len(SIM_MODES))
+    L.append("static const char *const MODE_KNOBS[NMODES_G][8] = {%s};" % ", ".join(
+        "{" + ", ".join('"%s"' % n for n in row) + "}" for row in MODE_KNOBS))
     L.append("static const float SND_DEF[NSND] = {%s};" % ", ".join(cf(v) for v in sdef))
     L.append("static const float GLOB_DEF[NGLOB] = {%s};" % ", ".join(cf(v) for v in gdef))
     L.append("/* the parameter that shows each sound / global slot */")

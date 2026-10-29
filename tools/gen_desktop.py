@@ -27,7 +27,7 @@ OUT = os.path.join(ROOT, "desktop", "gen")
 TAB_H = 40                      # the tab row above the 1280 x 628 pages
 CANVAS_W, CANVAS_H = V.W, V.H + TAB_H
 K = dict(HLINE=0, TOGGLE=1, BUTTON=2, RADIO=3, POPUP=4, FIELD=5, FADER=6, TITLE=7, TEXT=8, METER=9, ENVWIN=10,
-         SCREEN=11, READOUT=12, PRESETS=13)
+         SCREEN=11, READOUT=12, PRESETS=13, LIVETEXT=14)
 SKIP_KEYS = {"web_url", "qr_show"}           # the phone's address and the logo/QR switch: nothing to show on a desktop
 HIDDEN_KEYS = {"qr_show", "motion"}          # not host parameters (motion stays on)
 
@@ -87,6 +87,12 @@ def main():
     L.append("static const char *const VG_FRONT_NAME[5] = {%s};" % ", ".join(cstr(n) for _, n in G.FRONT))
     L.append("static const char *const VG_CORNER_NAME[5] = {\"A\", \"B\", \"C\", \"D\", \"ALL\"};")
 
+    L.append("#define VG_NENG %d" % len(G.ENGINE_TAB))
+    L.append("static const char *const VG_ENG_KNOBS[VG_NENG][4] = {%s};" % ", ".join(
+        "{" + ", ".join(cstr(n) for n in e[3]) + "}" for e in G.ENGINE_TAB))
+    L.append("#define VG_NMODES %d" % len(G.SIM_MODES))
+    L.append("static const char *const VG_MODE_KNOBS[VG_NMODES][8] = {%s};" % ", ".join(
+        "{" + ", ".join(cstr(n) for n in row) + "}" for row in G.MODE_KNOBS))
     # ---- the pages
     L.append("enum { %s };" % ", ".join("VGK_%s = %d" % (k, v) for k, v in K.items()))
     L.append("typedef struct {\n    uint8_t kind, big, vertical, cols, size, nlab;\n    int16_t par, front, aux, x, y, w, h, ow, oh, lx, ly, wpar, wopt;\n"
@@ -98,6 +104,10 @@ def main():
         key = c.get("key")
         if k == "qr":
             return None
+        if k == "livetext":
+            return dict(kind=K["LIVETEXT"], big=0, vertical=0, cols=0, size=22, nlab=0, par=-1, front=0, aux=int(key[2:]) + (100 if key.startswith("cn") else 0),
+                        x=c["x"], y=c["y"] + dy, w=c["w"], h=28, ow=0, oh=0, lx=0, ly=0, wpar=-1, wopt=0, label="",
+                        labels=None, order=None, colour=0xFFFFFF)
         if key in SKIP_KEYS or c.get("text") == "COMPANION SCREEN":
             return None
         e = dict(kind=K[k.upper()] if k.upper() in K else None, big=int(bool(c.get("big"))), vertical=0, cols=0,
