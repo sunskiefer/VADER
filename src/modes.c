@@ -30,9 +30,9 @@ void sim_reset(sim_t *s, int mode, const float *k) {
     case 1: {   /* CHASE: N balls on a ring, each chasing the next */
         s->n = 2 + (int)lroundf(k[1] * 6);
         for (int i = 0; i < s->n; i++) {
-            float a = TWO_PI * i / s->n - PI / 2;
-            s->px[i] = cosf(a);
-            s->py[i] = sinf(a);
+            float a = TWO_PI * i / s->n - PI / 2, r0 = k[2] < 0.5f ? 1.0f : 0.05f;   /* in from the walls, or (reversed) out from the middle */
+            s->px[i] = r0 * cosf(a);
+            s->py[i] = r0 * sinf(a);
         }
         break;
     }
@@ -144,7 +144,7 @@ void sim_step(sim_t *s, const float *k, float dt) {
         float r = 0;
         for (int i = 0; i < n; i++) { float dx = s->px[i] - cx, dy = s->py[i] - cy; r += sqrtf(dx * dx + dy * dy); }
         r /= n;
-        if (r < 0.03f || k[7] > 0.5f && r < 0.2f) {   /* arrived at the middle: start again on the walls */
+        if ((k[2] < 0.5f && (r < 0.03f || (k[7] > 0.5f && r < 0.2f))) || (k[2] >= 0.5f && r > 1.0f) || r != r) {   /* arrived at the middle: start again on the walls */
             sim_t keep = *s; (void)keep;
             float kk[8]; memcpy(kk, k, sizeof kk);
             sim_reset(s, 1, kk);
@@ -571,5 +571,9 @@ void sim_step(sim_t *s, const float *k, float dt) {
             if (s->life[i] <= 0) { s->sx[0] = s->sy[0] = 0; }
             else { s->sx[0] = s->px[i]; s->sy[0] = s->py[i]; }
         }
+    }
+    for (int i = 0; i < s->n && i < SIM_N; i++) {   /* nothing leaves the square */
+        s->sx[i] = clampf_(s->sx[i], -1, 1);
+        s->sy[i] = clampf_(s->sy[i], -1, 1);
     }
 }

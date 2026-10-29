@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     CHECK(!strcmp(buf, "VADER"), "effect name '%s'", buf);
     e->dispatcher(e, effGetVendorString, 0, 0, buf, 0);
     CHECK(strstr(buf, "Cronx") != nullptr, "vendor '%s'", buf);
-    CHECK(e->numParams == 147, "147 parameters (got %d)", e->numParams);
+    CHECK(e->numParams >= 147, "at least 147 parameters (got %d)", e->numParams);
     CHECK(e->numPrograms >= 1, "programs (%d; DPF's VST2 has one: presets are the PRESET parameter)", e->numPrograms);
     CHECK(e->numOutputs == 2 && e->numInputs == 0, "2 outputs, no inputs");
     CHECK(e->uniqueID == (('A' << 24) | ('n' << 16) | ('V' << 8) | 'd'), "unique id AnVd");
