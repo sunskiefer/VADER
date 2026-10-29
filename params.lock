@@ -2128,6 +2128,9 @@ d_lim
 sound_balls
 kal_n
 kal_sound
+sub_dir
+sub_link
+sub_shape
 warp_reset
 randomize
 undo_random
@@ -2209,3 +2212,5 @@ smp_len_a__open
 smp_len_b__open
 smp_len_c__open
 smp_len_d__open
+sub_dir__open
+sub_shape__open

@@ -331,7 +331,10 @@ def page_travel():
          hl("corner_stop", A, 268, 400, "STOP AT CORNERS", big=True),
          title("PART OF THE PATH", A, 340, 400),
          hl("path_start", A, 362, 192, "START", big=True), hl("path_end", A + 208, 362, 192, "END", big=True),
-         hl("soft_turn", A, 424, 400, "SOFT TURN", big=True)]
+         hl("soft_turn", A, 424, 400, "SOFT TURN", big=True),
+         title("SUBORBIT BALL", A, 490, 400), tog("sub_link", A, 512, 400, "SAME DIRECTION AS ORBITER", h=48),
+         popup("sub_dir", A, 568, 192, "", h=48, list_at=(A, 380), cols=1, ow=192, oh=44),
+         popup("sub_shape", A + 208, 568, 192, "", h=48, list_at=(A + 208, 330), cols=1, ow=192, oh=44)]
     c += [title("BEND THE SHAPE", B, 70, 400),
           hl("stretch_x", B, 92, 192, "STRETCH X", big=True), hl("stretch_y", B + 208, 92, 192, "STRETCH Y", big=True),
           hl("skew", B, 154, 192, "SKEW", big=True), hl("morph", B + 208, 154, 192, "MORPH ROUND", big=True),
@@ -349,7 +352,7 @@ def page_travel():
     q = [("SPEED", ["spd_lfo_rate", "spd_lfo_depth", "spd_curve", "corner_stop", "path_start", "path_end", "soft_turn", "at_sub"]),
          ("BEND", ["stretch_x", "stretch_y", "skew", "morph", "centre_x", "centre_y", "warp_x", "warp_y"]),
          ("FOCUS", ["focus", "focus_x", "focus_y", "warp_reset"]),
-         ("BALLS", ["sound_balls", "kal_n", "kal_sound"])]
+         ("BALLS", ["sound_balls", "kal_n", "kal_sound"]), ("SUBORBIT", ["sub_link", "sub_dir", "sub_shape"])]
     return c, q
 
 

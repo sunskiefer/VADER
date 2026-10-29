@@ -17422,6 +17422,37 @@
    "default": "OFF"
   },
   {
+   "key": "sub_dir",
+   "name": "SUBORBIT DIRECTION",
+   "options": [
+    "FORWARD",
+    "REVERSE",
+    "PING-PONG"
+   ],
+   "default": "FORWARD"
+  },
+  {
+   "key": "sub_link",
+   "name": "SUBORBIT LINK",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "ON"
+  },
+  {
+   "key": "sub_shape",
+   "name": "SUBORBIT SHAPE",
+   "options": [
+    "CIRCLE",
+    "ELLIPSE",
+    "FIGURE 8",
+    "SQUARE",
+    "LINE"
+   ],
+   "default": "CIRCLE"
+  },
+  {
    "key": "warp_reset",
    "name": "WARP RESET",
    "default": 0,
@@ -18134,6 +18165,22 @@
    "min": 0,
    "max": 1,
    "popup_of": "smp_len_d"
+  },
+  {
+   "key": "sub_dir__open",
+   "name": "sub_dir list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "sub_dir"
+  },
+  {
+   "key": "sub_shape__open",
+   "name": "sub_shape list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "sub_shape"
   }
  ]
 }

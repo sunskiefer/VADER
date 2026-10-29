@@ -269,7 +269,10 @@ for _c in "abcd":
                     ("%s_lim" % _c, "%s LIMITER" % _c.upper(), 0.0, 0, 1, None, False)]
 # 0.8, appended: several balls on one sound (sim balls, kaleidoscope copies)
 SOUND_LATE6 = [("sound_balls", "SOUND BALLS", 1, 1, 4, None, True), ("kal_n", "KALEIDOSCOPE COPIES", 1, 1, 16, None, True),
-               ("kal_sound", "KALEIDOSCOPE SOUND", 0, 0, 0, ["OFF", "ON"], False)]
+               ("kal_sound", "KALEIDOSCOPE SOUND", 0, 0, 0, ["OFF", "ON"], False),
+               ("sub_dir", "SUBORBIT DIRECTION", 0, 0, 0, ["FORWARD", "REVERSE", "PING-PONG"], False),
+               ("sub_link", "SUBORBIT LINK", 1, 0, 0, ["OFF", "ON"], False),
+               ("sub_shape", "SUBORBIT SHAPE", 0, 0, 0, ["CIRCLE", "ELLIPSE", "FIGURE 8", "SQUARE", "LINE"], False)]
 # 0.8, appended: the orbiter's travel (speed shaping, the part of the path used), its transform, the Warp pad, Focus
 CURVES = ["LINEAR", "SLOW MIDDLE", "FAST MIDDLE", "PULSE"]
 SOUND_LATE4 = [
@@ -293,7 +296,7 @@ SOUND_LATE2 = [("sh_a", "SHAPE A", 0.5, 0, 1, None, False), ("sh_b", "SHAPE B", 
                ("mk%d" % (i + 1), "MODE KNOB %d" % (i + 1), 0.5, 0, 1, None, False) for i in range(8)]
 POPUPS_LATE = ["im%d_%s" % (i + 1, f) for i in range(4) for f in ("src", "to")] 
 POPUPS_LATE2 = ["orb_dir", "sim_mode"]
-POPUPS_LATE3 = ["%s_eng" % c for c in "abcd"] + ["self_scale", "drone_chord", "spd_curve"] + ["%s_rmode" % c for c in "abcd"] + ["smp_len_%s" % c for c in "abcd"]
+POPUPS_LATE3 = ["%s_eng" % c for c in "abcd"] + ["self_scale", "drone_chord", "spd_curve"] + ["%s_rmode" % c for c in "abcd"] + ["smp_len_%s" % c for c in "abcd"] + ["sub_dir", "sub_shape"]
 
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
 POPUPS = ["shape", "orb_div", "arp_mode", "arp_rate", "dly_div"] + ["%s_%s" % (c, f) for c in "abcd" for f in ("mode", "ftype")]

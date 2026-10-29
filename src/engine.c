@@ -293,6 +293,21 @@ static inline float dir_t(const float *P, float ph) {
     }
 }
 
+/* 0.8: the suborbit: its own direction (or the orbiter's, when linked) and its own shape (circle, ellipse, figure 8, square, line) */
+static inline void sub_pos(const float *P, float ph, float *cx, float *cy) {
+    int d = (int)P[S_SUB_LINK] ? (int)P[S_ORB_DIR] : (int)P[S_SUB_DIR];
+    if (d == 1) ph = 1.0f - ph;
+    else if (d == 2) ph = 1.0f - fabsf(2.0f * ph - 1.0f);
+    float a = TWO_PI * ph, c = cosf(a), sn = sinf(a);
+    switch ((int)P[S_SUB_SHAPE]) {
+    case 1: *cx = c; *cy = 0.5f * sn; break;                                          /* ELLIPSE */
+    case 2: *cx = sn; *cy = sinf(2.0f * a) * 0.5f; break;                              /* FIGURE 8 */
+    case 3: *cx = clampf(1.35f * c, -1, 1); *cy = clampf(1.35f * sn, -1, 1); break;   /* SQUARE-ish */
+    case 4: *cx = c; *cy = 0; break;                                                   /* LINE */
+    default: *cx = c; *cy = sn; break;
+    }
+}
+
 /* 0.8: the part of the path used (PATH START..END), turning softly (SOFT TURN) */
 static inline float path_u(const float *P, float ph) {
     float u = dir_t(P, ph);
@@ -1271,7 +1286,9 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     px *= size;
     py *= size;
     float sr_ = m->sub_s * 0.6f;
-    float ox = clampf(px + sr_ * cosf(TWO_PI * oo), -1, 1), oy = clampf(py + sr_ * sinf(TWO_PI * oo), -1, 1);
+    float sc_, ss_;
+    sub_pos(P, oo, &sc_, &ss_);
+    float ox = clampf(px + sr_ * sc_, -1, 1), oy = clampf(py + sr_ * ss_, -1, 1);
     /* the IMAGE page: four MODs, each a source under the orbiter moving a sound control */
     float im_cut = 0, im_res = 0, im_oct = 0, im_semi = 0, im_og1 = 0, im_og2 = 0, im_blend = 0, im_lvl = 1;
     {
@@ -1540,7 +1557,9 @@ static void screen_update(vader_t *s, int force_shape) {
         fx *= size;
         fy *= size;
     }
-    float ox = clampf(fx + sr_ * cosf(TWO_PI * oo), -1, 1), oy = clampf(fy + sr_ * sinf(TWO_PI * oo), -1, 1);
+    float sc_, ss_;
+    sub_pos(P, oo, &sc_, &ss_);
+    float ox = clampf(fx + sr_ * sc_, -1, 1), oy = clampf(fy + sr_ * ss_, -1, 1);
     if (overlay_live(&s->ovl)) {   /* 0.5.0: the live screen draws it all: the tiles, balls and picture rest (empty) */
         if (!s->rested) {
             s->rested = 1;
