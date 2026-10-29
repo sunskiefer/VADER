@@ -468,7 +468,8 @@ void VaderUI::drawScreen(const R &r) {
         pathAt(ot, fx, fy);
         fx *= size;
         fy *= size;
-        const float ox = clampf(fx + sr_ * cosf(TAU_ * oo), -1, 1), oy = clampf(fy + sr_ * sinf(TAU_ * oo), -1, 1);
+        float ox = clampf(fx + sr_ * cosf(TAU_ * oo), -1, 1), oy = clampf(fy + sr_ * sinf(TAU_ * oo), -1, 1);
+        if (v.use_pos) { fx = v.fx; fy = v.fy; ox = v.ox; oy = v.oy; }
         const Col oc = ORB_COLS[colStep(v.sub_size)], pc = PATH_COLS[colStep(v.size)];
         if (v.motion) {
             // the light trail: where the orbiter has just been, a fading glowing curve
@@ -516,6 +517,7 @@ void VaderUI::drawScreen(const R &r) {
                 fill();
             };
             const float RO = S * 0.055f * (0.8f + 0.4f * v.env), RP = S * 0.038f;
+            if (v.use_pos) for (int k = 0; k < v.nballs && k < 8; k++) ball(v.bx[k], v.by[k], RO * 0.7f, oc, 16);
             if (behind) { ball(ox, oy, RO, oc, 26); ball(fx, fy, RP, pc, 18); }
             else { ball(fx, fy, RP, pc, 18); ball(ox, oy, RO, oc, 26); }
         }

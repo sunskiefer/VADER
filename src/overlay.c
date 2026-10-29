@@ -652,6 +652,7 @@ static void render_frame(overlay_t *o, const ovl_shape_t *sh, const ovl_view_t *
     fx *= size; fy *= size;
     ox = clampf_(fx + sr_ * cosf(6.2831853f * v->oo), -1, 1);
     oy = clampf_(fy + sr_ * sinf(6.2831853f * v->oo), -1, 1);
+    if (v->use_pos) { fx = v->fx; fy = v->fy; ox = v->ox; oy = v->oy; }
     rgbf oc = ORB_COLS[col_step(v->sub_size)], pc = PATH_COLS[col_step(v->size)];
     if (v->motion) {
         float tl = fabsf(v->sub) > 0.01f ? 0.6f / fabsf(v->sub) : 0.35f;
@@ -785,10 +786,14 @@ static void render_frame(overlay_t *o, const ovl_shape_t *sh, const ovl_view_t *
     if (v->motion) {
         /* the balls: drawn straight into the picture, a soft edge and a hot core, the orbiter behind the path point
          * on the upper half of its circle; whole inside the screen */
-        float X[2] = {bx_of(ox), bx_of(fx)}, Y[2] = {by_of(oy), by_of(fy)}, R[2] = {OVL_BALL_OD * 0.5f, OVL_BALL_PD * 0.5f};
-        rgbf C[2] = {oc, pc};
-        int order[2] = {behind ? 0 : 1, behind ? 1 : 0};
-        for (int q = 0; q < 2; q++) {
+        float X[10] = {bx_of(ox), bx_of(fx)}, Y[10] = {by_of(oy), by_of(fy)}, R[10] = {OVL_BALL_OD * 0.5f, OVL_BALL_PD * 0.5f};
+        rgbf C[10] = {oc, pc};
+        int nb = v->use_pos ? v->nballs : 0;
+        if (nb > 8) nb = 8;
+        int order[10], no = 0;
+        for (int e = 0; e < nb; e++) { X[2 + e] = bx_of(v->bx[e]); Y[2 + e] = by_of(v->by[e]); R[2 + e] = OVL_BALL_PD * 0.5f; C[2 + e] = oc; order[no++] = 2 + e; }
+        order[no++] = behind ? 0 : 1; order[no++] = behind ? 1 : 0;
+        for (int q = 0; q < no; q++) {
             int k = order[q];
             float cx = clampf_(X[k], OVL_TILES_X + R[k], OVL_TILES_X + OVL_TILES_W - R[k]), cy = clampf_(Y[k], OVL_TILES_Y + R[k], OVL_TILES_Y + OVL_TILES_H - R[k]);
             int bx0 = (int)(cx - R[k] - 2), bx1 = (int)(cx + R[k] + 2), by0 = (int)(cy - R[k] - 2), by1 = (int)(cy + R[k] + 2);

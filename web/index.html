@@ -65,7 +65,7 @@ function connect() {
       shape = { n, x, y, z, is3d: d.getUint8(1), user: d.getUint8(2), img };
     } else if (t === 1) {
       let p = 4; const f = () => { const r = d.getFloat32(p, true); p += 4; return r; };
-      v = { motion: d.getUint8(1), rot: f(), yaw: f(), tilt: f(), size: f(), sub: f(), ot: f(), oo: f(), hz: f(), subhz: f(), env: f(), w: [f(), f(), f(), f()] };
+      v = { motion: d.getUint8(1), rot: f(), yaw: f(), tilt: f(), size: f(), sub: f(), ot: f(), oo: f(), hz: f(), subhz: f(), env: f(), w: [f(), f(), f(), f()], usePos: f(), fx: f(), fy: f(), ox: f(), oy: f(), nb: f(), bl: Array.from({length: 8}, () => [f(), f()]) };
       vAt = performance.now();
     }
   };
@@ -173,7 +173,8 @@ function frame(now) {
   ctx.shadowBlur = 0;
   // the orbiter and the path point
   let [fx, fy] = pathAt(shape.n, ot); fx *= size; fy *= size;
-  const ox = clamp(fx + sr * Math.cos(TAU * oo), -1, 1), oy = clamp(fy + sr * Math.sin(TAU * oo), -1, 1);
+  let ox = clamp(fx + sr * Math.cos(TAU * oo), -1, 1), oy = clamp(fy + sr * Math.sin(TAU * oo), -1, 1);
+  if (v.usePos > 0.5) { fx = v.fx; fy = v.fy; ox = v.ox; oy = v.oy; }
   const oc = ORB_COLS[colStep(v.sub)], pc = PATH_COLS[colStep(v.size)];
   if (v.motion) {
     // the light trail: where the orbiter has just been, a fading glowing curve
@@ -198,6 +199,7 @@ function frame(now) {
       ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(gx, gy, r, 0, TAU); ctx.fill(); ctx.shadowBlur = 0;
     };
     const RO = S * 0.055 * (0.8 + 0.4 * v.env), RP = S * 0.038;
+    for (let k = 0; k < Math.round(v.nb); k++) ball(v.bl[k][0], v.bl[k][1], RO * 0.7, oc, 16);
     if (behind) { ball(ox, oy, RO, oc, 26); ball(fx, fy, RP, pc, 18); } else { ball(fx, fy, RP, pc, 18); ball(ox, oy, RO, oc, 26); }
   }
   // the corner bars: how much of each corner is heard

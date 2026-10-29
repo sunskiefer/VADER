@@ -478,6 +478,8 @@ static void *web_thread(void *arg) {
                     put_f(&p, v.rot); put_f(&p, v.yaw); put_f(&p, v.tilt); put_f(&p, v.size); put_f(&p, v.sub_size);
                     put_f(&p, v.ot); put_f(&p, v.oo); put_f(&p, v.hz); put_f(&p, v.sub);
                     put_f(&p, v.env); put_f(&p, v.w[0]); put_f(&p, v.w[1]); put_f(&p, v.w[2]); put_f(&p, v.w[3]);
+                    put_f(&p, (float)v.use_pos); put_f(&p, v.fx); put_f(&p, v.fy); put_f(&p, v.ox); put_f(&p, v.oy);
+                    put_f(&p, (float)v.nballs); for (int k = 0; k < 8; k++) { put_f(&p, v.bx[k]); put_f(&p, v.by[k]); }
                     if (ws_send(c->fd, msg, (size_t)(p - msg), 0)) { __atomic_sub_fetch(&w->watchers, 1, __ATOMIC_RELAXED); close(c->fd); c->fd = -1; }
                 }
             }

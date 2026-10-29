@@ -2130,6 +2130,14 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
             if (si == 3 || si == 5) x = 0.5f + 0.5f * x;
             v.im[k] = clampf(x, 0, 1);
         }
+        v.use_pos = best ? 1 : 0;
+        v.fx = best ? best->fx : 0; v.fy = best ? best->fy : 0;
+        v.ox = best ? best->ox : 0; v.oy = best ? best->oy : 0;
+        v.nballs = 0;
+        if ((int)T(t)[S_SIM_MODE] > 0) {
+            int nb = s->sim[t].n; if (nb > 8) nb = 8;
+            for (int k = 1; k < nb; k++) { v.bx[v.nballs] = s->sim[t].sx[k]; v.by[v.nballs] = s->sim[t].sy[k]; v.nballs++; }
+        }
         overlay_publish(&s->ovl, &v);
     }
 }

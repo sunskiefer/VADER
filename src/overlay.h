@@ -26,6 +26,10 @@ typedef struct {
     float ot, oo, hz, sub;                              /* the orbit and suborbit phases and speeds (turns, turns/s) */
     float env, w[4];                                    /* the newest voice's envelope, the corners' weights (0..1) */
     float im[4];                                        /* 0.7.0: the IMAGE page's four meters (0..1), for the desktop screen */
+    /* 0.8: where the orbiter and the path point really are (modes, transforms, focus), and the extra balls */
+    int use_pos, nballs;
+    float fx, fy, ox, oy;
+    float bx[8], by[8];
 } ovl_view_t;
 /* and the shape, published when it changes (overlay_publish_shape) */
 typedef struct {
