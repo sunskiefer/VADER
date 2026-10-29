@@ -343,9 +343,13 @@ def page_travel():
           title("FOCUS  (STEER BY HAND)", C, 224, 400), tog("focus", C, 246, 400, "FOCUS", h=48),
           hl("focus_x", C, 308, 192, "FOCUS X", big=True), hl("focus_y", C + 208, 308, 192, "FOCUS Y", big=True),
           title("PLAYING", C, 386, 400), hl("at_sub", C, 408, 400, "AFTERTOUCH > SUBORBIT", big=True)]
+    c += [title("MORE BALLS, ONE SOUND", B, 340, 400),
+          hl("sound_balls", B, 362, 192, "SOUND BALLS", big=True), hl("kal_n", B + 208, 362, 192, "KALEIDOSCOPE", big=True),
+          tog("kal_sound", B, 424, 400, "KALEIDOSCOPE SOUND", h=48)]
     q = [("SPEED", ["spd_lfo_rate", "spd_lfo_depth", "spd_curve", "corner_stop", "path_start", "path_end", "soft_turn", "at_sub"]),
          ("BEND", ["stretch_x", "stretch_y", "skew", "morph", "centre_x", "centre_y", "warp_x", "warp_y"]),
-         ("FOCUS", ["focus", "focus_x", "focus_y", "warp_reset"])]
+         ("FOCUS", ["focus", "focus_x", "focus_y", "warp_reset"]),
+         ("BALLS", ["sound_balls", "kal_n", "kal_sound"])]
     return c, q
 
 

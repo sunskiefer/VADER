@@ -517,7 +517,7 @@ void VaderUI::drawScreen(const R &r) {
                 fill();
             };
             const float RO = S * 0.055f * (0.8f + 0.4f * v.env), RP = S * 0.038f;
-            if (v.use_pos) for (int k = 0; k < v.nballs && k < 8; k++) ball(v.bx[k], v.by[k], RO * 0.7f, oc, 16);
+            if (v.use_pos) for (int k = 0; k < v.nballs && k < 16; k++) ball(v.bx[k], v.by[k], RO * 0.7f, oc, 16);
             if (behind) { ball(ox, oy, RO, oc, 26); ball(fx, fy, RP, pc, 18); }
             else { ball(fx, fy, RP, pc, 18); ball(ox, oy, RO, oc, 26); }
         }

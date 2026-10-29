@@ -29,7 +29,7 @@ typedef struct {
     /* 0.8: where the orbiter and the path point really are (modes, transforms, focus), and the extra balls */
     int use_pos, nballs;
     float fx, fy, ox, oy;
-    float bx[8], by[8];
+    float bx[16], by[16];
 } ovl_view_t;
 /* and the shape, published when it changes (overlay_publish_shape) */
 typedef struct {

@@ -261,6 +261,9 @@ for _c in "abcd":
     SOUND_LATE5 += [("%s_rmode" % _c, "%s RATIO MODE" % _c.upper(), 0, 0, 0, RATIO_MODES, False),
                     ("%s_ratio" % _c, "%s RATIO" % _c.upper(), 0, 0, 15, None, True),
                     ("%s_lim" % _c, "%s LIMITER" % _c.upper(), 0.0, 0, 1, None, False)]
+# 0.8, appended: several balls on one sound (sim balls, kaleidoscope copies)
+SOUND_LATE6 = [("sound_balls", "SOUND BALLS", 1, 1, 4, None, True), ("kal_n", "KALEIDOSCOPE COPIES", 1, 1, 16, None, True),
+               ("kal_sound", "KALEIDOSCOPE SOUND", 0, 0, 0, ["OFF", "ON"], False)]
 # 0.8, appended: the orbiter's travel (speed shaping, the part of the path used), its transform, the Warp pad, Focus
 CURVES = ["LINEAR", "SLOW MIDDLE", "FAST MIDDLE", "PULSE"]
 SOUND_LATE4 = [
@@ -318,7 +321,7 @@ def build():
     for c in "abcd":
         for f, *_ in CORNER:
             snd_slots.append("%s_%s" % (c, f))
-    for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2 + SOUND_LATE3 + SOUND_LATE4 + SOUND_LATE5:
+    for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2 + SOUND_LATE3 + SOUND_LATE4 + SOUND_LATE5 + SOUND_LATE6:
         snd_slots.append(k)
     glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3 + GLOBAL_LATE4 + GLOBAL_LATE5]
 
@@ -411,7 +414,7 @@ def build():
         if k[2:4] == "v" + k[3:4] and not opts:
             extra["dynamic_name"] = True
         add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), extra)
-    for k, name, d, lo, hi, opts, isint in SOUND_LATE4 + SOUND_LATE5:
+    for k, name, d, lo, hi, opts, isint in SOUND_LATE4 + SOUND_LATE5 + SOUND_LATE6:
         add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), None if opts else {"dynamic_display": True})
     for k, name in TRIGGERS_LATE3:
         add(k, name, 0, 0, 1, None, False, "TRIG", 0, {"momentary": True})

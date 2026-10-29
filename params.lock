@@ -2125,6 +2125,9 @@ c_lim
 d_rmode
 d_ratio
 d_lim
+sound_balls
+kal_n
+kal_sound
 warp_reset
 randomize
 undo_random

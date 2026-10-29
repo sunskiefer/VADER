@@ -17382,6 +17382,33 @@
    "dynamic_display": true
   },
   {
+   "key": "sound_balls",
+   "name": "SOUND BALLS",
+   "default": 1,
+   "min": 1,
+   "max": 4,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "kal_n",
+   "name": "KALEIDOSCOPE COPIES",
+   "default": 1,
+   "min": 1,
+   "max": 16,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "kal_sound",
+   "name": "KALEIDOSCOPE SOUND",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
    "key": "warp_reset",
    "name": "WARP RESET",
    "default": 0,

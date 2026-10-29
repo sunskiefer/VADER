@@ -1298,6 +1298,22 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     v->shown_t = ot; v->shown_o = oo;
     float u = (ox + 1) * 0.5f, w_ = (oy + 1) * 0.5f;
     float wt[4] = {(1 - u) * (1 - w_), u * (1 - w_), (1 - u) * w_, u * w_};
+    {   /* 0.8: several balls on this one sound: the simulation's balls and the kaleidoscope's copies, their corner weights averaged */
+        float ex[18], ey[18];
+        int ne = 0, nb = (int)P[S_SOUND_BALLS], kn = (int)P[S_KAL_N];
+        if ((int)P[S_SIM_MODE] > 0) for (int k = 1; k < nb && k < s->sim[t].n && ne < 3; k++) { ex[ne] = s->sim[t].sx[k]; ey[ne++] = s->sim[t].sy[k]; }
+        if (kn > 1 && (int)P[S_KAL_SOUND]) for (int j = 1; j < kn && ne < 17; j++) {
+            float a = TWO_PI * j / kn, ca = cosf(a), sa = sinf(a);
+            ex[ne] = clampf(ox * ca - oy * sa, -1, 1); ey[ne++] = clampf(ox * sa + oy * ca, -1, 1);
+        }
+        if (ne > 0) {
+            for (int k = 0; k < ne; k++) {
+                float uu = (ex[k] + 1) * 0.5f, ww = (ey[k] + 1) * 0.5f;
+                wt[0] += (1 - uu) * (1 - ww); wt[1] += uu * (1 - ww); wt[2] += (1 - uu) * ww; wt[3] += uu * ww;
+            }
+            for (int c = 0; c < 4; c++) wt[c] /= (float)(ne + 1);
+        }
+    }
     float w0[4], wd[4];
     for (int c = 0; c < 4; c++) {
         w0[c] = v->w[c] < 0 ? wt[c] : v->w[c];
@@ -2405,6 +2421,13 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
         if ((int)T(t)[S_SIM_MODE] > 0) {
             int nb = s->sim[t].n; if (nb > 8) nb = 8;
             for (int k = 1; k < nb; k++) { v.bx[v.nballs] = s->sim[t].sx[k]; v.by[v.nballs] = s->sim[t].sy[k]; v.nballs++; }
+        }
+        {   /* the kaleidoscope's copies of the orbiter: turned about the centre */
+            int kn = (int)T(t)[S_KAL_N];
+            for (int j = 1; j < kn && v.nballs < 16; j++) {
+                float a = TWO_PI * j / kn, ca = cosf(a), sa = sinf(a);
+                v.bx[v.nballs] = clampf(v.ox * ca - v.oy * sa, -1, 1); v.by[v.nballs] = clampf(v.ox * sa + v.oy * ca, -1, 1); v.nballs++;
+            }
         }
         overlay_publish(&s->ovl, &v);
     }

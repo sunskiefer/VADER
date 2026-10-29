@@ -786,11 +786,11 @@ static void render_frame(overlay_t *o, const ovl_shape_t *sh, const ovl_view_t *
     if (v->motion) {
         /* the balls: drawn straight into the picture, a soft edge and a hot core, the orbiter behind the path point
          * on the upper half of its circle; whole inside the screen */
-        float X[10] = {bx_of(ox), bx_of(fx)}, Y[10] = {by_of(oy), by_of(fy)}, R[10] = {OVL_BALL_OD * 0.5f, OVL_BALL_PD * 0.5f};
-        rgbf C[10] = {oc, pc};
+        float X[18] = {bx_of(ox), bx_of(fx)}, Y[18] = {by_of(oy), by_of(fy)}, R[18] = {OVL_BALL_OD * 0.5f, OVL_BALL_PD * 0.5f};
+        rgbf C[18] = {oc, pc};
         int nb = v->use_pos ? v->nballs : 0;
-        if (nb > 8) nb = 8;
-        int order[10], no = 0;
+        if (nb > 16) nb = 16;
+        int order[18], no = 0;
         for (int e = 0; e < nb; e++) { X[2 + e] = bx_of(v->bx[e]); Y[2 + e] = by_of(v->by[e]); R[2 + e] = OVL_BALL_PD * 0.5f; C[2 + e] = oc; order[no++] = 2 + e; }
         order[no++] = behind ? 0 : 1; order[no++] = behind ? 1 : 0;
         for (int q = 0; q < no; q++) {
