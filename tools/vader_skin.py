@@ -127,7 +127,7 @@ def page_main():
     c += [hl("dly_time", L, 554, 192, "DLY TIME", when="alt:OFF", big=True), hl("dly_fb", L + 208, 554, 192, "FEEDBACK", when="alt:OFF", big=True),
           hl("ch_speed", L, 554, 192, "CH SPEED", when="alt:ON", big=True), hl("ch_depth", L + 208, 554, 192, "CH DEPTH", when="alt:ON", big=True)]
     # middle: the shape, the QR code with the mark, the corner, the corner's sound (ALT: drive, reverb, master reso)
-    c += [popup("shape", C, 68, 408, "SHAPE", h=44, list_at=(C - 100, 118), cols=4, ow=158, oh=44), {"kind": "qr"}]
+    c += [popup("shape", C, 68, 408, "SHAPE", h=44, list_at=(min(C - 100, 1280 - 948 - 16), 118), cols=6, ow=158, oh=44), {"kind": "qr"}]
     c += [title("CORNER SELECT", C, 398, 408), radio("corner", C, 416, 408, h=38)]
     c += [hl("f_og1", C, 460, 192, "GEN 1", when="alt:OFF", big=True), hl("f_og2", C + 208, 460, 192, "GEN 2", when="alt:OFF", big=True),
           hl("f_blend", C, 512, 192, "BLEND", when="alt:OFF", big=True), hl("f_cutoff", C + 208, 512, 192, "CUTOFF", when="alt:OFF", big=True),
@@ -173,7 +173,7 @@ def page_corners():
 
 def page_orbit():
     A, B, Cc = 16, 440, 864
-    c = [title("ORBITER", A, 70, 400), popup("shape", A, 92, 400, "SHAPE", h=44, list_at=(A, 140), cols=4, ow=158, oh=44)]
+    c = [title("ORBITER", A, 70, 400), popup("shape", A, 92, 400, "SHAPE", h=44, list_at=(A, 140), cols=6, ow=158, oh=44)]
     c += [hl("orb_speed", A, 146, 192, "ORBIT SPEED"), hl("orb_size", A + 208, 146, 192, "ORBIT SIZE"),
           hl("sub_size", A, 200, 192, "SUBORBIT SIZE"), hl("sub_speed", A + 208, 200, 192, "SUBORBIT SPEED"),
           hl("rotate", A, 254, 192, "ROTATE"), hl("orb_env", A + 208, 254, 192, "ORBIT ENV"),

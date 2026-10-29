@@ -86,7 +86,20 @@
     "PI LISSAJOUS",
     "EPICYCLES",
     "PULSE",
-    "ADSR PATH"
+    "ADSR PATH",
+    "POLYHEDRA",
+    "HILBERT",
+    "KOCH",
+    "FOURIER",
+    "SQUEEZE",
+    "DE BROGLIE",
+    "COTES",
+    "POINSOT",
+    "ATOMIC",
+    "MANDALA",
+    "STACKED SPIRO",
+    "TIMES TABLE",
+    "TOY GEARS"
    ],
    "default": "STAR",
    "dynamic_display": true
