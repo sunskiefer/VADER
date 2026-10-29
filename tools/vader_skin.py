@@ -303,7 +303,7 @@ def page_play():
 
 
 def page_samples():
-    """0.8: one sample per corner (a WAV from the Samples folder, "VADER Samples" on a card or drive): played one-shot at the
+    """0.8: one sample per corner (and each corner's GEN 2 ratio and limiter) (a WAV from the Samples folder, "VADER Samples" on a card or drive): played one-shot at the
     root note, or as a loop over 1-4 bars of the tempo."""
     c, q = [], []
     for ci, cl in enumerate("abcd"):
@@ -312,8 +312,12 @@ def page_samples():
               hl("smp_" + cl, x, 92, 300, "SAMPLE", big=True),
               text("MODE", x, 180, 22),
               popup("smp_len_" + cl, x, 202, 300, "", h=48, list_at=(x if ci < 2 else x - 100, 254), cols=1, ow=300, oh=44),
-              hl("smp_root_" + cl, x, 272, 300, "ROOT NOTE", big=True)]
-        q.append(("SAMPLE " + cl.upper(), ["smp_" + cl, "smp_len_" + cl, "smp_root_" + cl]))
+              hl("smp_root_" + cl, x, 272, 300, "ROOT NOTE", big=True),
+              title("GEN 2 RATIO", x, 350, 300),
+              popup(cl + "_rmode", x, 372, 300, "", h=48, list_at=(x if ci < 2 else x - 100, 424), cols=1, ow=300, oh=44),
+              hl(cl + "_ratio", x, 440, 300, "RATIO", big=True),
+              hl(cl + "_lim", x, 516, 300, "LIMITER", big=True)]
+        q.append(("SAMPLE " + cl.upper(), ["smp_" + cl, "smp_len_" + cl, "smp_root_" + cl, cl + "_rmode", cl + "_ratio", cl + "_lim"]))
     return c, q
 
 

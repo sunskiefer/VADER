@@ -572,19 +572,16 @@ static void smp_request(vader_t *s, int c) {
 static void smp_sync_all(vader_t *s) { for (int c = 0; c < 4; c++) smp_request(s, c); }
 
 /* a corner's sample for n frames: ONE SHOT follows the key (the ROOT NOTE plays it at its own speed); a LOOP runs the
- * whole sample over 1-4 bars (4/4) of the tempo and ignores the key. */
+ * whole sample over 1-4 bars (4/4) of the tempo at the root note, and the keys pitch it from there. */
 static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, int n) {
     smp_t *sl = &s->smp[c];
     int cu = __atomic_load_n(&sl->cur, __ATOMIC_ACQUIRE), len = sl->n[cu];
     const float *d = sl->d[cu];
     int mode = (int)s->g[G_SMP_LEN_A + c];
     double rate, p = v->sp[c];
-    if (mode == 0) {
-        float fr = 440.0f * powf(2.0f, (s->g[G_SMP_ROOT_A + c] - 69.0f) / 12.0f);
-        rate = (double)sl->sr * INV_SR * freq / fr;
-    } else {
-        rate = (double)len / ((double)mode * (4.0 * 60.0 / tempo_of(s)) / INV_SR);
-    }
+    float fr = 440.0f * powf(2.0f, (s->g[G_SMP_ROOT_A + c] - 69.0f) / 12.0f);
+    if (mode == 0) rate = (double)sl->sr * INV_SR * freq / fr;
+    else rate = (double)len / ((double)mode * (4.0 * 60.0 / tempo_of(s)) / INV_SR) * (freq / fr);   /* in time at the root note, pitched by the keys */
     for (int i = 0; i < n; i++) {
         if (mode == 0 && p >= len - 1) { out[i] = 0; continue; }
         while (p >= len) p -= len;
@@ -1115,6 +1112,12 @@ static inline float fast_tanh(float x) {
 
 typedef struct { float a1, a2, a3, k, G, kl; int type; } filt_t;
 
+/* 0.8: a corner's limiter: a soft ceiling that comes down as the amount goes up (0 = off) */
+static inline float corner_lim(float x, float amt) {
+    if (amt < 0.001f) return x;
+    float thr = 1.0f - 0.85f * amt;
+    return thr * tanhf(x / thr);
+}
 static inline float corner_filter(voice_t *v, int c, const filt_t *f, float x) {
     switch (f->type) {
     case 0: case 2: case 3: return svf(x, &v->s1[c][0], &v->s1[c][1], f->a1, f->a2, f->a3, f->k, f->type == 0 ? 0 : f->type);
@@ -1310,6 +1313,19 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         const float *C = &P[c * NCF];
         float f1 = base * powf(2.0f, C[CF_OCT]);
         float f2 = f1 * powf(2.0f, (C[CF_TUNE] + C[CF_FINE] / 100.0f) / 12.0f);
+        {   /* 0.8: GEN 2 TUNE as a ratio: musical (just intervals) or prime (each prime folded into one octave) */
+            static const float MUS[16] = {1, 1.125f, 1.2f, 1.25f, 1.3333334f, 1.5f, 1.6f, 1.6666666f, 1.75f, 2, 2.5f, 3, 3.5f, 4, 5, 8};
+            static const int PRM[16] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53};
+            int rm = (int)P[S_A_RMODE + c * 3], ri = (int)P[S_A_RATIO + c * 3];
+            if (ri < 0) ri = 0;
+            if (ri > 15) ri = 15;
+            if (rm == 1) f2 = f1 * MUS[ri] * powf(2.0f, C[CF_FINE] / 1200.0f);
+            else if (rm == 2) {
+                float r = (float)PRM[ri];
+                while (r >= 2.0f) r *= 0.5f;
+                f2 = f1 * r * powf(2.0f, C[CF_FINE] / 1200.0f);
+            }
+        }
         inc[c][0] = f1 * INV_SR;
         inc[c][1] = f2 * INV_SR;
         mip[c][0] = tab_mip(f1);
@@ -1363,7 +1379,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
             float wc = w0[c] + wd[c] * i;
             if (!on[c]) continue;
             if (eng_on[c]) {   /* a ZYNTH voice: its tone through the corner's filter */
-                out += corner_filter(v, c, &F[c], ebuf[c][i]) * wc * level[c];
+                out += corner_lim(corner_filter(v, c, &F[c], ebuf[c][i]), P[S_A_LIM + c * 3]) * wc * level[c];
                 continue;
             }
             float p1 = v->ph[c][0], p2 = v->ph[c][1];
@@ -1398,7 +1414,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
                 }
             }
             if (fpos[c] == 0) x = corner_filter(v, c, &F[c], x);
-            out += x * wc * level[c];
+            out += corner_lim(x, P[S_A_LIM + c * 3]) * wc * level[c];
             p1 += inc[c][0]; if (p1 >= 1) p1 -= 1;
             p2 += inc[c][1]; if (p2 >= 1) p2 -= 1;
             v->ph[c][0] = p1;

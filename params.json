@@ -17261,6 +17261,114 @@
    "dynamic_display": true
   },
   {
+   "key": "a_rmode",
+   "name": "A RATIO MODE",
+   "options": [
+    "OFF",
+    "MUSICAL",
+    "PRIME"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "a_ratio",
+   "name": "A RATIO",
+   "default": 0,
+   "min": 0,
+   "max": 15,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "a_lim",
+   "name": "A LIMITER",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_rmode",
+   "name": "B RATIO MODE",
+   "options": [
+    "OFF",
+    "MUSICAL",
+    "PRIME"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "b_ratio",
+   "name": "B RATIO",
+   "default": 0,
+   "min": 0,
+   "max": 15,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "b_lim",
+   "name": "B LIMITER",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_rmode",
+   "name": "C RATIO MODE",
+   "options": [
+    "OFF",
+    "MUSICAL",
+    "PRIME"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "c_ratio",
+   "name": "C RATIO",
+   "default": 0,
+   "min": 0,
+   "max": 15,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "c_lim",
+   "name": "C LIMITER",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_rmode",
+   "name": "D RATIO MODE",
+   "options": [
+    "OFF",
+    "MUSICAL",
+    "PRIME"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "d_ratio",
+   "name": "D RATIO",
+   "default": 0,
+   "min": 0,
+   "max": 15,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "d_lim",
+   "name": "D LIMITER",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
    "key": "warp_reset",
    "name": "WARP RESET",
    "default": 0,
@@ -17900,6 +18008,38 @@
    "min": 0,
    "max": 1,
    "popup_of": "spd_curve"
+  },
+  {
+   "key": "a_rmode__open",
+   "name": "a_rmode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "a_rmode"
+  },
+  {
+   "key": "b_rmode__open",
+   "name": "b_rmode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "b_rmode"
+  },
+  {
+   "key": "c_rmode__open",
+   "name": "c_rmode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "c_rmode"
+  },
+  {
+   "key": "d_rmode__open",
+   "name": "d_rmode list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "d_rmode"
   },
   {
    "key": "smp_len_a__open",
