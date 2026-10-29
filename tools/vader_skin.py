@@ -207,8 +207,14 @@ def page_arp():
         x = 16 + i * 78
         c += [text(str(i + 1), x + 26, 258, 18, INK), radio("step%d" % (i + 1), x, 282, 70, labels=["OFF", "ON", "ACC", "TIE"],
                                                          h=46, vertical=True, order=[2, 1, 3, 0])]
-    q = [("ARP", ["arp_on", "latch", "arp_mode", "arp_rate", "arp_oct", "note_len", "arp_steps"]),
-         ("STEPS 1-8", ["step%d" % (i + 1) for i in range(8)]), ("STEPS 9-16", ["step%d" % (i + 9) for i in range(8)])]
+    c += [title("STEP OCTAVE  (-2 .. +2)", 16, 470, 1248)]
+    for i in range(16):
+        c += [hl("stepo%d" % (i + 1), 16 + i * 78, 494, 72, str(i + 1))]
+    c += [text("OCTAVE WALK", 16, 560, 18), radio("arp_walk", 150, 552, 420, h=42), hl("arp_human", 600, 548, 400, "HUMANIZE")]
+    q = [("ARP", ["arp_on", "latch", "arp_mode", "arp_rate", "arp_oct", "note_len", "arp_steps", "arp_walk"]),
+         ("STEPS 1-8", ["step%d" % (i + 1) for i in range(8)]), ("STEPS 9-16", ["step%d" % (i + 9) for i in range(8)]),
+         ("STEP OCT 1-8", ["stepo%d" % (i + 1) for i in range(8)]), ("STEP OCT 9-16", ["stepo%d" % (i + 9) for i in range(8)]),
+         ("HUMAN", ["arp_human"])]
     return c, q
 
 
@@ -220,10 +226,13 @@ def page_fx():
           hl("ch_col", 332, 200, 300, "COLOUR"), tog("ch_sync", 332, 262, 300, "SYNC TO TEMPO")]
     c += [title("DELAY", 648, 70, 300), hl("dly_time", 648, 92, 300, "TIME"), hl("dly_fb", 648, 146, 300, "FEEDBACK"),
           tog("dly_sync", 648, 206, 142, "SYNC"), btn("tap", 806, 206, 142, "TAP"),
-          text("DIVISION", 648, 262, 18), popup("dly_div", 648, 284, 300, "", list_at=(648, 330), cols=2, ow=150)]
+          text("DIVISION", 648, 262, 18), popup("dly_div", 648, 284, 300, "", list_at=(648, 330), cols=2, ow=150),
+          text("MODE", 648, 354, 22), radio("dly_mode", 648, 378, 300, h=42),
+          tog("dly_hold", 648, 430, 142, "HOLD"), tog("dly_add", 806, 430, 142, "ADD"), tog("dly_rev", 648, 480, 300, "REVERSE")]
     c += mixer(980, 70)
     q = [("FX", ["drive", "drive_col", "ch_speed", "ch_depth", "ch_col", "dly_time", "dly_fb", "rev_size",
-                 "rev_col", "mres", "mix_rev", "mix_ch", "mix_dly", "volume", "dly_div", "ch_sync"])]
+                 "rev_col", "mres", "mix_rev", "mix_ch", "mix_dly", "volume", "dly_div", "ch_sync"]),
+         ("DELAY", ["dly_mode", "dly_hold", "dly_add", "dly_rev"])]
     return c, q
 
 
@@ -283,7 +292,11 @@ def page_play():
          text("RATE", A, 408, 22), text("(the ARP RATE sets the speed)", A + 90, 410, 18)]
     c += [title("DRONE", B, 70, 400), tog("drone", B, 92, 400, "DRONE", h=48),
           text("CHORD", B, 156, 22), popup("drone_chord", B + 110, 146, 290, "", h=48, list_at=(B, 198), cols=2, ow=200, oh=44)]
-    q = [("PLAY", ["self_play", "self_scale", "self_root", "self_range", "drone", "drone_chord"])]
+    c += [title("VOICE MODE", A, 470, 400), radio("voice_mode", A, 492, 400, h=48)]
+    c += [title("RANDOM SOUND", B, 260, 400), btn("randomize", B, 282, 192, "RANDOMIZE", h=48), btn("undo_random", B + 208, 282, 192, "UNDO", h=48),
+          hl("rand_amt", B, 346, 400, "HOW FAR", big=True)]
+    q = [("PLAY", ["self_play", "self_scale", "self_root", "self_range", "drone", "drone_chord", "voice_mode", "rand_amt"]),
+         ("RANDOM", ["randomize", "undo_random"])]
     return c, q
 
 

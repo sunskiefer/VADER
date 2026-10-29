@@ -104,6 +104,7 @@ typedef struct {
     float drive, drive_col;
     float ch_rate_hz, ch_depth, ch_col, ch_mix;
     float dly_sec, dly_fb, dly_mix;
+    int dly_tape, dly_hold, dly_add, dly_rev;   /* 0.8: TAPE or DIGITAL; HOLD, ADD, REVERSE */
     float rev_size, rev_col, rev_mix;
     float volume;
 } fx_params_t;

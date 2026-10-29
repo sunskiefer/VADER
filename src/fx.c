@@ -23,6 +23,8 @@ struct fx_s {
     int dly_w;
     float dly_time_s;          /* the delay time, slewed (a change bends instead of clicking) */
     float dly_lp[2];
+    float dly_old, dly_xfade, dly_hold_len, dly_wow, dly_fbsm, dly_lpz[2], dly_hpz[2];
+    int dly_rev_pos;
     float rev[NREV][REV_MAXLEN];
     int rev_w[NREV];
     float rev_lp[NREV];
@@ -86,25 +88,69 @@ void fx_process(fx_t *f, const fx_params_t *p, float *L, float *R, int n) {
             R[i] += p->ch_mix * f->ch_lp[1];
         }
     }
-    /* ---- delay: ping-pong, damped feedback */
+    /* ---- delay (0.8: the delay of LXRXXL ZYNTH, from its manual: TAPE or DIGITAL, HOLD, ADD, REVERSE) */
     {
+        const int tape = p->dly_tape, hold = p->dly_hold, add = p->dly_add, rev = p->dly_rev;
         float target = p->dly_sec * SR;
         if (target < 32) target = 32;
         if (target > DLY_MAX - 4) target = DLY_MAX - 4;
         if (f->dly_time_s <= 0) f->dly_time_s = target;
-        float fb = p->dly_fb * 0.95f;
+        const float fbT = p->dly_fb * 1.08f;
+        const float lpA = 1.f - expf(-6.2831853f * (tape ? 4500.f : 15000.f) / SR);
+        const float hpA = 1.f - expf(-6.2831853f * 40.f / SR);
+        if (!tape && fabsf(target - f->dly_time_s) > 1.f && f->dly_xfade >= 1.f) {   /* DIGITAL: a new time crossfades */
+            f->dly_old = f->dly_time_s;
+            f->dly_time_s = target;
+            f->dly_xfade = 0.f;
+        }
+        if (!hold) f->dly_hold_len = tape ? f->dly_time_s : target;
         for (int i = 0; i < n; i++) {
-            f->dly_time_s += 0.0005f * (target - f->dly_time_s);
-            float a = read_frac(f->dly[0], DLY_MAX, f->dly_w, f->dly_time_s);
-            float b = read_frac(f->dly[1], DLY_MAX, f->dly_w, f->dly_time_s);
-            f->dly_lp[0] += 0.35f * (a - f->dly_lp[0]);
-            f->dly_lp[1] += 0.35f * (b - f->dly_lp[1]);
-            float in = (L[i] + R[i]) * 0.5f;
-            f->dly[0][f->dly_w] = in + f->dly_lp[1] * fb;   /* left takes the right's echo: ping-pong */
-            f->dly[1][f->dly_w] = f->dly_lp[0] * fb;
+            float d, wet[2];
+            f->dly_fbsm += 0.001f * (fbT - f->dly_fbsm);
+            if (tape) {
+                f->dly_time_s += 0.00012f * (target - f->dly_time_s);   /* the tape's slew: a change bends the pitch */
+                f->dly_wow += 0.55f / SR;
+                if (f->dly_wow >= 1.f) f->dly_wow -= 1.f;
+                d = f->dly_time_s + 6.f * sinf(6.2831853f * f->dly_wow);
+            } else d = f->dly_time_s;
+            if (hold) d = f->dly_hold_len;
+            if (d < 2.f) d = 2.f;
+            if (d > DLY_MAX - 4) d = DLY_MAX - 4;
+            for (int c = 0; c < 2; c++) {
+                const float *bf = f->dly[c];
+                float y;
+                if (rev) {   /* backwards: two heads half a window apart, crossfaded */
+                    float win = d > DLY_MAX / 2 - 4 ? DLY_MAX / 2 - 4 : d;
+                    float j0 = (float)(f->dly_rev_pos % (int)win), j1 = fmodf(j0 + win * 0.5f, win);
+                    float w0 = 1.f - fabsf(2.f * j0 / win - 1.f), w1 = 1.f - fabsf(2.f * j1 / win - 1.f);
+                    y = read_frac(bf, DLY_MAX, f->dly_w, 2.f * j0 + 1.f) * w0 + read_frac(bf, DLY_MAX, f->dly_w, 2.f * j1 + 1.f) * w1;
+                } else if (!tape && f->dly_xfade < 1.f && !hold) {
+                    y = read_frac(bf, DLY_MAX, f->dly_w, f->dly_old) * (1.f - f->dly_xfade) + read_frac(bf, DLY_MAX, f->dly_w, d) * f->dly_xfade;
+                } else y = read_frac(bf, DLY_MAX, f->dly_w, d);
+                wet[c] = y;
+            }
+            if (rev) f->dly_rev_pos++;
+            if (!tape && f->dly_xfade < 1.f) f->dly_xfade += 1.f / 2048.f;
+            for (int c = 0; c < 2; c++) {
+                float *bf = f->dly[c];
+                const float sin_ = c ? R[i] : L[i];
+                float wr;
+                if (hold) {   /* the buffer loops TIME long; ADD layers the input on it */
+                    float loop = read_frac(bf, DLY_MAX, f->dly_w, f->dly_hold_len);
+                    wr = loop + (add ? soft(sin_) * 0.7f : 0.f);
+                    wr = soft(wr * 0.98f);
+                } else {
+                    float fb = wet[c] * f->dly_fbsm;
+                    f->dly_lpz[c] += lpA * (fb - f->dly_lpz[c]);
+                    fb = f->dly_lpz[c];
+                    f->dly_hpz[c] += hpA * (fb - f->dly_hpz[c]);
+                    fb -= f->dly_hpz[c];
+                    wr = soft(sin_ + (tape ? soft(fb * 1.2f) * 0.85f : fb));
+                }
+                bf[f->dly_w] = wr;
+                if (c) R[i] += p->dly_mix * wet[c]; else L[i] += p->dly_mix * wet[c];
+            }
             if (++f->dly_w >= DLY_MAX) f->dly_w = 0;
-            L[i] += p->dly_mix * a;
-            R[i] += p->dly_mix * b;
         }
     }
     /* ---- reverb: two allpasses into an 8-line feedback network (Hadamard) */

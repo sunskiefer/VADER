@@ -17269,6 +17269,166 @@
    "momentary": true
   },
   {
+   "key": "randomize",
+   "name": "RANDOMIZE",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "undo_random",
+   "name": "UNDO RANDOM",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "stepo1",
+   "name": "STEP 1 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo2",
+   "name": "STEP 2 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo3",
+   "name": "STEP 3 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo4",
+   "name": "STEP 4 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo5",
+   "name": "STEP 5 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo6",
+   "name": "STEP 6 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo7",
+   "name": "STEP 7 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo8",
+   "name": "STEP 8 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo9",
+   "name": "STEP 9 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo10",
+   "name": "STEP 10 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo11",
+   "name": "STEP 11 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo12",
+   "name": "STEP 12 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo13",
+   "name": "STEP 13 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo14",
+   "name": "STEP 14 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo15",
+   "name": "STEP 15 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "stepo16",
+   "name": "STEP 16 OCTAVE",
+   "default": 0,
+   "min": -2,
+   "max": 2,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
    "key": "self_play",
    "name": "SELF PLAY",
    "options": [
@@ -17331,6 +17491,78 @@
     "SUS 4"
    ],
    "default": "ROOT + FIFTH"
+  },
+  {
+   "key": "voice_mode",
+   "name": "VOICE MODE",
+   "options": [
+    "POLY",
+    "DUAL",
+    "MONO"
+   ],
+   "default": "POLY"
+  },
+  {
+   "key": "rand_amt",
+   "name": "RANDOM AMOUNT",
+   "default": 0.6,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "arp_walk",
+   "name": "ARP OCTAVE WALK",
+   "options": [
+    "SPAN",
+    "RISE",
+    "RANDOM"
+   ],
+   "default": "SPAN"
+  },
+  {
+   "key": "arp_human",
+   "name": "ARP HUMANIZE",
+   "default": 0.0,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "dly_mode",
+   "name": "DELAY MODE",
+   "options": [
+    "TAPE",
+    "DIGITAL"
+   ],
+   "default": "TAPE"
+  },
+  {
+   "key": "dly_hold",
+   "name": "DELAY HOLD",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "dly_add",
+   "name": "DELAY ADD",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
+  },
+  {
+   "key": "dly_rev",
+   "name": "DELAY REVERSE",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": "OFF"
   },
   {
    "key": "cn1",

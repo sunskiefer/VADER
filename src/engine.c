@@ -118,6 +118,8 @@ typedef struct {
     long arp_off_at;             /* frames until they stop (-1: tied / none) */
     unsigned rng;
     double self_next;            /* 0.8: SELF PLAY's next step (beats) */
+    float undo_snd[NSND], undo_mv[NMODES][3][8];   /* 0.8: the sound before RANDOMIZE */
+    int undo_t;
     int drone_notes[4], ndrone;  /* 0.8: the DRONE's held notes */
     /* screen */
     screen_t scr;
@@ -587,6 +589,11 @@ static int timbre_limit(vader_t *s) {
 
 static voice_t *alloc_voice(vader_t *s, int t) {
     int mv = max_voices(s), lim = timbre_limit(s), used = 0;
+    int vm = (int)s->g[G_VOICE_MODE];   /* 0.8: POLY, DUAL (2 notes), MONO (1) */
+    if (vm) {
+        int cap = (vm == 1 ? 2 : 1) * (1 << ((int)T(t)[S_UNISON] & 3));
+        if (cap < lim) lim = cap;
+    }
     voice_t *free_v = NULL, *oldest = NULL, *oldest_rel = NULL;
     for (int i = 0; i < mv; i++) {
         voice_t *v = &s->v[i];
@@ -597,7 +604,7 @@ static voice_t *alloc_voice(vader_t *s, int t) {
         if (v->released && (!oldest_rel || v->age < oldest_rel->age)) oldest_rel = v;
     }
     if (used < lim && free_v) return free_v;
-    if (oldest_rel) return oldest_rel;
+    if (oldest_rel && !vm) return oldest_rel;
     if (oldest) return oldest;
     return free_v;
 }
@@ -677,7 +684,7 @@ static void arp_release(vader_t *s) {
 }
 
 static int arp_order(vader_t *s, int *out) {
-    int n = 0, oct = (int)s->g[G_ARP_OCT];
+    int n = 0, oct = (int)s->g[G_ARP_WALK] ? 1 : (int)s->g[G_ARP_OCT];   /* RISE and RANDOM walk the octaves themselves */
     int sorted[MAXHELD];
     memcpy(sorted, s->held, sizeof(int) * (size_t)s->nheld);
     if ((int)s->g[G_ARP_MODE] != 4)
@@ -703,6 +710,12 @@ static void arp_step(vader_t *s, float step_frames) {
     int n = arp_order(s, seq), mode = (int)s->g[G_ARP_MODE];
     if (!n) return;
     float vel = st == 2 ? 1.0f : 0.75f;
+    int walk = (int)s->g[G_ARP_WALK], octs = (int)s->g[G_ARP_OCT], so = (int)s->g[G_STEPO1 + ((s->arp_count - 1) % steps)];
+    float hum = s->g[G_ARP_HUMAN];
+    if (hum > 0.001f) {
+        s->rng = s->rng * 1664525u + 1013904223u;
+        vel = clampf(vel + (((s->rng >> 8) & 1023) / 1023.0f - 0.5f) * 0.5f * hum, 0.1f, 1.0f);
+    }
     if (mode == 5) {   /* CHORD */
         for (int i = 0; i < s->nheld && s->narp < MAXHELD; i++) {
             s->arp_sounding[s->narp++] = s->held[i];
@@ -723,10 +736,17 @@ static void arp_step(vader_t *s, float step_frames) {
             note = seq[mode == 1 ? n - 1 - k : k];
             s->arp_idx++;
         }
+        if (walk == 1 && octs > 1) note += 12 * ((s->arp_idx / (n > 0 ? n : 1)) % octs);
+        else if (walk == 2 && octs > 1) { s->rng = s->rng * 1664525u + 1013904223u; note += 12 * (int)((s->rng >> 8) % (unsigned)octs); }
+        note += 12 * so;
+        if (note < 0) note = 0;
+        if (note > 127) note = 127;
         s->arp_sounding[s->narp++] = note;
         play_on(s, note, vel);
     }
-    s->arp_off_at = (long)(step_frames * (0.05f + 0.93f * s->g[G_NOTE_LEN]));
+    float len = s->g[G_NOTE_LEN];
+    if (hum > 0.001f) { s->rng = s->rng * 1664525u + 1013904223u; len = clampf(len * (1 + (((s->rng >> 8) & 1023) / 1023.0f - 0.5f) * 0.6f * hum), 0.02f, 1.0f); }
+    s->arp_off_at = (long)(step_frames * (0.05f + 0.93f * len));
 }
 
 /* ------------------------------------------------------------------------------------------------ 0.8 self play, drone */
@@ -772,6 +792,55 @@ static void drone_apply(vader_t *s) {
             s->drone_notes[s->ndrone++] = n;
             play_on(s, n, 0.7f);
         }
+}
+
+/* ------------------------------------------------------------------------------------------------ 0.8 randomizer */
+static float rnd01(vader_t *s) {
+    s->rng = s->rng * 1664525u + 1013904223u;
+    return (float)(s->rng >> 8) * (1.0f / 16777216.0f);
+}
+static void param_set_slot(vader_t *s, int t, int slot, float v) {
+    T(t)[slot] = v;
+    if (t == edit(s)) mark(s, SND_P[slot]);
+}
+/* new random values for the sound of the edited timbre, AMOUNT of the way from the present ones; the old ones are kept for UNDO */
+static void randomize(vader_t *s) {
+    int t = edit(s);
+    memcpy(s->undo_snd, T(t), sizeof s->undo_snd);
+    memcpy(s->undo_mv, s->mv[t], sizeof s->undo_mv);
+    s->undo_t = t + 1;
+    float amt = s->g[G_RAND_AMT];
+    float *P = T(t);
+    for (int c = 0; c < 4; c++) {
+        int b = c * NCF;
+        static const int F[] = {CF_OG1, CF_OG2, CF_BLEND, CF_CUTOFF, CF_RESO};
+        for (int k = 0; k < 5; k++) param_set_slot(s, t, b + F[k], P[b + F[k]] + (rnd01(s) - P[b + F[k]]) * amt);
+        param_set_slot(s, t, b + CF_MODE, rnd01(s) < amt ? (float)(int)(rnd01(s) * 7) : P[b + CF_MODE]);
+        param_set_slot(s, t, b + CF_FTYPE, rnd01(s) < amt * 0.5f ? (float)(int)(rnd01(s) * 5) : P[b + CF_FTYPE]);
+        param_set_slot(s, t, b + CF_TUNE, rnd01(s) < amt ? (float)((int)(rnd01(s) * 4) * 5 - 5 + (rnd01(s) < 0.5f ? 0 : 7)) : P[b + CF_TUNE]);
+    }
+    static const int O[] = {S_ORB_SPEED, S_ORB_SIZE, S_SUB_SIZE, S_SUB_SPEED, S_ROTATE, S_SH_A, S_SH_B, S_SH_C};
+    for (int k = 0; k < 8; k++) param_set_slot(s, t, O[k], P[O[k]] + (rnd01(s) - P[O[k]]) * amt);
+    if (rnd01(s) < amt) {   /* a shape: one of the built-in ones or a maths one (not the picture USER slot) */
+        int n = 15 + NMATH;
+        int idx = (int)(rnd01(s) * n);
+        if (idx >= 15) idx += 1;
+        param_set_slot(s, t, S_SHAPE, (float)idx);
+        timbre_shape(s, t);
+    }
+    timbre_shape(s, t);
+    s->shape_wait = 0;
+}
+static void undo_random(vader_t *s) {
+    if (!s->undo_t) return;
+    int t = s->undo_t - 1;
+    memcpy(T(t), s->undo_snd, sizeof s->undo_snd);
+    memcpy(s->mv[t], s->undo_mv, sizeof s->undo_mv);
+    s->undo_t = 0;
+    timbre_shape(s, t);
+    mode_load(s, t, 1);
+    if (t == edit(s)) mark_sound(s);
+    s->shape_wait = 0;
 }
 
 /* every note lets go (they fade with their release), the arpeggiator forgets its keys */
@@ -1674,6 +1743,8 @@ static void set_param(void *p, const char *key, const char *val) {
                 for (int t = 0; t < 2; t++) { T(t)[S_WARP_X] = 0.5f; T(t)[S_WARP_Y] = 0.5f; }
                 mark(s, SND_P[S_WARP_X]); mark(s, SND_P[S_WARP_Y]);
             }
+            else if (i == P_RANDOMIZE) randomize(s);
+            else if (i == P_UNDO_RANDOM) undo_random(s);
             else if (i == P_RESCAN) { rescan(s); memset(s->uknown, 0, sizeof s->uknown); }
             else if (i == P_SAVE_USER) { save_user(s); mark(s, P_USER_SLOT); }
             else if (i == P_LOAD_USER) { load_user(s); mark(s, P_USER_SLOT); }
@@ -1966,6 +2037,10 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
     if (fp.dly_sec > 1.95f) fp.dly_sec = 1.95f;
     fp.dly_fb = s->g[G_DLY_FB];
     fp.dly_mix = s->g[G_MIX_DLY];
+    fp.dly_tape = (int)s->g[G_DLY_MODE] == 0;
+    fp.dly_hold = (int)s->g[G_DLY_HOLD];
+    fp.dly_add = (int)s->g[G_DLY_ADD];
+    fp.dly_rev = (int)s->g[G_DLY_REV];
     fp.rev_size = s->g[G_REV_SIZE];
     fp.rev_col = s->g[G_REV_COL];
     fp.rev_mix = s->g[G_MIX_REV];

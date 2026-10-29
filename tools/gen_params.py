@@ -233,12 +233,20 @@ for _c in "abcd":
 # 0.8, appended: the self-playing switch and the drone
 SELF_SCALES = ["MAJOR", "MINOR", "DORIAN", "PENTATONIC", "MINOR PENT", "WHOLE TONE", "BLUES", "CHROMATIC"]
 DRONE_CHORDS = ["ROOT", "ROOT + FIFTH", "ROOT + OCTAVE", "MINOR", "MAJOR", "SUS 4"]
-GLOBAL_LATE3 = [("self_play", "SELF PLAY", 0, 0, 0, ["OFF", "ON"], False),
+GLOBAL_LATE3 = [("stepo%d" % (i + 1), "STEP %d OCTAVE" % (i + 1), 0, -2, 2, None, True) for i in range(16)] + [("self_play", "SELF PLAY", 0, 0, 0, ["OFF", "ON"], False),
                 ("self_scale", "SELF SCALE", 0, 0, 0, SELF_SCALES, False),
                 ("self_root", "SELF ROOT NOTE", 0, 0, 11, None, True),
                 ("self_range", "SELF OCTAVES", 2, 1, 4, None, True),
                 ("drone", "DRONE", 0, 0, 0, ["OFF", "ON"], False),
-                ("drone_chord", "DRONE CHORD", 1, 0, 0, DRONE_CHORDS, False)]
+                ("drone_chord", "DRONE CHORD", 1, 0, 0, DRONE_CHORDS, False),
+                ("voice_mode", "VOICE MODE", 0, 0, 0, ["POLY", "DUAL", "MONO"], False),
+                ("rand_amt", "RANDOM AMOUNT", 0.6, 0, 1, None, False),
+                ("arp_walk", "ARP OCTAVE WALK", 0, 0, 0, ["SPAN", "RISE", "RANDOM"], False),
+                ("arp_human", "ARP HUMANIZE", 0.0, 0, 1, None, False),
+                ("dly_mode", "DELAY MODE", 0, 0, 0, ["TAPE", "DIGITAL"], False),
+                ("dly_hold", "DELAY HOLD", 0, 0, 0, ["OFF", "ON"], False),
+                ("dly_add", "DELAY ADD", 0, 0, 0, ["OFF", "ON"], False),
+                ("dly_rev", "DELAY REVERSE", 0, 0, 0, ["OFF", "ON"], False)]
 # 0.8, appended: the orbiter's travel (speed shaping, the part of the path used), its transform, the Warp pad, Focus
 CURVES = ["LINEAR", "SLOW MIDDLE", "FAST MIDDLE", "PULSE"]
 SOUND_LATE4 = [
@@ -252,7 +260,7 @@ SOUND_LATE4 = [
     ("warp_x", "WARP X", 0.5, 0, 1, None, False), ("warp_y", "WARP Y", 0.5, 0, 1, None, False),
     ("focus", "FOCUS", 0, 0, 0, ["OFF", "ON"], False), ("focus_x", "FOCUS X", 0.5, 0, 1, None, False),
     ("focus_y", "FOCUS Y", 0.5, 0, 1, None, False), ("at_sub", "AFTERTOUCH TO SUBORBIT", 0.0, 0, 1, None, False)]
-TRIGGERS_LATE3 = [("warp_reset", "WARP RESET")]
+TRIGGERS_LATE3 = [("warp_reset", "WARP RESET"), ("randomize", "RANDOMIZE"), ("undo_random", "UNDO RANDOM")]
 DIRS = ["FORWARD", "REVERSE", "PING-PONG", "LOOP BACK"]
 SOUND_LATE2 = [("sh_a", "SHAPE A", 0.5, 0, 1, None, False), ("sh_b", "SHAPE B", 0.5, 0, 1, None, False),
                ("sh_c", "SHAPE C", 0.5, 0, 1, None, False), ("sh_d", "SHAPE D", 0.0, 0, 1, None, False),
