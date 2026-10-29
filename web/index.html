@@ -65,7 +65,7 @@ function connect() {
       shape = { n, x, y, z, is3d: d.getUint8(1), user: d.getUint8(2), img };
     } else if (t === 1) {
       let p = 4; const f = () => { const r = d.getFloat32(p, true); p += 4; return r; };
-      v = { motion: d.getUint8(1), rot: f(), yaw: f(), tilt: f(), size: f(), sub: f(), ot: f(), oo: f(), hz: f(), subhz: f(), env: f(), w: [f(), f(), f(), f()], usePos: f(), fx: f(), fy: f(), ox: f(), oy: f(), nb: f(), bl: Array.from({length: 16}, () => [f(), f()]) };
+      v = { motion: d.getUint8(1), rot: f(), yaw: f(), tilt: f(), size: f(), sub: f(), ot: f(), oo: f(), hz: f(), subhz: f(), env: f(), w: [f(), f(), f(), f()], usePos: f(), fx: f(), fy: f(), ox: f(), oy: f(), nb: f(), bl: Array.from({length: 16}, () => [f(), f()]), ps: 0, pe: 1 }; v.ps = f(); v.pe = f();
       vAt = performance.now();
     }
   };
@@ -154,6 +154,12 @@ function frame(now) {
       k ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
     }
     ctx.strokeStyle = 'rgba(90,160,245,0.28)'; ctx.lineWidth = 1.2 * DPR; ctx.shadowBlur = 0; ctx.stroke();
+  }
+  // PATH START / END: a marker at each end of the part of the path used
+  if (v.ps > 0.001 || v.pe < 0.999) for (const u of [v.ps, v.pe]) {
+    const [mx, my] = pathAt(shape.n, u); const gx = sx(mx * size), gy = sy(my * size);
+    ctx.strokeStyle = '#ffd24a'; ctx.lineWidth = 2.5 * DPR; ctx.shadowBlur = 0;
+    ctx.beginPath(); ctx.arc(gx, gy, S * 0.02, 0, TAU); ctx.stroke();
   }
   // the shape: a glowing line, a 3D shape shaded by depth
   ctx.lineJoin = 'round';

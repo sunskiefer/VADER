@@ -2474,6 +2474,7 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
         v.use_pos = best ? 1 : 0;
         v.fx = best ? best->fx : 0; v.fy = best ? best->fy : 0;
         v.ox = best ? best->ox : 0; v.oy = best ? best->oy : 0;
+        v.ps = T(t)[S_PATH_START]; v.pe = T(t)[S_PATH_END];
         v.nballs = 0;
         if ((int)T(t)[S_SIM_MODE] > 0) {
             int nb = s->sim[t].n; if (nb > 8) nb = 8;

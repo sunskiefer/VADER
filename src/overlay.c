@@ -679,6 +679,14 @@ static void render_frame(overlay_t *o, const ovl_shape_t *sh, const ovl_view_t *
         disc(clampf_(bx_of(ox), OVL_TILES_X + R0, OVL_TILES_X + OVL_TILES_W - R0), clampf_(by_of(oy), OVL_TILES_Y + R0, OVL_TILES_Y + OVL_TILES_H - R0), R0 * 1.15f, oc, 0.55f);
         disc(clampf_(bx_of(fx), OVL_TILES_X + R1, OVL_TILES_X + OVL_TILES_W - R1), clampf_(by_of(fy), OVL_TILES_Y + R1, OVL_TILES_Y + OVL_TILES_H - R1), R1 * 1.15f, pc, 0.5f);
     }
+    if (v->ps > 0.001f || v->pe < 0.999f) {   /* PATH START / END markers */
+        for (int q = 0; q < 2; q++) {
+            float mx, my;
+            path_at2(x2, y2, q ? v->pe : v->ps, &mx, &my);
+            rgbf mc = {1.0f, 0.82f, 0.29f};
+            disc(bx_of(mx * size), by_of(my * size), 7.0f, mc, 0.9f);
+        }
+    }
     /* the bloom: the lights so far, at quarter size, blurred, added back */
     const int LW = OVL_W / 2, LH = OVL_H / 2;
     for (int y = 0; y < LH; y++)

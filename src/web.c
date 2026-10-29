@@ -480,6 +480,7 @@ static void *web_thread(void *arg) {
                     put_f(&p, v.env); put_f(&p, v.w[0]); put_f(&p, v.w[1]); put_f(&p, v.w[2]); put_f(&p, v.w[3]);
                     put_f(&p, (float)v.use_pos); put_f(&p, v.fx); put_f(&p, v.fy); put_f(&p, v.ox); put_f(&p, v.oy);
                     put_f(&p, (float)v.nballs); for (int k = 0; k < 16; k++) { put_f(&p, v.bx[k]); put_f(&p, v.by[k]); }
+                    put_f(&p, v.ps); put_f(&p, v.pe);
                     if (ws_send(c->fd, msg, (size_t)(p - msg), 0)) { __atomic_sub_fetch(&w->watchers, 1, __ATOMIC_RELAXED); close(c->fd); c->fd = -1; }
                 }
             }

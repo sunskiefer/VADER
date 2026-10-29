@@ -37,7 +37,7 @@ GROUND = (0, 0, 0)
 BTN_ON = (0, 0, 0)
 BTN_OFF = (0, 0, 0)
 
-TABS = ["MAIN", "CORNERS", "ORBIT", "IMAGE", "ARP", "FX", "MODE", "VOICES", "PLAY", "TRAVEL", "SAMPLES", "SAMPLE EDIT"]
+TABS = ["MAIN", "CORNERS", "ORBIT", "IMAGE", "ARP", "FX", "MODE", "VOICES", "PLAY", "TRAVEL", "SAMPLES", "WINDOW"]
 HL = 50          # a line control's height: name row, then the line
 LINE_H = 16      # its line's strip frame height
 LINE_Y = 30      # where the line sits inside the control
