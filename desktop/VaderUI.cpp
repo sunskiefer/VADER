@@ -90,6 +90,7 @@ private:
     FontId fBold, fSemi;
     float fv[VG_NEXP];
     int fPage = 0;
+    unsigned fFrame = 0;   // draws so far (the dotted cloud's slow turn)
     float fScale = 1, fOx = 0, fOy = 0;
     double fMx = -1, fMy = -1;
     Drag fDrag;
@@ -437,7 +438,18 @@ void VaderUI::drawScreen(const R &r) {
         lineJoin(NanoVG::ROUND);
         lineCap(NanoVG::ROUND);
         nvgGlobalCompositeBlendFunc(ctx, NVG_SRC_ALPHA, NVG_ONE);
-        if (fShape.is3d) {
+        if (v.style > 0.5f) {   // 0.8: a dotted cloud with a slow 3D turn
+            fFrame++;
+            const float ang = (float)(fFrame % 100000) * 0.012f, ca = cosf(ang), sa = sinf(ang);
+            for (int i = 0; i < 256; i += 2) {
+                const float zq = fShape.is3d ? fz2[i] : fy2[i] * 0.6f, xr = fx2[i] * ca + zq * sa, zr = -fx2[i] * sa + zq * ca;
+                const float depth = clampf(0.5f - 0.3f * zr, 0.1f, 1.f);
+                beginPath();
+                circle(sx(xr * size), sy(fy2[i] * size), (1.1f + 1.6f * depth) * k * 1.4f);
+                colr(Col{150, 215, 255}, (int)(255 * (0.35f + 0.65f * depth)));
+                fill();
+            }
+        } else if (fShape.is3d) {
             for (int pass = 0; pass < 3; pass++) {
                 for (int i = 0; i < 256; i++) {
                     const int j = (i + 1) & 255;

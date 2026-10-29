@@ -2190,6 +2190,7 @@ smp_root_c
 smp_root_d
 voice_cap
 arp_chain
+screen_dots
 smp_st
 smp_en
 smp_ln

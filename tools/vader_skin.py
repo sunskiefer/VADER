@@ -294,10 +294,11 @@ def page_play():
           text("CHORD", B, 156, 22), popup("drone_chord", B + 110, 146, 290, "", h=48, list_at=(B, 198), cols=2, ow=200, oh=44)]
     c += [title("VOICE MODE", A, 470, 400), radio("voice_mode", A, 492, 400, h=48),
           hl("voice_cap", A, 556, 400, "VOICE LIMIT", big=True),
+          title("SCREEN", B, 482, 400), radio("screen_dots", B, 504, 400, h=48),
           {"kind": "livetext", "key": "cpu", "x": B, "y": 420, "w": 400}]
     c += [title("RANDOM SOUND", B, 260, 400), btn("randomize", B, 282, 192, "RANDOMIZE", h=48), btn("undo_random", B + 208, 282, 192, "UNDO", h=48),
           hl("rand_amt", B, 346, 400, "HOW FAR", big=True)]
-    q = [("PLAY", ["self_play", "self_scale", "self_root", "self_range", "drone", "drone_chord", "voice_mode", "voice_cap", "rand_amt"]),
+    q = [("PLAY", ["self_play", "self_scale", "self_root", "self_range", "drone", "drone_chord", "voice_mode", "voice_cap", "rand_amt", "screen_dots"]),
          ("RANDOM", ["randomize", "undo_random"])]
     return c, q
 

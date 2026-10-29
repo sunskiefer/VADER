@@ -30,6 +30,7 @@ typedef struct {
     int use_pos, nballs;
     float fx, fy, ox, oy;
     float bx[16], by[16];
+    float style;                                        /* 0.8: 0 the glowing line, 1 a dotted cloud with a slow 3D turn */
     float ps, pe;                                       /* the part of the path used (PATH START, END): markers when not the whole */
 } ovl_view_t;
 /* and the shape, published when it changes (overlay_publish_shape) */

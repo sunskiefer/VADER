@@ -17991,6 +17991,15 @@
    "dynamic_display": true
   },
   {
+   "key": "screen_dots",
+   "name": "SCREEN STYLE",
+   "options": [
+    "LINE",
+    "DOTS"
+   ],
+   "default": "LINE"
+  },
+  {
    "key": "smp_st",
    "name": "SAMPLE START",
    "default": 0.0,

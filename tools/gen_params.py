@@ -255,6 +255,7 @@ GLOBAL_LATE3 = [("stepo%d" % (i + 1), "STEP %d OCTAVE" % (i + 1), 0, -2, 2, None
                 ("dly_add", "DELAY ADD", 0, 0, 0, ["OFF", "ON"], False),
                 ("dly_rev", "DELAY REVERSE", 0, 0, 0, ["OFF", "ON"], False)]
 GLOBAL_LATE5 = [("voice_cap", "VOICE LIMIT", 16, 1, 16, None, True), ("arp_chain", "ARP CHAIN", 0, 0, 8, None, True),
+                ("screen_dots", "SCREEN STYLE", 0, 0, 0, ["LINE", "DOTS"], False),
                 ("smp_st", "SAMPLE START", 0.0, 0, 1, None, False), ("smp_en", "SAMPLE END", 1.0, 0, 1, None, False), ("smp_ln", "SAMPLE LENGTH", 1.0, 0, 1, None, False)]   # the selected corner's   # 0.8: the most notes sounding (less CPU)
 # 0.8, appended: samples, one per corner (a WAV from the Samples folders; OFF = the corner's own voice)
 SMP_LENS = ["ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS"]

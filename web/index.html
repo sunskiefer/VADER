@@ -65,7 +65,7 @@ function connect() {
       shape = { n, x, y, z, is3d: d.getUint8(1), user: d.getUint8(2), img };
     } else if (t === 1) {
       let p = 4; const f = () => { const r = d.getFloat32(p, true); p += 4; return r; };
-      v = { motion: d.getUint8(1), rot: f(), yaw: f(), tilt: f(), size: f(), sub: f(), ot: f(), oo: f(), hz: f(), subhz: f(), env: f(), w: [f(), f(), f(), f()], usePos: f(), fx: f(), fy: f(), ox: f(), oy: f(), nb: f(), bl: Array.from({length: 16}, () => [f(), f()]), ps: 0, pe: 1 }; v.ps = f(); v.pe = f();
+      v = { motion: d.getUint8(1), rot: f(), yaw: f(), tilt: f(), size: f(), sub: f(), ot: f(), oo: f(), hz: f(), subhz: f(), env: f(), w: [f(), f(), f(), f()], usePos: f(), fx: f(), fy: f(), ox: f(), oy: f(), nb: f(), bl: Array.from({length: 16}, () => [f(), f()]), ps: 0, pe: 1, style: 0 }; v.ps = f(); v.pe = f(); v.style = f();
       vAt = performance.now();
     }
   };
@@ -164,7 +164,16 @@ function frame(now) {
   }
   // the shape: a glowing line, a 3D shape shaded by depth
   ctx.lineJoin = 'round';
-  if (shape.is3d) {
+  if (v.style > 0.5) {   // a dotted cloud with a slow 3D turn
+    const ang = now * 0.00025, ca = Math.cos(ang), sa = Math.sin(ang);
+    ctx.shadowColor = 'rgba(58,160,255,0.9)';
+    for (let i = 0; i < shape.n; i += 2) {
+      const zq = shape.is3d ? z2[i] : y2[i] * 0.6, xr = x2[i] * ca + zq * sa, zr = -x2[i] * sa + zq * ca;
+      const depth = clamp(0.5 - 0.3 * zr, 0.1, 1);
+      ctx.fillStyle = `rgba(150,215,255,${(0.35 + 0.65 * depth).toFixed(3)})`; ctx.shadowBlur = 8 * DPR * depth;
+      ctx.beginPath(); ctx.arc(sx(xr * size), sy(y2[i] * size), (1.1 + 1.6 * depth) * DPR, 0, TAU); ctx.fill();
+    }
+  } else if (shape.is3d) {
     for (let i = 0; i < shape.n; i++) {
       const j = (i + 1) % shape.n, depth = clamp(0.5 - 0.25 * (z2[i] + z2[j]), 0, 1);
       ctx.beginPath(); ctx.moveTo(sx(x2[i] * size), sy(y2[i] * size)); ctx.lineTo(sx(x2[j] * size), sy(y2[j] * size));
