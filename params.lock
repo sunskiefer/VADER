@@ -2158,6 +2158,8 @@ smp_root_a
 smp_root_b
 smp_root_c
 smp_root_d
+voice_cap
+cpu
 cn1
 cn2
 cn3

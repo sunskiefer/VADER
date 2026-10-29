@@ -247,6 +247,7 @@ GLOBAL_LATE3 = [("stepo%d" % (i + 1), "STEP %d OCTAVE" % (i + 1), 0, -2, 2, None
                 ("dly_hold", "DELAY HOLD", 0, 0, 0, ["OFF", "ON"], False),
                 ("dly_add", "DELAY ADD", 0, 0, 0, ["OFF", "ON"], False),
                 ("dly_rev", "DELAY REVERSE", 0, 0, 0, ["OFF", "ON"], False)]
+GLOBAL_LATE5 = [("voice_cap", "VOICE LIMIT", 16, 1, 16, None, True)]   # 0.8: the most notes sounding (less CPU)
 # 0.8, appended: samples, one per corner (a WAV from the Samples folders; OFF = the corner's own voice)
 SMP_LENS = ["ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS"]
 GLOBAL_LATE4 = ([("smp_%s" % c, "SAMPLE %s" % c.upper(), 0, 0, 499, None, True) for c in "abcd"]
@@ -311,7 +312,7 @@ def build():
             snd_slots.append("%s_%s" % (c, f))
     for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2 + SOUND_LATE3 + SOUND_LATE4:
         snd_slots.append(k)
-    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3 + GLOBAL_LATE4]
+    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3 + GLOBAL_LATE4 + GLOBAL_LATE5]
 
     # 1. the main page's corner knobs
     for i, (f, name) in enumerate(FRONT):
@@ -410,6 +411,9 @@ def build():
         add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None if opts else {"dynamic_display": True})
     for k, name, d, lo, hi, opts, isint in GLOBAL_LATE4:
         add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None if opts else {"dynamic_display": True})
+    for k, name, d, lo, hi, opts, isint in GLOBAL_LATE5:
+        add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None if opts else {"dynamic_display": True})
+    add("cpu", "CPU READOUT", 0, 0, 1, None, False, "STR", 26, {"display": "string"})
     for i in range(16):   # the live names of the corners' character controls
         add("cn%d" % (i + 1), "CORNER CHARACTER %d NAME" % (i + 1), 0, 0, 1, None, False, "STR", 10 + i, {"display": "string"})
     for k in POPUPS_LATE2:

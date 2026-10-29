@@ -292,10 +292,12 @@ def page_play():
          text("RATE", A, 408, 22), text("(the ARP RATE sets the speed)", A + 90, 410, 18)]
     c += [title("DRONE", B, 70, 400), tog("drone", B, 92, 400, "DRONE", h=48),
           text("CHORD", B, 156, 22), popup("drone_chord", B + 110, 146, 290, "", h=48, list_at=(B, 198), cols=2, ow=200, oh=44)]
-    c += [title("VOICE MODE", A, 470, 400), radio("voice_mode", A, 492, 400, h=48)]
+    c += [title("VOICE MODE", A, 470, 400), radio("voice_mode", A, 492, 400, h=48),
+          hl("voice_cap", A, 556, 400, "VOICE LIMIT", big=True),
+          {"kind": "livetext", "key": "cpu", "x": B, "y": 420, "w": 400}]
     c += [title("RANDOM SOUND", B, 260, 400), btn("randomize", B, 282, 192, "RANDOMIZE", h=48), btn("undo_random", B + 208, 282, 192, "UNDO", h=48),
           hl("rand_amt", B, 346, 400, "HOW FAR", big=True)]
-    q = [("PLAY", ["self_play", "self_scale", "self_root", "self_range", "drone", "drone_chord", "voice_mode", "rand_amt"]),
+    q = [("PLAY", ["self_play", "self_scale", "self_root", "self_range", "drone", "drone_chord", "voice_mode", "voice_cap", "rand_amt"]),
          ("RANDOM", ["randomize", "undo_random"])]
     return c, q
 

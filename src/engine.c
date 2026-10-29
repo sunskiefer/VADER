@@ -17,6 +17,7 @@
 #include <string.h>
 #include <strings.h>
 #include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 #include "engine.h"
 #include "eng.h"   /* 0.8: the ZYNTH voice engines (src/zynth) */
@@ -116,6 +117,9 @@ typedef struct {
     fx_t *fx;
     /* host time */
     int playing;
+    char cpu_text[48];           /* 0.8: the CPU readout (render time over block time) */
+    double cpu_acc, cpu_blk;
+    int cpu_n;
     double ppq;                  /* at the start of the current render() */
     float tempo;
     /* MIDI */
@@ -785,7 +789,7 @@ static void load_preset(vader_t *s, int n) {
 /* ------------------------------------------------------------------------------------------------ voices */
 static float note_hz(float n) { return 440.0f * powf(2.0f, (n - 69) / 12.0f); }
 
-static int max_voices(vader_t *s) { return (int)s->g[G_VOICES] ? 16 : 8; }
+static int max_voices(vader_t *s) { int m = (int)s->g[G_VOICES] ? 16 : 8, c = (int)s->g[G_VOICE_CAP]; return c >= 1 && c < m ? c : m; }
 
 /* which timbres a key plays: bit 0 A, bit 1 B */
 static int route(vader_t *s, int note) {
@@ -2030,6 +2034,7 @@ static int get_param(void *p, const char *key, char *buf, int len) {
         case K_TRIG: return snprintf(buf, (size_t)len, "0");
         case K_STR:
             if (q->slot >= 10 && q->slot < 26) { char nm[32]; cn_name(s, edit(s), (q->slot - 10) / 4, (q->slot - 10) % 4, nm, sizeof nm); return snprintf(buf, (size_t)len, "%s", nm) + 1; }
+            if (q->slot == 26) return snprintf(buf, (size_t)len, "%s", s->cpu_text) + 1;
             if (q->slot >= 2 && q->slot < 10) { char nm[32]; mk_name(s, edit(s), q->slot - 2, nm, sizeof nm); return snprintf(buf, (size_t)len, "%s", nm) + 1; }
             return snprintf(buf, (size_t)len, "%s", i == P_WEB_URL ? s->web_text : s->readout);
         case K_DISP:
@@ -2146,6 +2151,8 @@ static int get_param(void *p, const char *key, char *buf, int len) {
  * which has no 16-bit stage. Exactly one of the two is used; the sound is the same. */
 static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames) {
     float L[128], R[128];
+    struct timespec ts0;
+    clock_gettime(CLOCK_MONOTONIC, &ts0);
     collect_load(s);
     memset(L, 0, sizeof(float) * (size_t)frames);
     memset(R, 0, sizeof(float) * (size_t)frames);
@@ -2317,6 +2324,19 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
                 s->load_select = 1;
                 start_load(s, up);
             }
+        }
+    }
+    {   /* the CPU readout: the share of the block's time the render took, a short average */
+        struct timespec ts1;
+        clock_gettime(CLOCK_MONOTONIC, &ts1);
+        s->cpu_acc += (ts1.tv_sec - ts0.tv_sec) + (ts1.tv_nsec - ts0.tv_nsec) * 1e-9;
+        s->cpu_blk += frames * INV_SR;
+        if (s->cpu_blk > 0.5) {
+            int nv = 0;
+            for (int i = 0; i < MAXV; i++) nv += s->v[i].active;
+            snprintf(s->cpu_text, sizeof s->cpu_text, "CPU %d%%   VOICES %d", (int)(100.0 * s->cpu_acc / s->cpu_blk + 0.5), nv);
+            s->cpu_acc = s->cpu_blk = 0;
+            mark(s, P_CPU);
         }
     }
     /* ---- what to draw (the companion screen, web.c; the live screen, overlay.c): every block; the shape when it changes */
