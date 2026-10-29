@@ -366,6 +366,32 @@ the pages edit. Everything is per timbre except the effects, the mixer, the arpe
 
 Loading a timbre from a preset: presets set both timbres (most set B the same as A).
 
+## New in 0.8
+
+**MODE.** Pick a mode and the orbiter follows a simulation instead of the shape. The eight knobs change name with the
+mode; ALT-style layers 1-3 hold more knobs. Each mode keeps its own values in the preset. Modes with many dots (BOIDS,
+PARAMECIA, CLUMP SWARM) play the crowd's centre; the other dots show on the screen.
+
+**VOICES.** Each corner plays VADER's own generators (SYNTH) or a ZYNTH voice (ANALOG, TRIO, WAVE, CHIP, MACRO, WHEEL,
+VOICE, NOISE, TONE, METAL, BAZZ, DRONE, TEXTURE, FX) with four character knobs, named live. The filter stays VADER's own.
+
+**SAMPLES.** Put WAV files in the plugin's `Samples` folder (or `VADER Samples` on a card or drive) and press rescan.
+Pick one per corner. ONE SHOT plays it once; LOOP 1-4 BARS fits it to the tempo. Every sample is rooted on C2 and follows
+the keys from there. The WINDOW page cuts the selected corner's sample with START, END and LENGTH. Files up to 30 s;
+the example set is named vader 1 to vader 54 (docs/SAMPLE-NAMES.txt lists the originals).
+
+**PLAY.** SELF PLAY fires notes from a scale by itself, DRONE holds a chord, VOICE MODE is POLY, DUAL or MONO,
+RANDOMIZE makes a new sound (HOW FAR sets the change) and UNDO brings the last one back. VOICE LIMIT caps the notes and
+the CPU readout shows the load.
+
+**TRAVEL.** Speed LFO, curves and stop at corners; the part of the path used (START/END show as yellow markers); soft
+turn; stretch, skew, morph, centre; the Warp pad; Focus; SOUND BALLS (the simulation's balls on the one sound);
+KALEIDOSCOPE copies (visual; KALEIDOSCOPE SOUND averages their positions into the sound); the suborbit ball's own
+direction and shape.
+
+**Per corner.** GEN 2 RATIO sets the second generator as a musical or prime ratio (each prime folded into one octave)
+instead of semitones; LIMITER is a soft ceiling for that corner.
+
 ## Presets and saving
 
 16 presets, in the PRESET field and MPC's PRESET menu:

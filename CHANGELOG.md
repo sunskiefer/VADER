@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased: 0.8.0 (Force and desktop, one release)
+
+Built for the Force (ARM) and the desktop plugins from the same sources. **Not yet tested on a device.**
+
+- **MODE page** (27 modes, three layers of eight knobs each, named live): PATH, CHASE, RECAMAN, METEOR RAIN, KEPLER,
+  ROSETTE, FIGURE 8, LORENZ, ROSSLER, THOMAS, AIZAWA, PENDULUM, BOUNCE, RIPPLE, MAGNET, BOIDS, PARTICLE WAVE, OPTIMIZE,
+  TRANSFER ORBIT, GRAVITY WELLS, SERPENTINE DRAGON, PARAMECIA, MEDUSA, FLATWORMS, ETHEREAL RAY, CLUMP SWARM, THUNDER.
+- **35 maths shapes** beside the old ones (N-gon, butterfly, superformula, Lissajous, rose, limacon, cardioid,
+  spirograph, spirals, torus knot, Mobius, harmonograph, pi Lissajous, epicycles, pulse, ADSR, polyhedra, Hilbert, Koch,
+  Fourier, squeeze, de Broglie, Cotes, Poinsot, atomic, mandala, stacked spirograph, times table, toy gears), each
+  with four shape numbers.
+- **VOICES page**: each corner can be VADER's own generators or one of 14 voices from LXRXXL ZYNTH (the ZYNTH voices
+  and tables carry their own licences, see third_party and src/zynth).
+- **SAMPLES and WINDOW pages**: one WAV per corner (any rate 8-192 kHz, 8/16/24/32-bit or float, up to 30 s), played
+  one-shot or looped over 1-4 bars of the tempo, rooted on C2; start, end and length controls for the selected corner.
+  54 example samples ("vader 1" to "vader 54") and six sample presets.
+- **PLAY page**: SELF PLAY (the orbiter plays notes from a scale), DRONE chords, POLY/DUAL/MONO, RANDOMIZE with UNDO,
+  VOICE LIMIT and a CPU readout.
+- **TRAVEL page**: speed LFO and curves, stop at corners, part of the path, soft turn, stretch/skew/morph/centre,
+  Warp pad with reset, Focus (steer by hand), aftertouch to suborbit, MIDI CC 20/21 centre point, sound balls and
+  kaleidoscope copies, suborbit direction/shape.
+- **ARP**: octave per step, octave walk, humanize, chain. **FX**: the delay is now the ZYNTH delay.
+- **Per corner**: GEN 2 ratio (musical or prime) and a limiter.
+- **Screens**: show the real orbiter, extra balls, kaleidoscope copies and the path start/end markers.
+- Desktop: the left/right arrow keys turn the pages.
+- Not in this release: the freehand drawing (dropped), the modulator plugin (a later version). See docs/USER_GUIDE.md.
+
 ## Unreleased: desktop plugins (planned 0.7.0)
 
 Desktop only; the Force plugin is unchanged. Tested on Linux, and on Windows under Wine only (not on real Windows).
