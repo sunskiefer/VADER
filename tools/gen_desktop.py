@@ -105,7 +105,7 @@ def main():
         if k == "qr":
             return None
         if k == "livetext":
-            return dict(kind=K["LIVETEXT"], big=0, vertical=0, cols=0, size=22, nlab=0, par=-1, front=0, aux=int(key[2:]) + (100 if key.startswith("cn") else 0),
+            return dict(kind=K["LIVETEXT"], big=0, vertical=0, cols=0, size=22, nlab=0, par=-1, front=0, aux=200 if key == "cpu" else int(key[2:]) + (100 if key.startswith("cn") else 0),
                         x=c["x"], y=c["y"] + dy, w=c["w"], h=28, ow=0, oh=0, lx=0, ly=0, wpar=-1, wopt=0, label="",
                         labels=None, order=None, colour=0xFFFFFF)
         if key in SKIP_KEYS or c.get("text") == "COMPANION SCREEN":

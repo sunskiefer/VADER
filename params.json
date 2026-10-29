@@ -17843,7 +17843,7 @@
   {
    "key": "smp_root_a",
    "name": "SAMPLE A ROOT NOTE",
-   "default": 60,
+   "default": 48,
    "min": 0,
    "max": 127,
    "display": "int",
@@ -17852,7 +17852,7 @@
   {
    "key": "smp_root_b",
    "name": "SAMPLE B ROOT NOTE",
-   "default": 60,
+   "default": 48,
    "min": 0,
    "max": 127,
    "display": "int",
@@ -17861,7 +17861,7 @@
   {
    "key": "smp_root_c",
    "name": "SAMPLE C ROOT NOTE",
-   "default": 60,
+   "default": 48,
    "min": 0,
    "max": 127,
    "display": "int",
@@ -17870,7 +17870,7 @@
   {
    "key": "smp_root_d",
    "name": "SAMPLE D ROOT NOTE",
-   "default": 60,
+   "default": 48,
    "min": 0,
    "max": 127,
    "display": "int",

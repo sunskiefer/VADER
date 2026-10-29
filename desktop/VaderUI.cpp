@@ -617,6 +617,7 @@ void VaderUI::drawCtl(const VgCtl &c) {
     }
     case VGK_LIVETEXT: {   // 0.8: the name of a mode knob follows the mode and the layer
         char nm[48] = "";
+        if (c.aux >= 200) break;   // the CPU readout is the Force's; a computer's host has its own meter
         if (c.aux >= 100) {   // a corner's character control: named by the corner's voice
             const int idx = c.aux - 101, corner_ = idx / 4, k = idx % 4;
             const int eng = (int)lroundf(fv[VGP_A_ENG + 0 + corner_ * 5]);

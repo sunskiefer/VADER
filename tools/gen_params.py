@@ -259,7 +259,7 @@ GLOBAL_LATE5 = [("voice_cap", "VOICE LIMIT", 16, 1, 16, None, True), ("arp_chain
 SMP_LENS = ["ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS"]
 GLOBAL_LATE4 = ([("smp_%s" % c, "SAMPLE %s" % c.upper(), 0, 0, 499, None, True) for c in "abcd"]
                 + [("smp_len_%s" % c, "SAMPLE %s MODE" % c.upper(), 0, 0, 0, SMP_LENS, False) for c in "abcd"]
-                + [("smp_root_%s" % c, "SAMPLE %s ROOT NOTE" % c.upper(), 60, 0, 127, None, True) for c in "abcd"])
+                + [("smp_root_%s" % c, "SAMPLE %s ROOT NOTE" % c.upper(), 48, 0, 127, None, True) for c in "abcd"])
 # 0.8, appended: per-corner extras: GEN 2 TUNE as a ratio (musical or prime, folded into one octave) and a limiter
 RATIO_MODES = ["OFF", "MUSICAL", "PRIME"]
 SOUND_LATE5 = []
