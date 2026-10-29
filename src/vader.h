@@ -72,7 +72,7 @@ static inline void path_at(const float *x2, const float *y2, float t, float *ox,
 }
 
 /* ---- modes.c (0.8): simulations that move the orbiter instead of a shape's path */
-#define NMODES 14
+#define NMODES 27
 #define SIM_N 64
 typedef struct {
     int mode, n, last, alive;

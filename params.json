@@ -16735,7 +16735,20 @@
     "AIZAWA",
     "PENDULUM",
     "BOUNCE",
-    "RIPPLE"
+    "RIPPLE",
+    "MAGNET",
+    "BOIDS",
+    "PARTICLE WAVE",
+    "OPTIMIZE",
+    "TRANSFER ORBIT",
+    "GRAVITY WELLS",
+    "SERPENTINE DRAGON",
+    "PARAMECIA",
+    "MEDUSA",
+    "FLATWORMS",
+    "ETHEREAL RAY",
+    "CLUMP SWARM",
+    "THUNDER"
    ],
    "default": "PATH"
   },
