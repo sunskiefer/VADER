@@ -251,3 +251,4 @@ First release: not yet tested on a device.
   line screen: the shape, the orbiter's trail and the envelope.
 
 - Suborbit shape MOBIUS: swings across the path with a half turn per lap (twisted ribbon).
+- Kaleidoscope: every second copy is now mirrored (not only rotated), in the sound and on the screens.

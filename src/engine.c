@@ -1359,7 +1359,8 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         if ((int)P[S_SIM_MODE] > 0) for (int k = 1; k < nb && k < s->sim[t].n && ne < 3; k++) { ex[ne] = s->sim[t].sx[k]; ey[ne++] = s->sim[t].sy[k]; }
         if (kn > 1 && (int)P[S_KAL_SOUND]) for (int j = 1; j < kn && ne < 17; j++) {
             float a = TWO_PI * j / kn, ca = cosf(a), sa = sinf(a);
-            ex[ne] = clampf(ox * ca - oy * sa, -1, 1); ey[ne++] = clampf(ox * sa + oy * ca, -1, 1);
+            { float my_ = (j & 1) ? -oy : oy;   /* every second copy is mirrored */
+                ex[ne] = clampf(ox * ca - my_ * sa, -1, 1); ey[ne++] = clampf(ox * sa + my_ * ca, -1, 1); }
         }
         if (ne > 0) {
             for (int k = 0; k < ne; k++) {
@@ -2492,7 +2493,7 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
             int kn = (int)T(t)[S_KAL_N];
             for (int j = 1; j < kn && v.nballs < 16; j++) {
                 float a = TWO_PI * j / kn, ca = cosf(a), sa = sinf(a);
-                v.bx[v.nballs] = clampf(v.ox * ca - v.oy * sa, -1, 1); v.by[v.nballs] = clampf(v.ox * sa + v.oy * ca, -1, 1); v.nballs++;
+                { float my_ = (j & 1) ? -v.oy : v.oy; v.bx[v.nballs] = clampf(v.ox * ca - my_ * sa, -1, 1); v.by[v.nballs] = clampf(v.ox * sa + my_ * ca, -1, 1); v.nballs++; }
             }
         }
         overlay_publish(&s->ovl, &v);
