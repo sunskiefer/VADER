@@ -44,7 +44,7 @@ add_library(vader_zynth STATIC
 target_include_directories(vader_zynth PUBLIC ${VADER_ROOT}/src/zynth)
 target_include_directories(vader_zynth PRIVATE ${VADER_ROOT}/src/zynth/shim ${VADER_ROOT}/third_party/lxr02open
   ${VADER_ROOT}/third_party/lxr02open/Core ${VADER_ROOT}/third_party/lxr02open/Core/DSPAudio ${M})
-target_compile_definitions(vader_zynth PRIVATE TEST=1)
+target_compile_definitions(vader_zynth PRIVATE TEST=1 _USE_MATH_DEFINES=1)
 target_compile_options(vader_zynth PRIVATE -w -O2 -ffp-contract=off $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-rtti -fno-threadsafe-statics -std=c++11>)
 add_library(vader_engine STATIC ${ENGINE_SRCS})
 target_link_libraries(vader_engine PUBLIC vader_zynth)
