@@ -17565,6 +17565,126 @@
    "default": "OFF"
   },
   {
+   "key": "smp_a",
+   "name": "SAMPLE A",
+   "default": 0,
+   "min": 0,
+   "max": 499,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_b",
+   "name": "SAMPLE B",
+   "default": 0,
+   "min": 0,
+   "max": 499,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_c",
+   "name": "SAMPLE C",
+   "default": 0,
+   "min": 0,
+   "max": 499,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_d",
+   "name": "SAMPLE D",
+   "default": 0,
+   "min": 0,
+   "max": 499,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_len_a",
+   "name": "SAMPLE A MODE",
+   "options": [
+    "ONE SHOT",
+    "LOOP 1 STEP",
+    "LOOP 2 STEPS",
+    "LOOP 3 STEPS",
+    "LOOP 4 STEPS"
+   ],
+   "default": "ONE SHOT"
+  },
+  {
+   "key": "smp_len_b",
+   "name": "SAMPLE B MODE",
+   "options": [
+    "ONE SHOT",
+    "LOOP 1 STEP",
+    "LOOP 2 STEPS",
+    "LOOP 3 STEPS",
+    "LOOP 4 STEPS"
+   ],
+   "default": "ONE SHOT"
+  },
+  {
+   "key": "smp_len_c",
+   "name": "SAMPLE C MODE",
+   "options": [
+    "ONE SHOT",
+    "LOOP 1 STEP",
+    "LOOP 2 STEPS",
+    "LOOP 3 STEPS",
+    "LOOP 4 STEPS"
+   ],
+   "default": "ONE SHOT"
+  },
+  {
+   "key": "smp_len_d",
+   "name": "SAMPLE D MODE",
+   "options": [
+    "ONE SHOT",
+    "LOOP 1 STEP",
+    "LOOP 2 STEPS",
+    "LOOP 3 STEPS",
+    "LOOP 4 STEPS"
+   ],
+   "default": "ONE SHOT"
+  },
+  {
+   "key": "smp_root_a",
+   "name": "SAMPLE A ROOT NOTE",
+   "default": 60,
+   "min": 0,
+   "max": 127,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_root_b",
+   "name": "SAMPLE B ROOT NOTE",
+   "default": 60,
+   "min": 0,
+   "max": 127,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_root_c",
+   "name": "SAMPLE C ROOT NOTE",
+   "default": 60,
+   "min": 0,
+   "max": 127,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
+   "key": "smp_root_d",
+   "name": "SAMPLE D ROOT NOTE",
+   "default": 60,
+   "min": 0,
+   "max": 127,
+   "display": "int",
+   "dynamic_display": true
+  },
+  {
    "key": "cn1",
    "name": "CORNER CHARACTER 1 NAME",
    "default": 0,
@@ -17763,6 +17883,38 @@
    "min": 0,
    "max": 1,
    "popup_of": "spd_curve"
+  },
+  {
+   "key": "smp_len_a__open",
+   "name": "smp_len_a list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "smp_len_a"
+  },
+  {
+   "key": "smp_len_b__open",
+   "name": "smp_len_b list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "smp_len_b"
+  },
+  {
+   "key": "smp_len_c__open",
+   "name": "smp_len_c list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "smp_len_c"
+  },
+  {
+   "key": "smp_len_d__open",
+   "name": "smp_len_d list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "smp_len_d"
   }
  ]
 }

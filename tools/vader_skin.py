@@ -37,7 +37,7 @@ GROUND = (0, 0, 0)
 BTN_ON = (0, 0, 0)
 BTN_OFF = (0, 0, 0)
 
-TABS = ["MAIN", "CORNERS", "ORBIT", "IMAGE", "ARP", "FX", "MODE", "VOICES", "PLAY", "TRAVEL"]
+TABS = ["MAIN", "CORNERS", "ORBIT", "IMAGE", "ARP", "FX", "MODE", "VOICES", "PLAY", "TRAVEL", "SAMPLES"]
 HL = 50          # a line control's height: name row, then the line
 LINE_H = 16      # its line's strip frame height
 LINE_Y = 30      # where the line sits inside the control
@@ -300,6 +300,21 @@ def page_play():
     return c, q
 
 
+def page_samples():
+    """0.8: one sample per corner (a WAV from the Samples folder, "VADER Samples" on a card or drive): played one-shot at the
+    root note, or as a loop over 1-4 steps of the tempo."""
+    c, q = [], []
+    for ci, cl in enumerate("abcd"):
+        x = 16 + ci * 316
+        c += [title("CORNER " + cl.upper(), x, 70, 300),
+              hl("smp_" + cl, x, 92, 300, "SAMPLE", big=True),
+              text("MODE", x, 180, 22),
+              popup("smp_len_" + cl, x, 202, 300, "", h=48, list_at=(x if ci < 2 else x - 100, 254), cols=1, ow=300, oh=44),
+              hl("smp_root_" + cl, x, 272, 300, "ROOT NOTE", big=True)]
+        q.append(("SAMPLE " + cl.upper(), ["smp_" + cl, "smp_len_" + cl, "smp_root_" + cl]))
+    return c, q
+
+
 def page_travel():
     """0.8: how the orbiter travels and how its shape is bent: speed shaping, the part of the path used, stretch, skew, the
     centre point, the Warp pad, Focus (steer by hand), aftertouch."""
@@ -328,7 +343,7 @@ def page_travel():
     return c, q
 
 
-PAGES = [page_main, page_corners, page_orbit, page_image, page_arp, page_fx, page_mode, page_voices, page_play, page_travel]
+PAGES = [page_main, page_corners, page_orbit, page_image, page_arp, page_fx, page_mode, page_voices, page_play, page_travel, page_samples]
 
 
 def stripe():

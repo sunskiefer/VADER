@@ -57,6 +57,17 @@ static int find(const char *s) { return find_n(s, (int)strlen(s)); }
 #define MAXHELD 32
 typedef struct { char *path, *label; } shapefile_t;   /* a shape file found: where it is, how it's listed */
 
+/* 0.8: a corner's sample (one WAV per corner), loaded off the audio thread; two buffers so the swap never frees what plays */
+typedef struct {
+    float *d[2];
+    int n[2], cur;
+    float sr;
+    char path[600], want[600];
+    int busy, joinable;
+    pthread_t th;
+    pthread_mutex_t lk;
+} smp_t;
+
 typedef struct {
     int active, timbre, note, key, released, held_by_pedal;   /* key: the key that played it (note: with the timbre's octave) */
     float vel;
@@ -65,6 +76,7 @@ typedef struct {
     int stage;                   /* 0 attack, 1 decay, 2 sustain, 3 release */
     float env;
     float ph[4][2];              /* generator phases */
+    double sp[4];                /* 0.8: each corner's sample position */
     float s1[4][2], s2[4][2];    /* SVF states (two stages) */
     float lad[4][4], lad_y[4];   /* ladder */
     float sh_ph, sh_lp[2];       /* the shape sound */
@@ -146,6 +158,9 @@ typedef struct {
     char dir[512];
     shapefile_t files[MAXFILES];
     int nfiles;
+    shapefile_t wavs[MAXFILES];  /* 0.8: the WAV files found (samples) */
+    int nwavs;
+    smp_t smp[4];
     path_t user;
     int has_user;
     image_t img, load_img;        /* the picture under the shape (IMAGE page), from the last PNG/JPG loaded */
@@ -342,13 +357,20 @@ static int cmp_file(const void *a, const void *b) {
     return strcasecmp(x->label, y->label);
 }
 
+static int is_wav_file(const char *n) {
+    const char *e = strrchr(n, '.');
+    return e && (!strcasecmp(e, ".wav") || !strcasecmp(e, ".wave"));
+}
+static int g_scan_wav;   /* 1: scan_dir lists WAV files into s->wavs instead of the shapes */
 static void scan_dir(vader_t *s, const char *root, const char *rel, const char *tag, int depth) {
+    shapefile_t *arr = g_scan_wav ? s->wavs : s->files;
+    int *cnt = g_scan_wav ? &s->nwavs : &s->nfiles;
     char path[1024];
     snprintf(path, sizeof path, "%s%s%s", root, rel[0] ? "/" : "", rel);
     DIR *d = opendir(path);
     if (!d) return;
     struct dirent *e;
-    while ((e = readdir(d)) && s->nfiles < MAXFILES) {
+    while ((e = readdir(d)) && *cnt < MAXFILES) {
         if (e->d_name[0] == '.') continue;
         char r2[512], full[1024];
         snprintf(r2, sizeof r2, "%s%s%s", rel, rel[0] ? "/" : "", e->d_name);
@@ -357,12 +379,12 @@ static void scan_dir(vader_t *s, const char *root, const char *rel, const char *
         if (lstat(full, &st)) continue;   /* lstat: links are not followed */
         if (S_ISDIR(st.st_mode)) {
             if (depth < 2) scan_dir(s, root, r2, tag, depth + 1);
-        } else if (S_ISREG(st.st_mode) && is_shape_file(e->d_name)) {
+        } else if (S_ISREG(st.st_mode) && (g_scan_wav ? is_wav_file(e->d_name) : is_shape_file(e->d_name))) {
             char label[600];
             snprintf(label, sizeof label, "%s%s", tag, r2);
-            s->files[s->nfiles].path = strdup(full);
-            s->files[s->nfiles].label = strdup(label);
-            s->nfiles++;
+            arr[*cnt].path = strdup(full);
+            arr[*cnt].label = strdup(label);
+            (*cnt)++;
         }
     }
     closedir(d);
@@ -375,6 +397,7 @@ static void scan_dir(vader_t *s, const char *root, const char *rel, const char *
 #define VADER_SDCARD "/sdcard"
 #endif
 
+static void smp_sync_all(vader_t *s);
 static void rescan(vader_t *s) {
     for (int i = 0; i < s->nfiles; i++) { free(s->files[i].path); free(s->files[i].label); }
     s->nfiles = 0;
@@ -395,8 +418,160 @@ static void rescan(vader_t *s) {
         closedir(m);
     }
     qsort(s->files, (size_t)s->nfiles, sizeof(shapefile_t), cmp_file);
+    /* the samples: WAV files in the plugin folder, "VADER Samples" on the card and on drives */
+    for (int i = 0; i < s->nwavs; i++) { free(s->wavs[i].path); free(s->wavs[i].label); }
+    s->nwavs = 0;
+    g_scan_wav = 1;
+    if (s->dir[0]) scan_dir(s, s->dir, "", "", 0);
+    if (s->pdir[0]) {   /* <plugin folder>/Samples */
+        snprintf(root, sizeof root, "%s", s->pdir);
+        char *sl_ = strrchr(root, '/');
+        if (sl_) { snprintf(sl_, sizeof root - (size_t)(sl_ - root), "/Samples"); scan_dir(s, root, "", "", 0); }
+    }
+    snprintf(root, sizeof root, "%s/VADER Samples", VADER_SDCARD);
+    scan_dir(s, root, "", "[CARD] ", 0);
+    DIR *m2 = opendir(VADER_MEDIA);
+    if (m2) {
+        struct dirent *e;
+        while ((e = readdir(m2))) {
+            if (e->d_name[0] == '.') continue;
+            char tag[96];
+            snprintf(root, sizeof root, "%s/%s/VADER Samples", VADER_MEDIA, e->d_name);
+            snprintf(tag, sizeof tag, "[%.80s] ", e->d_name);
+            scan_dir(s, root, "", tag, 0);
+        }
+        closedir(m2);
+    }
+    g_scan_wav = 0;
+    qsort(s->wavs, (size_t)s->nwavs, sizeof(shapefile_t), cmp_file);
     s->status[0] = 0;
     mark(s, P_FILE);
+    for (int c = 0; c < 4; c++) mark(s, P_SMP_A + c);
+    smp_sync_all(s);
+}
+
+/* ---- 0.8: samples */
+static unsigned rd16(const unsigned char *p) { return p[0] | (p[1] << 8); }
+static unsigned rd32(const unsigned char *p) { return p[0] | (p[1] << 8) | ((unsigned)p[2] << 16) | ((unsigned)p[3] << 24); }
+/* a WAV (PCM 8/16/24/32 or float 32, any channels, mixed down to mono, up to 30 s) -> floats */
+static int wav_load(const char *path, float **out, int *nout, float *sr) {
+    FILE *f = fopen(path, "rb");
+    if (!f) return -1;
+    fseek(f, 0, SEEK_END);
+    long sz = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (sz < 44 || sz > 64 * 1024 * 1024) { fclose(f); return -1; }
+    unsigned char *b = malloc((size_t)sz);
+    if (!b || fread(b, 1, (size_t)sz, f) != (size_t)sz) { free(b); fclose(f); return -1; }
+    fclose(f);
+    int rc = -1, fmt = 0, ch = 0, bits = 0;
+    unsigned rate = 0;
+    const unsigned char *data = NULL;
+    unsigned dlen = 0;
+    if (memcmp(b, "RIFF", 4) || memcmp(b + 8, "WAVE", 4)) { free(b); return -1; }
+    for (long p = 12; p + 8 <= sz;) {
+        unsigned cl = rd32(b + p + 4);
+        const unsigned char *c = b + p + 8;
+        if (!memcmp(b + p, "fmt ", 4) && p + 8 + 16 <= sz) {
+            fmt = (int)rd16(c); ch = (int)rd16(c + 2); rate = rd32(c + 4); bits = (int)rd16(c + 14);
+            if (fmt == 0xFFFE && cl >= 26) fmt = (int)rd16(c + 24);   /* extensible: the sub-format */
+        } else if (!memcmp(b + p, "data", 4)) {
+            data = c; dlen = cl;
+            if ((long)(p + 8 + dlen) > sz) dlen = (unsigned)(sz - p - 8);
+            break;
+        }
+        p += 8 + (long)cl + (cl & 1);
+    }
+    if (data && ch >= 1 && ch <= 8 && rate >= 8000 && rate <= 192000 && ((fmt == 1 && (bits == 8 || bits == 16 || bits == 24 || bits == 32)) || (fmt == 3 && bits == 32))) {
+        int bps = bits / 8;
+        long frames = (long)(dlen / (unsigned)(bps * ch));
+        long maxf = (long)rate * 30;
+        if (frames > maxf) frames = maxf;
+        float *d = frames > 1 ? malloc(sizeof(float) * (size_t)frames) : NULL;
+        if (d) {
+            for (long i = 0; i < frames; i++) {
+                float acc = 0;
+                for (int k = 0; k < ch; k++) {
+                    const unsigned char *q = data + ((size_t)i * (size_t)ch + (size_t)k) * (size_t)bps;
+                    float x;
+                    if (fmt == 3) { float fv; memcpy(&fv, q, 4); x = fv; }
+                    else if (bits == 8) x = ((int)q[0] - 128) / 128.0f;
+                    else if (bits == 16) x = (short)rd16(q) / 32768.0f;
+                    else if (bits == 24) x = (int)((unsigned)(q[0] << 8 | q[1] << 16 | (unsigned)q[2] << 24)) / 2147483648.0f;
+                    else x = (int)rd32(q) / 2147483648.0f;
+                    acc += x;
+                }
+                d[i] = acc / (float)ch;
+            }
+            *out = d; *nout = (int)frames; *sr = (float)rate;
+            rc = 0;
+        }
+    }
+    free(b);
+    return rc;
+}
+
+static void *smp_worker(void *arg) {
+    smp_t *sl = arg;
+    for (;;) {
+        char w[600];
+        pthread_mutex_lock(&sl->lk);
+        if (!strcmp(sl->want, sl->path)) { sl->busy = 0; pthread_mutex_unlock(&sl->lk); return NULL; }
+        snprintf(w, sizeof w, "%s", sl->want);
+        pthread_mutex_unlock(&sl->lk);
+        float *d = NULL; int n = 0; float sr = 48000;
+        if (w[0] && wav_load(w, &d, &n, &sr)) { d = NULL; n = 0; }
+        int nx = 1 - sl->cur;
+        free(sl->d[nx]);
+        sl->d[nx] = d; sl->n[nx] = n; sl->sr = sr;
+        __atomic_store_n(&sl->cur, nx, __ATOMIC_RELEASE);
+        pthread_mutex_lock(&sl->lk);
+        snprintf(sl->path, sizeof sl->path, "%s", w);
+        pthread_mutex_unlock(&sl->lk);
+    }
+}
+
+/* the corner's SAMPLE choice (0: off, else the n-th WAV found): load it (or drop it) in the background */
+static void smp_request(vader_t *s, int c) {
+    smp_t *sl = &s->smp[c];
+    int i = (int)s->g[G_SMP_A + c] - 1;
+    const char *want = i >= 0 && i < s->nwavs ? s->wavs[i].path : "";
+    pthread_mutex_lock(&sl->lk);
+    snprintf(sl->want, sizeof sl->want, "%s", want);
+    if (!sl->busy && strcmp(sl->want, sl->path)) {
+        sl->busy = 1;
+        if (sl->joinable) pthread_join(sl->th, NULL);
+        sl->joinable = pthread_create(&sl->th, NULL, smp_worker, sl) == 0;
+        if (!sl->joinable) sl->busy = 0;
+    }
+    pthread_mutex_unlock(&sl->lk);
+}
+static void smp_sync_all(vader_t *s) { for (int c = 0; c < 4; c++) smp_request(s, c); }
+
+/* a corner's sample for n frames: ONE SHOT follows the key (the ROOT NOTE plays it at its own speed); a LOOP runs the
+ * whole sample over 1-4 sixteenth steps of the tempo and ignores the key. */
+static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, int n) {
+    smp_t *sl = &s->smp[c];
+    int cu = __atomic_load_n(&sl->cur, __ATOMIC_ACQUIRE), len = sl->n[cu];
+    const float *d = sl->d[cu];
+    int mode = (int)s->g[G_SMP_LEN_A + c];
+    double rate, p = v->sp[c];
+    if (mode == 0) {
+        float fr = 440.0f * powf(2.0f, (s->g[G_SMP_ROOT_A + c] - 69.0f) / 12.0f);
+        rate = (double)sl->sr * INV_SR * freq / fr;
+    } else {
+        rate = (double)len / ((double)mode * (60.0 / tempo_of(s) / 4.0) / INV_SR);
+    }
+    for (int i = 0; i < n; i++) {
+        if (mode == 0 && p >= len - 1) { out[i] = 0; continue; }
+        while (p >= len) p -= len;
+        int i0 = (int)p, i1 = i0 + 1;
+        float fr = (float)(p - i0);
+        if (i1 >= len) i1 = mode ? 0 : i0;
+        out[i] = (d[i0] + (d[i1] - d[i0]) * fr) * 0.8f;
+        p += rate;
+    }
+    v->sp[c] = p;
 }
 
 static void *load_thread(void *arg) {
@@ -1124,7 +1299,11 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     int eng_on[4] = {0, 0, 0, 0};
     for (int c = 0; c < 4; c++) {
         int ei = (int)P[S_A_ENG + c * 5];
-        if (ei > 0 && on[c]) {
+        float cfreq = base * powf(2.0f, P[c * NCF + CF_OCT]);
+        if ((int)s->g[G_SMP_A + c] > 0 && on[c] && s->smp[c].n[__atomic_load_n(&s->smp[c].cur, __ATOMIC_ACQUIRE)] > 1) {
+            eng_on[c] = 1;   /* a sample: through the corner's filter like a voice */
+            smp_render(s, v, c, cfreq, ebuf[c], n);
+        } else if (ei > 0 && on[c]) {
             eng_on[c] = 1;
             corner_engine(s, v, c, P, ei, base * powf(2.0f, P[c * NCF + CF_OCT]), ebuf[c], n);
         }
@@ -1406,6 +1585,11 @@ static void value_text(vader_t *s, int p, float v, char *buf, int len) {
         snprintf(buf, (size_t)len, "%s", s->status[0] ? s->status : f ? f->label : "NO SHAPE FILES FOUND");
         return;
     }
+    if (p >= P_SMP_A && p <= P_SMP_D) {
+        int i = (int)lroundf(v) - 1;
+        snprintf(buf, (size_t)len, "%s", i < 0 ? "OFF" : i < s->nwavs ? s->wavs[i].label : "NOT FOUND");
+        return;
+    }
     if (p == P_USER_SLOT) {
         int n = (int)lroundf(v);
         snprintf(buf, (size_t)len, "USER %03d   %s", n, s->ustatus[0] ? s->ustatus : user_saved(s, n) ? "saved" : "empty");
@@ -1445,6 +1629,7 @@ static void *create(const char *data_dir) {
     if (!s) return NULL;
     s->fx = fx_new();
     if (!s->fx) { free(s); return NULL; }
+    for (int c = 0; c < 4; c++) pthread_mutex_init(&s->smp[c].lk, NULL);
     if (data_dir) {
         snprintf(s->dir, sizeof s->dir, "%s", data_dir);
         /* the presets go next to the Shapes folder, in the plugin's own folder */
@@ -1496,6 +1681,12 @@ static void destroy(void *p) {
     web_stop(&s->web);
     overlay_stop(&s->ovl);
     if (s->loader_joinable) pthread_join(s->loader, NULL);
+    for (int c = 0; c < 4; c++) {
+        pthread_mutex_lock(&s->smp[c].lk); s->smp[c].want[0] = 0; strcpy(s->smp[c].path, "\x01"); pthread_mutex_unlock(&s->smp[c].lk);
+        if (s->smp[c].joinable) pthread_join(s->smp[c].th, NULL);
+        free(s->smp[c].d[0]); free(s->smp[c].d[1]);
+    }
+    for (int i = 0; i < s->nwavs; i++) { free(s->wavs[i].path); free(s->wavs[i].label); }
     for (int i = 0; i < s->nfiles; i++) { free(s->files[i].path); free(s->files[i].label); }
     fx_free(s->fx);
     for (int i = 0; i < MAXV; i++)
@@ -1599,6 +1790,7 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
         s->self_next = -1;
         drone_apply(s);
         all_dirty(s);
+        smp_sync_all(s);
         screen_forget(s);
         }
 
@@ -1723,6 +1915,7 @@ static void set_param(void *p, const char *key, const char *val) {
         if (q->slot == G_CORNER) mark_corner_view(s);
         if (q->slot == G_VOICES) all_off(s, 1);
         if (q->slot == G_FILE) s->status[0] = 0;
+        if (q->slot >= G_SMP_A && q->slot <= G_SMP_D) smp_request(s, q->slot - G_SMP_A);
         if (q->slot == G_USER_SLOT) s->ustatus[0] = 0;
         if (q->slot == G_ARP_ON && !(int)v) { s->nheld = 0; arp_release(s); }
         if (q->slot == G_MOTION) s->shape_wait = 0;

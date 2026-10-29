@@ -247,6 +247,11 @@ GLOBAL_LATE3 = [("stepo%d" % (i + 1), "STEP %d OCTAVE" % (i + 1), 0, -2, 2, None
                 ("dly_hold", "DELAY HOLD", 0, 0, 0, ["OFF", "ON"], False),
                 ("dly_add", "DELAY ADD", 0, 0, 0, ["OFF", "ON"], False),
                 ("dly_rev", "DELAY REVERSE", 0, 0, 0, ["OFF", "ON"], False)]
+# 0.8, appended: samples, one per corner (a WAV from the Samples folders; OFF = the corner's own voice)
+SMP_LENS = ["ONE SHOT", "LOOP 1 STEP", "LOOP 2 STEPS", "LOOP 3 STEPS", "LOOP 4 STEPS"]
+GLOBAL_LATE4 = ([("smp_%s" % c, "SAMPLE %s" % c.upper(), 0, 0, 499, None, True) for c in "abcd"]
+                + [("smp_len_%s" % c, "SAMPLE %s MODE" % c.upper(), 0, 0, 0, SMP_LENS, False) for c in "abcd"]
+                + [("smp_root_%s" % c, "SAMPLE %s ROOT NOTE" % c.upper(), 60, 0, 127, None, True) for c in "abcd"])
 # 0.8, appended: the orbiter's travel (speed shaping, the part of the path used), its transform, the Warp pad, Focus
 CURVES = ["LINEAR", "SLOW MIDDLE", "FAST MIDDLE", "PULSE"]
 SOUND_LATE4 = [
@@ -270,7 +275,7 @@ SOUND_LATE2 = [("sh_a", "SHAPE A", 0.5, 0, 1, None, False), ("sh_b", "SHAPE B", 
                ("mk%d" % (i + 1), "MODE KNOB %d" % (i + 1), 0.5, 0, 1, None, False) for i in range(8)]
 POPUPS_LATE = ["im%d_%s" % (i + 1, f) for i in range(4) for f in ("src", "to")] 
 POPUPS_LATE2 = ["orb_dir", "sim_mode"]
-POPUPS_LATE3 = ["%s_eng" % c for c in "abcd"] + ["self_scale", "drone_chord", "spd_curve"]
+POPUPS_LATE3 = ["%s_eng" % c for c in "abcd"] + ["self_scale", "drone_chord", "spd_curve"] + ["smp_len_%s" % c for c in "abcd"]
 
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
 POPUPS = ["shape", "orb_div", "arp_mode", "arp_rate", "dly_div"] + ["%s_%s" % (c, f) for c in "abcd" for f in ("mode", "ftype")]
@@ -306,7 +311,7 @@ def build():
             snd_slots.append("%s_%s" % (c, f))
     for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2 + SOUND_LATE3 + SOUND_LATE4:
         snd_slots.append(k)
-    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3]
+    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3 + GLOBAL_LATE4]
 
     # 1. the main page's corner knobs
     for i, (f, name) in enumerate(FRONT):
@@ -402,6 +407,8 @@ def build():
     for k, name in TRIGGERS_LATE3:
         add(k, name, 0, 0, 1, None, False, "TRIG", 0, {"momentary": True})
     for k, name, d, lo, hi, opts, isint in GLOBAL_LATE3:
+        add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None if opts else {"dynamic_display": True})
+    for k, name, d, lo, hi, opts, isint in GLOBAL_LATE4:
         add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None if opts else {"dynamic_display": True})
     for i in range(16):   # the live names of the corners' character controls
         add("cn%d" % (i + 1), "CORNER CHARACTER %d NAME" % (i + 1), 0, 0, 1, None, False, "STR", 10 + i, {"display": "string"})

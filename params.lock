@@ -2146,6 +2146,18 @@ dly_mode
 dly_hold
 dly_add
 dly_rev
+smp_a
+smp_b
+smp_c
+smp_d
+smp_len_a
+smp_len_b
+smp_len_c
+smp_len_d
+smp_root_a
+smp_root_b
+smp_root_c
+smp_root_d
 cn1
 cn2
 cn3
@@ -2171,3 +2183,7 @@ d_eng__open
 self_scale__open
 drone_chord__open
 spd_curve__open
+smp_len_a__open
+smp_len_b__open
+smp_len_c__open
+smp_len_d__open
