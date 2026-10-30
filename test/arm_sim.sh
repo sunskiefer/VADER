@@ -14,6 +14,9 @@ FL="-O2 -w -std=gnu11 -Ibuild -I$MPC_VST/wrapper $INCS"
 mkdir -p build/armsim
 OBJS=""
 for f in $PLUGIN_SRCS test/engine_test.c; do o="build/armsim/$(echo $f | tr / _).o"; $ZIG cc $TGT $FL -c $f -o $o; OBJS="$OBJS $o"; done
-$ZIG cc $TGT -static $OBJS -lm -o build/armsim/engine_test
+# 0.8: the ZYNTH voices (C) and the Mutable Instruments engines (C++)
+for f in $ZYN_SRCS; do o="build/armsim/$(echo $f | tr / _).o"; $ZIG cc $TGT -O2 -w -std=gnu11 $ZINCS -c $f -o $o; OBJS="$OBJS $o"; done
+for f in $CXX_SRCS; do o="build/armsim/$(echo $f | tr / _).o"; $ZIG c++ $TGT -O2 -w $CXXFLAGS_MI $CXXINCS -c $f -o $o; OBJS="$OBJS $o"; done
+$ZIG c++ $TGT -static $OBJS -lm -o build/armsim/engine_test
 QEMU=$(command -v qemu-arm || command -v qemu-arm-static)
 VADER_SLOW=1 $QEMU build/armsim/engine_test   # emulated: the engine test's timing check is skipped
