@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased: 0.8.0 (Force and desktop, one release)
+## 0.8.0 (Force and desktop, one release)
 
 Built for the Force (ARM) and the desktop plugins from the same sources. **Not yet tested on a device.**
 

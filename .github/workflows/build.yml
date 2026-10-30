@@ -55,6 +55,7 @@ jobs:
             --so build/arm/vader.so \
             --skin "build/skin/L'Cronx - VST - VADER" \
             --extra shapes:Shapes \
+            --extra Samples:Samples \
             --entry build/pluginlist-entry.xml \
             --version "$VERSION" \
             --about "VADER by L'Cronx: an orbit-based vector synth for MPC OS, with shapes and pictures of your own" \

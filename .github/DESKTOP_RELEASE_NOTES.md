@@ -1,4 +1,4 @@
-VADER as a VST3 and a VST2 plugin for Windows (x86_64) and Linux (x86_64), with the orbit screen drawn in the plugin's own window. The Force plugin is unchanged.
+VADER as a VST3 and a VST2 plugin for Windows (x86_64) and Linux (x86_64), with the orbit screen drawn in the plugin's own window. This is the 0.8.0 desktop build: the same engine, pages and presets as the 0.8.0 Force plugin (modes, voices, samples and the new pages).
 
 ![VADER desktop: the orbit screen on the MAIN page](https://raw.githubusercontent.com/sunskiefer/VADER/main/docs/img/desktop/vader-desktop-main.png)
 
