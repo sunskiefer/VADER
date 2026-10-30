@@ -505,6 +505,15 @@ static void rescan(vader_t *s) {
         char *sl_ = strrchr(root, '/');
         if (sl_) { snprintf(sl_, sizeof root - (size_t)(sl_ - root), "/Samples"); scan_dir(s, root, "", "", 0); }
     }
+    {   /* the desktop plugin: samples shipped inside the plugin (VADER_SAMPLES_EXTRA, folders separated by '|') */
+        const char *xs = getenv("VADER_SAMPLES_EXTRA");
+        while (xs && *xs) {
+            const char *bar = strchr(xs, '|');
+            size_t n = bar ? (size_t)(bar - xs) : strlen(xs);
+            if (n > 0 && n < sizeof root) { memcpy(root, xs, n); root[n] = 0; scan_dir(s, root, "", "", 0); }
+            xs = bar ? bar + 1 : NULL;
+        }
+    }
     snprintf(root, sizeof root, "%s/VADER Samples", VADER_SDCARD);
     scan_dir(s, root, "", "[CARD] ", 0);
     DIR *m2 = opendir(VADER_MEDIA);

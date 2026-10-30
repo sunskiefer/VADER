@@ -5,6 +5,8 @@
 #include <string.h>
 #include <locale.h>
 #include "paths.hpp"
+#include "DistrhoPluginUtils.hpp"
+#include <string>
 
 START_NAMESPACE_DISTRHO
 
@@ -27,6 +29,24 @@ static void spin_unlock(std::atomic_flag &f) { f.clear(std::memory_order_release
 
 VaderPlugin::VaderPlugin() : Plugin(VG_NEXP, 16, 1), fEng(mpc_engine()), fInst(nullptr), fBus(nullptr), fVersion(1) {
     std::string dir = vaderShapesDir();
+    {   // the example samples travel inside the plugin: <bundle>/Contents/Resources/Samples (VST3), or a Samples / VADER Samples folder beside the file (VST2)
+        std::string bin = DISTRHO_NAMESPACE::getBinaryFilename();
+        for (char &c : bin)
+            if (c == '\\') c = '/';
+        std::string list;
+        auto up = [](std::string p) { size_t i = p.find_last_of('/'); return i == std::string::npos ? std::string() : p.substr(0, i); };
+        const std::string d1 = up(bin), d2 = up(d1);
+        auto add = [&](const std::string &p) { if (!p.empty()) list += (list.empty() ? "" : "|") + p; };
+        add(d2 + "/Resources/Samples");
+        add(d1 + "/Samples");
+        add(d1 + "/VADER Samples");
+        add(d1 + "/Resources/Samples");
+#ifdef _WIN32
+        _putenv_s("VADER_SAMPLES_EXTRA", list.c_str());
+#else
+        setenv("VADER_SAMPLES_EXTRA", list.c_str(), 1);
+#endif
+    }
     {
         CLocale c;
         fInst = fEng->create(dir.empty() ? nullptr : dir.c_str());
