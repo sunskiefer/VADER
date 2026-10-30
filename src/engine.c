@@ -96,7 +96,7 @@ typedef struct {
 
 typedef struct {
     path_t base;                 /* the shape as built or loaded */
-    float x2[PATHN], y2[PATHN];  /* as the orbiter follows it now (turned, tilted) */
+    float x2[PATHN], y2[PATHN], z2[PATHN];  /* as the orbiter follows it now (turned, tilted) */
     float yaw, last_rot, last_tilt;
     int shape_built;
     float orb_t, orb_o;          /* the free-running orbit */
@@ -306,8 +306,28 @@ static inline float dir_t(const float *P, float ph) {
     }
 }
 
+/* 0.8: the path's Frenet frame at u, seen from the front: fr = Nx, Ny, Bx, By (flat shapes: N lies in the plane, B points at you) */
+static void frenet2(const timbre_t *m, float u, float *fr) {
+    float a[3], b[3], c[3];
+    path_at(m->x2, m->y2, u - 2.0f / PATHN, &a[0], &a[1]); path_at(m->x2, m->y2, u + 2.0f / PATHN, &b[0], &b[1]);
+    float za = 0, zb = 0;
+    { float f = (u - 2.0f / PATHN); f -= floorf(f); float g = f * PATHN; int i = (int)g % PATHN; za = m->z2[i]; }
+    { float f = (u + 2.0f / PATHN); f -= floorf(f); float g = f * PATHN; int i = (int)g % PATHN; zb = m->z2[i]; }
+    float t3[3] = {b[0] - a[0], b[1] - a[1], zb - za};
+    float ln = sqrtf(t3[0] * t3[0] + t3[1] * t3[1] + t3[2] * t3[2]);
+    if (ln < 1e-6f) { fr[0] = 0; fr[1] = 1; fr[2] = 0; fr[3] = 0; return; }
+    for (int i = 0; i < 3; i++) t3[i] /= ln;
+    /* N = T x up(0,0,1), B = T x N */
+    float n3[3] = {t3[1], -t3[0], 0};
+    float nl = sqrtf(n3[0] * n3[0] + n3[1] * n3[1]);
+    if (nl < 1e-4f) { fr[0] = 1; fr[1] = 0; fr[2] = 0; fr[3] = 1; return; }
+    n3[0] /= nl; n3[1] /= nl;
+    c[0] = t3[1] * n3[2] - t3[2] * n3[1]; c[1] = t3[2] * n3[0] - t3[0] * n3[2]; c[2] = t3[0] * n3[1] - t3[1] * n3[0];
+    fr[0] = n3[0]; fr[1] = n3[1]; fr[2] = c[0]; fr[3] = c[1];
+}
+
 /* 0.8: the suborbit: its own direction (or the orbiter's, when linked) and its own shape (circle, ellipse, figure 8, square, line) */
-static inline void sub_pos(const float *P, float ph, float *cx, float *cy, float tx, float ty, float u) {
+static inline void sub_pos(const float *P, float ph, float *cx, float *cy, const float *fr, float u) {
     int d = (int)P[S_SUB_LINK] ? (int)P[S_ORB_DIR] : (int)P[S_SUB_DIR];
     if (d == 1) ph = 1.0f - ph;
     else if (d == 2) ph = 1.0f - fabsf(2.0f * ph - 1.0f);
@@ -318,8 +338,8 @@ static inline void sub_pos(const float *P, float ph, float *cx, float *cy, float
     case 3: *cx = clampf(1.35f * c, -1, 1); *cy = clampf(1.35f * sn, -1, 1); break;   /* SQUARE-ish */
     case 4: *cx = c; *cy = 0; break;                                                   /* LINE */
     case 5: {   /* MOBIUS: swings across the path (its normal) with a half turn per lap, so it crosses over like a twisted ribbon */
-        float w = cosf(a * 0.5f + 3.14159265f * u) , l = sinf(a) * 0.35f;
-        *cx = -ty * w + tx * l; *cy = tx * w + ty * l; break; }
+        float ph2 = a * 0.5f + 3.14159265f * u, w = cosf(ph2), l = sinf(ph2);   /* around the path's own N and B (the 3D Frenet frame, seen from the front) */
+        *cx = fr[0] * w + fr[2] * l; *cy = fr[1] * w + fr[3] * l; break; }
     default: *cx = c; *cy = sn; break;
     }
 }
@@ -372,8 +392,10 @@ static void project(vader_t *s, int t, float dt) {
         m->yaw += spin * spin * TWO_PI * 0.6f * dt;
         if (m->yaw > TWO_PI) m->yaw -= TWO_PI;
         path_project(&m->base, rot, m->yaw, tilt, m->x2, m->y2);
+        path_depth(&m->base, m->yaw, tilt, m->z2);
     } else if (fabsf(rot - m->last_rot) > 1e-5f) {
         path_project(&m->base, rot, 0, 0, m->x2, m->y2);
+        path_depth(&m->base, 0, 0, m->z2);
     }
     m->last_rot = rot;
     m->last_tilt = tilt;
@@ -1318,9 +1340,9 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     py *= size;
     float sr_ = m->sub_s * 0.6f;
     float sc_, ss_;
-    float tgx = 1, tgy = 0;
-    if ((int)P[S_SUB_SHAPE] == 5) { float ax_, ay_, bx_, by_, u_ = path_u(P, ot); path_at(m->x2, m->y2, u_ - 2.0f / PATHN, &ax_, &ay_); path_at(m->x2, m->y2, u_ + 2.0f / PATHN, &bx_, &by_); tgx = bx_ - ax_; tgy = by_ - ay_; float ln_ = sqrtf(tgx * tgx + tgy * tgy); if (ln_ > 1e-6f) { tgx /= ln_; tgy /= ln_; } else { tgx = 1; tgy = 0; } }
-    sub_pos(P, oo, &sc_, &ss_, tgx, tgy, ot);
+    float fr_[4] = {0, 1, 0, 0};
+    if ((int)P[S_SUB_SHAPE] == 5) frenet2(m, path_u(P, ot), fr_);
+    sub_pos(P, oo, &sc_, &ss_, fr_, ot);
     float ox = clampf(px + sr_ * sc_, -1, 1), oy = clampf(py + sr_ * ss_, -1, 1);
     /* the IMAGE page: four MODs, each a source under the orbiter moving a sound control */
     float im_cut = 0, im_res = 0, im_oct = 0, im_semi = 0, im_og1 = 0, im_og2 = 0, im_blend = 0, im_lvl = 1;
@@ -1592,9 +1614,9 @@ static void screen_update(vader_t *s, int force_shape) {
         fy *= size;
     }
     float sc_, ss_;
-    float tgx = 1, tgy = 0;
-    if ((int)P[S_SUB_SHAPE] == 5) { float ax_, ay_, bx_, by_; path_at(m->x2, m->y2, ot - 2.0f / PATHN, &ax_, &ay_); path_at(m->x2, m->y2, ot + 2.0f / PATHN, &bx_, &by_); tgx = bx_ - ax_; tgy = by_ - ay_; float ln_ = sqrtf(tgx * tgx + tgy * tgy); if (ln_ > 1e-6f) { tgx /= ln_; tgy /= ln_; } else { tgx = 1; tgy = 0; } }
-    sub_pos(P, oo, &sc_, &ss_, tgx, tgy, ot);
+    float fr_[4] = {0, 1, 0, 0};
+    if ((int)P[S_SUB_SHAPE] == 5) frenet2(m, ot, fr_);
+    sub_pos(P, oo, &sc_, &ss_, fr_, ot);
     float ox = clampf(fx + sr_ * sc_, -1, 1), oy = clampf(fy + sr_ * ss_, -1, 1);
     if (overlay_live(&s->ovl)) {   /* 0.5.0: the live screen draws it all: the tiles, balls and picture rest (empty) */
         if (!s->rested) {

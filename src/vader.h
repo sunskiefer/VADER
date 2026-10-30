@@ -60,6 +60,7 @@ extern const path_t *paths_user;
 void paths_gen(int m, const float *k, path_t *p);
 void path_resample(const float *x, const float *y, const float *z, int n, int closed, int is3d, path_t *out);
 /* the 2D path the orbiter follows: rotated (in plane, or in 3D: yaw/pitch), fitted to -1..1 */
+void path_depth(const path_t *p, float yaw, float pitch, float *z2);
 void path_project(const path_t *p, float rot, float yaw, float pitch, float *x2, float *y2);
 static inline void path_at(const float *x2, const float *y2, float t, float *ox, float *oy) {
     float u = t * PATHN;

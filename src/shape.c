@@ -222,3 +222,13 @@ void path_project(const path_t *p, float rot, float yaw, float pitch, float *x2,
         for (int i = 0; i < PATHN; i++) { x2[i] *= g; y2[i] *= g; }
     }
 }
+
+/* 0.8: the depth of each point as path_project sees it (for the Mobius suborbit's 3D frame); flat shapes are all 0 */
+void path_depth(const path_t *p, float yaw, float pitch, float *z2) {
+    if (!p->is3d) { for (int i = 0; i < PATHN; i++) z2[i] = 0; return; }
+    float cy = cosf(yaw), sy = sinf(yaw), cp = cosf(pitch), sp = sinf(pitch);
+    for (int i = 0; i < PATHN; i++) {
+        float z1 = -p->x[i] * sy + p->z[i] * cy;
+        z2[i] = p->y[i] * sp + z1 * cp;
+    }
+}

@@ -255,3 +255,4 @@ First release: not yet tested on a device.
 - IMAGE page: new sources LINE COLOUR and LINE WAVE (colour along the line, for spirographs).
 - FOURIER shape: new LOADED option rebuilds your loaded shape from circles.
 - Desktop: MIDI CC 22 / CC 23 turn to the previous / next page.
+- MOBIUS suborbit now follows the path's 3D Frenet frame (twists in depth on 3D shapes, flat on 2D ones).
