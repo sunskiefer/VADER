@@ -17,3 +17,4 @@ $VG build/host/host_test
 $VG build/host/engine_test
 $CC -O1 -g -w -std=gnu11 -Ibuild -Ithird_party/mpc-vst-plugins/wrapper $INCS test/skin_dump.c $ENG -lm -lpthread -ldl -lstdc++ -o build/host/skin_dump
 python3 test/web_test.py
+python3 test/mirror_test.py

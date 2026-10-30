@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.0 (Force and desktop, one release)
+
+Built for the Force (ARM) and the desktop plugins from the same sources. **Not yet tested on a device.**
+
+- **PLUG**: the desktop VADER (Windows, Linux) as a mirror of the VADER on the Force. Press PLUG in the desktop window:
+  the Force's screen (shape, orbiter, balls, every mode's movement, 60 frames a second, computed on the Force), its
+  controls and its top line appear in the window, and every control moved in the window changes the Force at once (the
+  Force wins when both move the same control at the same time). The desktop plugin is silent while plugged in. The Force
+  is found on the network by a broadcast, or by an address typed after a right-click on PLUG (remembered in
+  `force_address.txt` next to the Shapes folder). Both sides must run the same version. docs/DESKTOP.md.
+- The Force plugin's web server (the companion screen's port 6731) now also carries the mirror (path `/mirror`), answers
+  "VADER PLUG?" on UDP 6731 so a desktop can find it, and moves to 6732..6739 when 6731 is taken (the ORBIT page and the
+  QR code show the port in use). The phone page is unchanged (30 frames a second).
+- The engine notes which parameters changed since the last block, for the mirror; nothing else in the sound changed.
+
 ## 0.8.0 (Force and desktop, one release)
 
 Built for the Force (ARM) and the desktop plugins from the same sources. **Not yet tested on a device.**

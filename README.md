@@ -110,6 +110,10 @@ limits are in **[docs/DESKTOP.md](docs/DESKTOP.md)**; build it with `desktop/bui
 Presets you save on the desktop (MY PRESETS, the `USER ###.vader` files) also load on the Force; see the
 [user guide](docs/USER_GUIDE.md).
 
+**PLUG** (0.9): press PLUG in the desktop window and it becomes the Force's VADER on your PC: the Force's screen drawn
+large and sharp, every control showing the Force's value, and every control you move going to the Force at once.
+Found on the network by itself, or by a typed address. See [docs/DESKTOP.md](docs/DESKTOP.md#plug-the-window-as-the-forces-screen).
+
 ## Use
 
 Read the **[user guide](docs/USER_GUIDE.md)**. It covers every page, every control and every Q-Link, with recipes and

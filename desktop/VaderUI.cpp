@@ -6,11 +6,16 @@
 #include "DistrhoUI.hpp"
 #include "VaderPlugin.hpp"
 #include "gen/vader_res.h"
+extern "C" {
+#include "version.h"
+}
 #include <algorithm>
 #include <chrono>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
+#include <ctype.h>
 #include "nanovg/nanovg.h"
 
 START_NAMESPACE_DISTRHO
@@ -56,6 +61,19 @@ protected:
     bool onMotion(const MotionEvent &) override;
     bool onScroll(const ScrollEvent &) override;
     bool onKeyboard(const KeyboardEvent &ev) override {
+        if (fAddrEdit) {   /* PLUG: typing the Force's address */
+            if (!ev.press) return true;
+            if (ev.key == kKeyEscape) { fAddrEdit = false; return true; }
+            if (ev.key == kKeyEnter || ev.key == '\n') {
+                fAddrEdit = false;
+                if (fP && !fAddrBuf.empty()) fP->uiPlug(fAddrBuf);
+                return true;
+            }
+            if (ev.key == kKeyBackspace || ev.key == kKeyDelete) { if (!fAddrBuf.empty()) fAddrBuf.pop_back(); return true; }
+            const uint32_t k = ev.key;
+            if (k < 128 && (isalnum((int)k) || k == '.' || k == ':' || k == '-') && fAddrBuf.size() < 60) fAddrBuf.push_back((char)k);
+            return true;
+        }
         if (ev.press && ev.key == 27 && fPop.open) { fPop.open = false; return true; }
         if (ev.press && !fPop.open && (ev.key == kKeyLeft || ev.key == kKeyRight)) {   /* 0.8: arrow keys turn the pages */
             fPage = (fPage + (ev.key == kKeyRight ? 1 : VG_NPAGES - 1)) % VG_NPAGES;
@@ -104,9 +122,15 @@ private:
     int fPgSeen = INT_MIN;
     ovl_shape_t fShape;
     unsigned fShapeVer;
+    overlay_t *fBusSeen = nullptr;
     float fx2[256], fy2[256], fz2[256];
     NanoImage fImg;
     bool fImgOk = false;
+    /* PLUG */
+    bool fAddrEdit = false;
+    std::string fAddrBuf;
+    void plugPressed(int button);
+    void drawPlug();
 
     /* ---- coordinates */
     void toCanvas(double px, double py, double &cx, double &cy) const {
@@ -186,6 +210,7 @@ private:
 
     /* ---- geometry of the controls */
     struct R { float x, y, w, h; };
+    static R plugRect() { return R{560, 46, 104, 44}; }
     R rectOf(const VgCtl &c) const {
         if (c.kind == VGK_HLINE) return {(float)c.x, (float)c.y, (float)c.w, (float)(c.big ? 52 : 50)};
         if (c.kind == VGK_FADER) return {(float)c.x, (float)c.y, (float)c.w, 186.f};
@@ -331,6 +356,7 @@ void VaderUI::project(float rot, float yaw, float tilt) {
 void VaderUI::prepareScreenData() {
     overlay_t *bus = fP ? fP->uiViewBus() : nullptr;
     if (!bus) return;
+    if (bus != fBusSeen) { fBusSeen = bus; fShapeVer = ~0u; }   /* PLUG switched between this engine's screen and the Force's: its shape, whatever its version number */
     overlay_read_view(bus, &fView);
     if (fPgSeen == INT_MIN) fPgSeen = fView.pgctr;
     if (fView.pgctr != fPgSeen) {   // 0.8: MIDI CC 22 / 23 turn the pages
@@ -773,15 +799,61 @@ void VaderUI::drawStripe() {
     text_(20, y0 + 46, "L'CRONX", 12, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});
     char line[96];
     if (fP) fP->uiReadout(line, sizeof line); else line[0] = 0;
-    fitText(196, y0 + 21, 470, line[0] ? line : "VADER", 26, ALIGN_LEFT | ALIGN_MIDDLE, INK);
+    float readLine = fReadLine;
+    /* PLUG: while the Force is plugged in, the top line is the Force's own; while plugging, what is going on */
+    if (fP) {
+        MirrorClient &m = fP->mirror();
+        const MirrorClient::State st = m.state();
+        /* short, so the line keeps its size (the full words are in docs/DESKTOP.md) */
+        if (fAddrEdit) snprintf(line, sizeof line, "ADDRESS: %s_", fAddrBuf.c_str());
+        else if (st == MirrorClient::Plugged) { m.readout(line, sizeof line, &readLine); if (!line[0]) snprintf(line, sizeof line, "PLUGGED: %s", m.address().c_str()); }
+        else if (st == MirrorClient::Finding) snprintf(line, sizeof line, "FINDING THE FORCE...");
+        else if (st == MirrorClient::Connecting) snprintf(line, sizeof line, "PLUGGING IN...");
+        else if (st == MirrorClient::NotFound) snprintf(line, sizeof line, "NO FORCE FOUND");
+        else if (st == MirrorClient::Unreachable) snprintf(line, sizeof line, "CAN'T REACH %s", m.address().c_str());
+        else if (st == MirrorClient::Rejected) snprintf(line, sizeof line, "FORCE HAS VADER %s", m.forceVersion().c_str());
+    }
+    fitText(196, y0 + 21, 352, line[0] ? line : "VADER", 26, ALIGN_LEFT | ALIGN_MIDDLE, INK);
     beginPath();
     moveTo(198, y0 + 46);
-    lineTo(666, y0 + 46);
+    lineTo(552, y0 + 46);
     lineCap(NanoVG::ROUND);
     strk(TRACK, 255, 2);
     stroke();
-    if (fReadLine > 0.004f) glowLine(199, y0 + 46, 199 + 466 * fReadLine, y0 + 46, ACCENT, 4.f);
+    if (readLine > 0.004f) glowLine(199, y0 + 46, 199 + 352 * clampf(readLine, 0, 1), y0 + 46, ACCENT, 4.f);
+    drawPlug();
     for (int i = 0; i < VG_STRIPE_N; i++) drawCtl(VG_STRIPE[i]);
+}
+
+/* PLUG: the button that links this window to the VADER on the Force (desktop/mirror.hpp) */
+void VaderUI::drawPlug() {
+    const R r = plugRect();
+    MirrorClient::State st = fP ? fP->mirror().state() : MirrorClient::Off;
+    const bool on = st == MirrorClient::Plugged;
+    const bool busy = st == MirrorClient::Finding || st == MirrorClient::Connecting || st == MirrorClient::Unreachable;
+    drawButton(r, "", on, isHover(r));
+    const char *label = on ? "PLUGGED" : busy ? "PLUG..." : "PLUG";
+    Col c = on ? INK : busy ? CYAN : (isHover(r) ? INK : INK_DIM);
+    if (busy) {   /* a slow pulse while it looks for the Force */
+        const double t = std::chrono::duration<double>(std::chrono::steady_clock::now() - fT0).count();
+        c = Col{(uint8_t)(120 + 100 * (0.5 + 0.5 * sin(t * 4))), 220, 255};
+    }
+    fitText(r.x + r.w / 2, r.y + r.h / 2, r.w - 14, label, on ? 22 : 26, ALIGN_CENTER | ALIGN_MIDDLE, c);
+}
+
+void VaderUI::plugPressed(int button) {
+    if (!fP) return;
+    MirrorClient &m = fP->mirror();
+    if (button == 2) {   /* right-click: type the address */
+        if (m.state() != MirrorClient::Off) fP->uiUnplug();
+        fAddrEdit = true;
+        fAddrBuf = fP->uiRememberedAddress();
+        return;
+    }
+    if (m.state() == MirrorClient::Off || m.state() == MirrorClient::NotFound || m.state() == MirrorClient::Rejected) {
+        fAddrEdit = false;
+        fP->uiPlug(m.state() == MirrorClient::Off ? fP->uiRememberedAddress() : std::string());   /* the last address, else find it */
+    } else fP->uiUnplug();
 }
 
 void VaderUI::drawTabs() {
@@ -978,6 +1050,8 @@ bool VaderUI::onMouse(const MouseEvent &ev) {
     toCanvas(ev.pos.getX(), ev.pos.getY(), x, y);
     fMx = x;
     fMy = y;
+    if (ev.press && (ev.button == 1 || ev.button == 2) && inside(plugRect(), x, y) && !fPop.open) { plugPressed(ev.button); return true; }   /* DPF: 2 is the right button */
+    if (fAddrEdit && ev.press) fAddrEdit = false;
     if (ev.button != 1) return false;
     if (!ev.press) {
         if (fDrag.on) { endEdit(fDrag.b); fDrag.on = false; }

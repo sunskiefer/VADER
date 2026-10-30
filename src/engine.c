@@ -199,6 +199,13 @@ typedef struct {
     unsigned char uknown[1000];   /* 0 not looked at yet, 1 empty, 2 saved */
     char ustatus[48];
     int page_ctr;   /* 0.8: net MIDI page presses */
+    /* PLUG (0.9): a desktop VADER mirroring this instance (web.c /mirror). Every parameter that changes is sent to it */
+    unsigned char mdirty[NP], morig[NP];   /* changed since the last send; who changed it (a plugged desktop's id, 0xff: here) */
+    unsigned char mir_origin;              /* whose change is being applied now */
+    int mir_full;                          /* send the whole state (after a restore) */
+    char *mir_tmp;                         /* the state text being made, MIR_STATE_MAX */
+    char mir_rd_sent[96];                  /* the readout line last sent, and its glow step */
+    unsigned char mir_rd_sent_q;
 } vader_t;
 
 /* ------------------------------------------------------------------------------------------------ helpers */
@@ -219,7 +226,10 @@ static int is_screen(int p) {
            (p >= P_WA && p <= P_WD) || (p >= P_IM_M1 && p <= P_IM_M4) || (p >= P_E00 && p < P_E00 + ENV_COLS);
 }
 static void mark(vader_t *s, int p) {
-    if (p >= 0 && p < NP) s->dirty[p] = 1;
+    if (p < 0 || p >= NP) return;
+    s->dirty[p] = 1;
+    if (!s->mdirty[p]) { s->mdirty[p] = 1; s->morig[p] = s->mir_origin; }
+    else if (s->morig[p] != s->mir_origin) s->morig[p] = 0xff;   /* changed from two sides: everyone gets it */
 }
 static void heal_later(vader_t *s, int p) {
     if (s->heal_n == HEAL_N) { memmove(s->heal_p, s->heal_p + 1, (HEAL_N - 1) * sizeof(int)); memmove(s->heal_at, s->heal_at + 1, (HEAL_N - 1) * sizeof(int)); s->heal_n--; }
@@ -1798,6 +1808,8 @@ static void *create(const char *data_dir) {
     if (!s) return NULL;
     s->fx = fx_new();
     if (!s->fx) { free(s); return NULL; }
+    s->mir_origin = 0xff;
+    s->mir_tmp = malloc(MIR_STATE_MAX);
     for (int c = 0; c < 4; c++) pthread_mutex_init(&s->smp[c].lk, NULL);
     if (data_dir) {
         snprintf(s->dir, sizeof s->dir, "%s", data_dir);
@@ -1849,6 +1861,7 @@ static void destroy(void *p) {
     if (!s) return;
     web_stop(&s->web);
     overlay_stop(&s->ovl);
+    free(s->mir_tmp);
     if (s->loader_joinable) pthread_join(s->loader, NULL);
     for (int c = 0; c < 4; c++) {
         pthread_mutex_lock(&s->smp[c].lk); s->smp[c].want[0] = 0; strcpy(s->smp[c].path, "\x01"); pthread_mutex_unlock(&s->smp[c].lk);
@@ -1962,6 +1975,7 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
         all_dirty(s);
         smp_sync_all(s);
         screen_forget(s);
+        s->mir_full = 1;   /* PLUG: both timbres changed: the whole state goes to a plugged desktop */
         }
 
 static int state_text(vader_t *s, char *buf, int len);
@@ -2122,6 +2136,7 @@ static void set_param(void *p, const char *key, const char *val) {
         return;
     }
     set_readout(s, i, q->kind == K_FRONT ? front_value(s, q->slot) : v);
+    if (q->kind == K_SND || q->kind == K_GLOB) { if (!s->mdirty[i]) { s->mdirty[i] = 1; s->morig[i] = s->mir_origin; } else if (s->morig[i] != s->mir_origin) s->morig[i] = 0xff; }
 }
 
 static int put_num(char *buf, int len, float v, const vp_t *q) {
@@ -2277,6 +2292,61 @@ static int get_param(void *p, const char *key, char *buf, int len) {
         return snprintf(buf, (size_t)len, "%s", PRESETS[n].name) + 1;
     }
     return 0;
+}
+
+/* ---- PLUG (0.9): a desktop VADER plugged into this instance (web.c /mirror). Once a block: what the desktop changed is
+ * applied (as if the host had), then every parameter that changed since the last block is queued for it; after a
+ * restore the whole state goes. The desktop keeps a copy of the engine, so values are enough: it works out the texts,
+ * the names and the corner knobs itself. The globals go first (EDIT TIMBRE and CORNER decide where the sound values land). */
+static void set_param(void *p, const char *key, const char *val);
+static void mirror_tick(vader_t *s) {
+    mir_msg_t in[64];
+    int n = web_mirror_take(&s->web, in, 64);
+    for (int i = 0; i < n; i++) {
+        const mir_msg_t *m = &in[i];
+        if (m->type == 3) { s->mir_full = 1; continue; }
+        if (m->idx >= NP) continue;
+        const vp_t *q = &VP[m->idx];
+        if (m->type == 1 && (q->kind == K_SND || q->kind == K_GLOB || q->kind == K_FRONT)) {
+            char b[32];
+            snprintf(b, sizeof b, "%.9g", (double)m->val);
+            s->mir_origin = m->client;
+            set_param(s, q->key, b);
+            s->mir_origin = 0xff;
+        } else if (m->type == 2 && q->kind == K_TRIG) {
+            s->mir_origin = m->client;
+            set_param(s, q->key, "1");
+            s->mir_origin = 0xff;
+        }
+    }
+    if (web_mirror_want_full(&s->web)) s->mir_full = 1;
+    if (strcmp(s->readout, s->mir_rd_sent) || s->sent_rd != s->mir_rd_sent_q) {   /* the readout line, when it changed */
+        snprintf(s->mir_rd_sent, sizeof s->mir_rd_sent, "%s", s->readout);
+        s->mir_rd_sent_q = s->sent_rd;
+        web_mirror_text(&s->web, s->readout, s->sent_rd == 0xff ? 0 : s->sent_rd / 100.0f);
+    }
+    mir_ent_t out[256];   /* more than this waits for the next block */
+    int o = 0;
+    for (int pass = 0; pass < 2; pass++)
+        for (int p = 0; p < NP && o < 256; p++) {
+            if (!s->mdirty[p]) continue;
+            const vp_t *q = &VP[p];
+            if (q->kind != (pass == 0 ? K_GLOB : K_SND)) { if (q->kind != K_GLOB && q->kind != K_SND) s->mdirty[p] = 0; continue; }
+            s->mdirty[p] = 0;
+            out[o].origin = s->morig[p];
+            out[o].idx = (uint16_t)p;
+            out[o].val = q->kind == K_GLOB ? s->g[q->slot] : T(edit(s))[q->slot];
+            o++;
+        }
+    web_mirror_push(&s->web, out, o);
+    if (s->mir_full) {
+        s->mir_full = 0;
+        if (s->mir_tmp) {
+            int len = state_text(s, s->mir_tmp, MIR_STATE_MAX);
+            if (len > 0 && len <= MIR_STATE_MAX) web_mirror_state(&s->web, s->mir_tmp, len);
+        }
+        for (int p = 0; p < NP; p++) s->mdirty[p] = 0;
+    }
 }
 
 /* 0.7.0: one block. out (int16, interleaved) for the MPC/Force wrapper; fl/fr (float, -1..1) for the desktop plugin,
@@ -2534,6 +2604,8 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
         }
         overlay_publish(&s->ovl, &v);
     }
+    if (s->web.started && (web_mirror_active(&s->web) || s->mir_full)) mirror_tick(s);   /* PLUG */
+    else if (s->mir_full) s->mir_full = 0;
 }
 
 static void render(void *p, int16_t *out, int frames) { render_ex(p, out, NULL, NULL, frames); }

@@ -5,9 +5,11 @@
 #include <chrono>
 #include <mutex>
 #include <string>
+#include <vector>
 #include "DistrhoPlugin.hpp"
 #include "Resampler.hpp"
 #include "gen/vader_gen.h"
+#include "mirror.hpp"
 
 extern "C" {
 #include "engine.h"
@@ -30,7 +32,12 @@ public:
     void uiReadout(char *buf, int n) const;                /* the line the Force shows across the top: "NAME   value" */
     void uiText(int slot, char *buf, int n) const;         /* VG_TEXT_PARS[slot]'s text: FILE, MY PRESET SLOT, PRESET, SHAPE */
     bool uiPresetName(int i, char *buf, int n);
-    overlay_t *uiViewBus() const { return fBus; }          /* the seqlock snapshots of the orbit screen */
+    overlay_t *uiViewBus() { return fMirror.plugged() ? fMirror.bus() : fBus; }   /* the orbit screen's data: the Force's while plugged */
+    /* PLUG (0.9): the window's button. plug("") finds the Force on the network; an address (or address:port) is remembered */
+    void uiPlug(const std::string &address);
+    void uiUnplug() { fMirror.unplug(); }
+    MirrorClient &mirror() { return fMirror; }
+    std::string uiRememberedAddress() const { return fForceAddr; }
     void uiFire(int par);                                  /* a momentary button pressed in the window (TAP, LOAD, ...): straight to the engine */
     int uiCorner() const;                                  /* 0..4 */
 
@@ -42,7 +49,7 @@ protected:
     const char *getMaker() const override { return "L'Cronx"; }
     const char *getHomePage() const override { return "https://github.com/sunskiefer/VADER"; }
     const char *getLicense() const override { return "Proprietary / see repository LICENSE"; }
-    uint32_t getVersion() const override { return d_version(0, 7, 0); }
+    uint32_t getVersion() const override { return d_version(0, 9, 0); }
     int64_t getUniqueId() const override { return d_cconst('A', 'n', 'V', 'd'); }
 
     void initParameter(uint32_t index, Parameter &p) override;
@@ -90,6 +97,13 @@ private:
     double fPollAcc = 0;
     std::chrono::steady_clock::time_point fLastPoll;
     float fBlkL[128], fBlkR[128];
+    /* PLUG */
+    MirrorClient fMirror;
+    int16_t fExp2Eng[VG_NEXP];               /* host parameter -> engine parameter index */
+    std::string fForceAddr, fAddrFile;       /* the Force's address last used, and where it is kept */
+    std::vector<MirrorClient::Delta> fDeltas;
+    std::string fStateIn;
+    void mirrorApply();                      /* what the Force sent, into the engine (under fMutex) */
     DISTRHO_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VaderPlugin)
 };
 

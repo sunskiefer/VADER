@@ -23,10 +23,36 @@ Add your own pictures (PNG, JPG), SVG or OBJ files and pick them with the SHAPE 
 ## The window
 
 Resizable (it starts at 1280 x 668). The tabs on top are the pages of the Force's screen: MAIN, CORNERS, ORBIT,
-IMAGE, ARP, FX, and SCREEN, which is the orbit view full size. Drag a control to change it, use the mouse wheel for
+IMAGE, ARP, FX, MODE, VOICES, PLAY, TRAVEL, SAMPLES, WINDOW and SCREEN, which is the orbit view full size. Drag a control to change it, use the mouse wheel for
 fine steps, click twice quickly to reset it. Lists (preset, shape, modes) open as a popup; Esc closes it. The page
 layouts and the parameters come from the same sources as the Force build, so they never drift apart. See the
 [user guide](USER_GUIDE.md) for what every control does.
+
+## PLUG: the window as the Force's screen
+
+Press **PLUG** (top, next to the top line) and the desktop VADER becomes a mirror of the VADER running on your Force:
+
+- The screen shows the Force's shape, orbiter, balls and every mode's movement, exactly as the Force computes them
+  (the Force sends its screen data 60 times a second; nothing is simulated on the PC), drawn in the window's full
+  quality.
+- Every control shows the Force's value, and the top line is the Force's top line (the control last touched there).
+- Turn a control here and the Force changes at once: a mirror both ways. If both sides move the same control at the
+  same moment, the Force wins.
+- The desktop plugin is silent while plugged in: the Force makes the sound.
+
+How it connects: the PC and the Force must be on the same network (Wi-Fi or wired; the Force's network settings are in
+MPC's PREFERENCES). PLUG first looks for the Force by itself (a broadcast on the local network); the address it finds,
+or one you typed, is remembered in `force_address.txt` next to the Shapes folder, and used next time. If nothing is
+found ("NO FORCE FOUND"), **right-click PLUG**, type the Force's address (the one shown on VADER's ORBIT page under
+COMPANION SCREEN, without the `http://` and the port; `address:port` also works) and press Enter. Esc cancels.
+
+The top line while plugging: FINDING THE FORCE... / PLUGGING IN... / CAN'T REACH <address> (it keeps trying while PLUG
+is on) / FORCE HAS VADER x.y.z (the Force runs another version: both must run the same one, the parameters have to
+match). Click PLUG again to unplug; the window goes back to its own engine.
+
+The link uses the Force plugin's web port (6731, the companion screen's), so nothing else on the Force is touched:
+SSH, other plugins, the companion page on the phone all keep working beside it. Up to 8 devices (phones and desktops
+together) can be plugged in at once. The screen data is a few kilobytes a second; a loaded picture goes once.
 
 ## Presets, and moving them to the Force
 

@@ -56,3 +56,11 @@ unsigned web_get(web_t *w, char *status, int len, unsigned char *qr) {
     return 0;
 }
 int web_port(void) { return 0; }
+/* PLUG: the engine's side of a mirror is only on the Force (the desktop is the other end, desktop/mirror.cpp) */
+unsigned web_schema(void) { return 0; }
+int web_mirror_active(web_t *w) { (void)w; return 0; }
+int web_mirror_take(web_t *w, mir_msg_t *out, int max) { (void)w; (void)out; (void)max; return 0; }
+int web_mirror_want_full(web_t *w) { (void)w; return 0; }
+void web_mirror_push(web_t *w, const mir_ent_t *e, int n) { (void)w; (void)e; (void)n; }
+void web_mirror_state(web_t *w, const char *txt, int len) { (void)w; (void)txt; (void)len; }
+void web_mirror_text(web_t *w, const char *readout, float line) { (void)w; (void)readout; (void)line; }

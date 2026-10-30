@@ -68,9 +68,13 @@ dpf_add_plugin(VADER
   FILES_DSP
     VaderPlugin.cpp
     paths.cpp
+    mirror.cpp
   FILES_UI
     VaderUI.cpp)
 
 target_include_directories(VADER PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(VADER PUBLIC vader_engine)
+if(WIN32)
+  target_link_libraries(VADER PUBLIC ws2_32)   # PLUG: the link to the Force
+endif()
 target_include_directories(VADER-ui PRIVATE ${DPF_ROOT}/dgl/src)

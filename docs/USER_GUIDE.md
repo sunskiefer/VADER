@@ -308,6 +308,15 @@ draws nothing while you play, so the sound gets the whole machine.
 
 Several devices can watch at once. The page needs only the local network, nothing from the internet.
 
+### PLUG: the desktop VADER as the Force's screen
+
+Since 0.9 the desktop plugin (Windows and Linux, see [DESKTOP.md](DESKTOP.md)) has a **PLUG** button: press it and
+the window on your PC becomes the Force's VADER, screen and controls. The Force sends what it draws (the shape, the
+orbiter, the balls, every mode's movement, 60 times a second) and every value that changes; the PC draws it large
+and sharp, and a control moved on the PC changes the Force at once. The Force keeps making the sound; the PC plugin is
+silent while plugged in. PLUG finds the Force on the network by itself; if not, right-click PLUG and type the address
+from the ORBIT page. Both must run the same VADER version.
+
 ## Your own shapes
 
 Put files in either place:

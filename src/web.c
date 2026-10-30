@@ -4,7 +4,22 @@
  * is sent once; after that the plugin streams what moves as small binary WebSocket messages, 30 a second, and the
  * shape when it changes. Up to 8 watchers at once. The plugin also answers for the name "vader.local" (mDNS), so Apple
  * devices can type that instead of an address, and tells the engine the address to show (and to put in the QR code).
- * No library: HTTP, the WebSocket handshake (SHA-1 + base64) and framing, and the mDNS answer are all here. */
+ * No library: HTTP, the WebSocket handshake (SHA-1 + base64) and framing, and the mDNS answer are all here.
+ *
+ * PLUG: a desktop VADER (desktop/mirror.cpp) can connect to the path /mirror of the same port and become a mirror of this
+ * instance: it is sent the whole state as text, then every parameter change as it happens, the shape, and the screen's data
+ * at 60 a second; what it changes comes back as messages the engine applies between blocks (engine.c, mirror_tick).
+ * Messages, all binary WebSocket frames, numbers little-endian:
+ *   to the desktop   0x30 hello   proto u32, parameter count u32, schema u32, id u8, version length u8, version text
+ *                    0x31 state   the state text (engine "state"), the deltas after it apply on top
+ *                    0x32 deltas  count u16, then count x (idx u16, value f32); idx is the engine's parameter index
+ *                    0x02 shape   as for the phone page
+ *                    0x21 view    as the phone page's 0x01, then the IMAGE meters (4 f32) and the page counter (f32)
+ *                    0x33 readout the top line's glow (f32) and its text (the control last touched on the Force)
+ *   to the Force     0x40 hello   proto u32, parameter count u32, schema u32
+ *                    0x41 set     idx u16, value f32
+ *                    0x42 fire    idx u16 (a button)
+ *                    0x43 again   send the whole state again */
 #define _GNU_SOURCE
 #include <arpa/inet.h>
 #include <errno.h>
@@ -24,11 +39,14 @@
 #include "qr.h"
 #include "vader_params.h"
 #include "web.h"
+#include "mirror_schema.h"
 #include "web_assets.h"   /* WEB_INDEX_HTML, WEB_ICON_PNG (tools/gen_web.py) */
 
 #define WEB_PORT 6731
+#define WEB_PORTS 9           /* 6731..6739: the first free one */
 #define MAXC 8
-#define FPS 30
+#define FPS 60                /* the loop's frame rate: the phone page gets every second one (30), a plugged desktop every one */
+#include "version.h"
 
 /* ------------------------------------------------------------------------------------------------ SHA-1, base64 */
 static void sha1(const unsigned char *msg, size_t len, unsigned char out[20]) {
@@ -156,8 +174,34 @@ static void mdns_serve(int s, const char *ip) {
         memcpy(r + o, &ia, 4); o += 4;
         struct sockaddr_in to = {.sin_family = AF_INET, .sin_port = htons(5353), .sin_addr.s_addr = inet_addr("224.0.0.251")};
         sendto(s, r, (size_t)o, 0, (struct sockaddr *)&to, sizeof to);
+        sendto(s, r, (size_t)o, 0, (struct sockaddr *)&from, fl);   /* and straight back to the asker (a desktop VADER looking for us) */
         return;
     }
+}
+
+/* ------------------------------------------------------------------------------------------------ PLUG: finding the Force */
+/* a UDP socket on the same number as the web port: a desktop VADER broadcasts "VADER PLUG?" and is answered "VADER <port> <version>" */
+static int disco_open(int port) {
+    int s = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
+    if (s < 0) return -1;
+    int one = 1;
+    setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &one, sizeof one);
+    setsockopt(s, SOL_SOCKET, SO_BROADCAST, &one, sizeof one);
+    struct sockaddr_in a = {.sin_family = AF_INET, .sin_port = htons((uint16_t)port), .sin_addr.s_addr = htonl(INADDR_ANY)};
+    if (bind(s, (struct sockaddr *)&a, sizeof a)) { close(s); return -1; }
+    return s;
+}
+static void disco_serve(int s, int port) {
+    char q[64];
+    struct sockaddr_in from;
+    socklen_t fl = sizeof from;
+    ssize_t n = recvfrom(s, q, sizeof q - 1, 0, (struct sockaddr *)&from, &fl);
+    if (n < 11) return;
+    q[n] = 0;
+    if (strncmp(q, "VADER PLUG?", 11)) return;
+    char r[64];
+    int rl = snprintf(r, sizeof r, "VADER %d %s", port, VADER_VERSION_STR);
+    sendto(s, r, (size_t)rl, 0, (struct sockaddr *)&from, fl);
 }
 
 /* ------------------------------------------------------------------------------------------------ clients */
@@ -167,6 +211,8 @@ typedef struct {
     char in[2048];
     int inlen;
     unsigned shape_seen;
+    int mirror, id, hello_ok;     /* PLUG: a desktop VADER; its slot number; it said hello with the same parameters */
+    unsigned cursor, state_seen, rd_seen;  /* PLUG: the next ring entry to send; the state and readout versions it has */
     time_t since;
     /* an upload in progress (POST /upload): the file being written, what is still to come */
     FILE *up;
@@ -222,6 +268,18 @@ static int ws_send(int fd, const void *payload, size_t n, int text) {
     return send_all(fd, payload, n);
 }
 
+/* the parameters' keys hashed: a desktop plugin of another build (other parameters) must not be mirrored */
+unsigned web_schema(void) { return mirror_schema(); }
+
+static void client_drop(web_t *w, client_t *c) {
+    if (c->fd < 0) return;
+    if (c->ws) __atomic_sub_fetch(&w->watchers, 1, __ATOMIC_RELAXED);
+    if (c->mirror) __atomic_sub_fetch(&w->mirror_n, 1, __ATOMIC_RELAXED);
+    if (c->up) { fclose(c->up); c->up = NULL; unlink(c->up_tmp); }
+    close(c->fd);
+    c->fd = -1;
+}
+
 static void http_reply(int fd, const char *status, const char *type, const void *body, size_t n, int cache) {
     char h[256];
     int hl = snprintf(h, sizeof h, "HTTP/1.1 %s\r\nContent-Type: %s\r\nContent-Length: %zu\r\nConnection: close\r\n%s\r\n",
@@ -239,7 +297,7 @@ static int handle_http(web_t *w, client_t *c) {
     if (sscanf(c->in, "%7s %255s", method, path) != 2) return 0;
     *line_end = '\r';
     char *key = strcasestr(c->in, "Sec-WebSocket-Key:");
-    if (!strcmp(path, "/ws") && key) {
+    if ((!strcmp(path, "/ws") || !strcmp(path, "/mirror")) && key) {
         key += 18;
         while (*key == ' ') key++;
         char k[128];
@@ -258,7 +316,9 @@ static int handle_http(web_t *w, client_t *c) {
         setsockopt(c->fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof one);
         c->ws = 1;
         c->shape_seen = ~0u;
+        c->mirror = !strcmp(path, "/mirror");
         __atomic_add_fetch(&w->watchers, 1, __ATOMIC_RELAXED);
+        if (c->mirror) __atomic_add_fetch(&w->mirror_n, 1, __ATOMIC_RELAXED);
         return 1;
     }
     if (!strncmp(path, "/upload?", 8) && !strcmp(method, "POST")) {
@@ -307,8 +367,37 @@ static int upload_more(web_t *w, client_t *c, const char *data, int n) {
     return 0;
 }
 
-/* a WebSocket message from the browser: close and ping are answered, the rest ignored */
-static int ws_input(client_t *c) {
+/* a message from a plugged desktop: into the engine's inbox (it applies them between blocks). 0: fine; -1: drop the client */
+static int mirror_msg(web_t *w, client_t *c, const unsigned char *m, int n) {
+    if (n < 1) return 0;
+    if (m[0] == 0x40) {
+        uint32_t pr, np, sc;
+        if (n < 13) return -1;
+        memcpy(&pr, m + 1, 4); memcpy(&np, m + 5, 4); memcpy(&sc, m + 9, 4);
+        if (pr != MIR_PROTO || np != (uint32_t)NP || sc != web_schema()) return -1;   /* another build: not mirrored */
+        c->hello_ok = 1;
+        pthread_mutex_lock(&w->lock);
+        c->state_seen = w->mir_state_ver;
+        pthread_mutex_unlock(&w->lock);
+        __atomic_store_n(&w->mir_want_full, 1, __ATOMIC_RELEASE);
+        return 0;
+    }
+    if (!c->hello_ok) return 0;
+    mir_msg_t q;
+    memset(&q, 0, sizeof q);
+    q.client = (unsigned char)c->id;
+    if (m[0] == 0x41 && n >= 7) { q.type = 1; memcpy(&q.idx, m + 1, 2); memcpy(&q.val, m + 3, 4); }
+    else if (m[0] == 0x42 && n >= 3) { q.type = 2; memcpy(&q.idx, m + 1, 2); }
+    else if (m[0] == 0x43) { q.type = 3; }
+    else return 0;
+    pthread_mutex_lock(&w->lock);
+    if (w->in_head - w->in_tail < MIR_INBOX) w->inbox[w->in_head++ % MIR_INBOX] = q;
+    pthread_mutex_unlock(&w->lock);
+    return 0;
+}
+
+/* a WebSocket message from the browser: close and ping are answered, a plugged desktop's messages go to the engine, the rest ignored */
+static int ws_input(web_t *w, client_t *c) {
     while (c->inlen >= 2) {
         unsigned char op = c->in[0] & 0x0f;
         int masked = (c->in[1] & 0x80) != 0;
@@ -316,7 +405,7 @@ static int ws_input(client_t *c) {
         if (len == 126) { if (c->inlen < 4) return 0; len = (size_t)(unsigned char)c->in[2] << 8 | (unsigned char)c->in[3]; hl = 4; }
         else if (len == 127) return -1;   /* too long for us */
         if (masked) hl += 4;
-        if ((size_t)c->inlen < hl + len) return 0;
+        if ((size_t)c->inlen < hl + len) { if (hl + len > sizeof c->in - 1) return -1; return 0; }
         if (op == 8) return -1;   /* close */
         if (op == 9) {            /* ping -> pong, unmasked payload */
             unsigned char p[128];
@@ -325,6 +414,11 @@ static int ws_input(client_t *c) {
             unsigned char h[2] = {0x8a, (unsigned char)n};
             send_all(c->fd, h, 2);
             send_all(c->fd, p, n);
+        }
+        if (op == 2 && c->mirror && len <= 64) {
+            unsigned char p[64];
+            for (size_t i = 0; i < len; i++) p[i] = (unsigned char)c->in[hl + i] ^ (masked ? (unsigned char)c->in[hl - 4 + (i & 3)] : 0);
+            if (mirror_msg(w, c, p, (int)len)) return -1;
         }
         memmove(c->in, c->in + hl + len, (size_t)c->inlen - hl - len);
         c->inlen -= (int)(hl + len);
@@ -342,16 +436,22 @@ static void *web_thread(void *arg) {
     if (ls < 0) { pthread_mutex_lock(&w->lock); snprintf(w->status, sizeof w->status, "NO SOCKET"); w->url_ver++; pthread_mutex_unlock(&w->lock); return NULL; }
     int one = 1;
     setsockopt(ls, SOL_SOCKET, SO_REUSEADDR, &one, sizeof one);
-    struct sockaddr_in a = {.sin_family = AF_INET, .sin_port = htons(WEB_PORT), .sin_addr.s_addr = htonl(INADDR_ANY)};
-    if (bind(ls, (struct sockaddr *)&a, sizeof a) || listen(ls, 8)) {
+    int bound = 0;
+    for (int k = 0; k < WEB_PORTS && !bound; k++) {   /* 6731, or the next free port when another program has it */
+        struct sockaddr_in a = {.sin_family = AF_INET, .sin_port = htons((uint16_t)(WEB_PORT + k)), .sin_addr.s_addr = htonl(INADDR_ANY)};
+        if (!bind(ls, (struct sockaddr *)&a, sizeof a) && !listen(ls, 8)) { bound = 1; w->port = WEB_PORT + k; }
+        else { close(ls); ls = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0); if (ls < 0) break; setsockopt(ls, SOL_SOCKET, SO_REUSEADDR, &one, sizeof one); }
+    }
+    if (!bound) {
         pthread_mutex_lock(&w->lock);
         snprintf(w->status, sizeof w->status, "PORT %d BUSY", WEB_PORT);
         w->url_ver++;
         pthread_mutex_unlock(&w->lock);
-        close(ls);
+        if (ls >= 0) close(ls);
         return NULL;
     }
     int ms = mdns_open();
+    int ds = disco_open(w->port);
     client_t cl[MAXC];
     memset(cl, 0, sizeof cl);
     for (int i = 0; i < MAXC; i++) cl[i].fd = -1;
@@ -360,6 +460,9 @@ static void *web_thread(void *arg) {
     struct timespec next;
     clock_gettime(CLOCK_MONOTONIC, &next);
     unsigned char msg[8192];
+    unsigned char *stbuf = malloc(MIR_STATE_MAX + 8);   /* a copy of the state to send without holding the lock */
+    unsigned frame_no = 0;
+    if (!stbuf) { close(ls); return NULL; }
     while (!w->stop) {
         /* the address, looked up every 5 s (a network may come or go) */
         time_t now = time(NULL);
@@ -370,7 +473,7 @@ static void *web_thread(void *arg) {
                 if (strcmp(nip, ip)) {
                     snprintf(ip, sizeof ip, "%s", nip);
                     char url[96];
-                    snprintf(url, sizeof url, "http://%s:%d/", ip, WEB_PORT);
+                    snprintf(url, sizeof url, "http://%s:%d/", ip, w->port);
                     /* the QR code of it, as bytes of 8 modules per row (the skin's grid) */
                     unsigned char mods[41 * 41], qb[QR_N * QR_BYTES];
                     int n = 0;
@@ -397,15 +500,18 @@ static void *web_thread(void *arg) {
             }
         }
         /* new connections, requests, mDNS */
-        struct pollfd pf[MAXC + 2];
-        int np = 0;
+        struct pollfd pf[MAXC + 3];
+        int np = 0, msi = -1, dsi = -1;
         pf[np++] = (struct pollfd){ls, POLLIN, 0};
-        if (ms >= 0) pf[np++] = (struct pollfd){ms, POLLIN, 0};
+        if (ms >= 0) { msi = np; pf[np++] = (struct pollfd){ms, POLLIN, 0}; }
+        if (ds >= 0) { dsi = np; pf[np++] = (struct pollfd){ds, POLLIN, 0}; }
         for (int i = 0; i < MAXC; i++) if (cl[i].fd >= 0) pf[np++] = (struct pollfd){cl[i].fd, POLLIN, 0};
         struct timespec nowts;
         clock_gettime(CLOCK_MONOTONIC, &nowts);
         long wait_ms = (next.tv_sec - nowts.tv_sec) * 1000 + (next.tv_nsec - nowts.tv_nsec) / 1000000;
-        poll(pf, (nfds_t)np, wait_ms < 0 ? 0 : wait_ms > 100 ? 100 : (int)wait_ms);
+        /* with a desktop plugged in the loop wakes every 2 ms (and at once when it sends something): changes go out at once */
+        long cap = __atomic_load_n(&w->mirror_n, __ATOMIC_RELAXED) > 0 ? 2 : 100;
+        poll(pf, (nfds_t)np, wait_ms < 0 ? 0 : wait_ms > cap ? (int)cap : (int)wait_ms);
         if (pf[0].revents & POLLIN) {
             int fd = accept4(ls, NULL, NULL, SOCK_NONBLOCK);
             if (fd >= 0) {
@@ -415,41 +521,103 @@ static void *web_thread(void *arg) {
                 else { memset(&cl[k], 0, sizeof cl[k]); cl[k].fd = fd; cl[k].since = now; }
             }
         }
-        if (ms >= 0 && pf[1].revents & POLLIN && ip[0]) mdns_serve(ms, ip);
+        if (msi >= 0 && pf[msi].revents & POLLIN && ip[0]) mdns_serve(ms, ip);
+        if (dsi >= 0 && pf[dsi].revents & POLLIN) disco_serve(ds, w->port);
         for (int i = 0; i < MAXC; i++) {
             client_t *c = &cl[i];
             if (c->fd < 0) continue;
             ssize_t n = recv(c->fd, c->in + c->inlen, sizeof c->in - 1 - (size_t)c->inlen, MSG_DONTWAIT);
-            if (n == 0 || (n < 0 && errno != EAGAIN && errno != EINTR)) goto drop;
+            if (n == 0 || (n < 0 && errno != EAGAIN && errno != EINTR)) { client_drop(w, c); continue; }
             if (n > 0) {
-                if (c->up) { if (!upload_more(w, c, c->in + c->inlen, (int)n)) goto drop; continue; }
+                if (c->up) { if (!upload_more(w, c, c->in + c->inlen, (int)n)) { client_drop(w, c); } continue; }
                 c->inlen += (int)n;
                 c->in[c->inlen] = 0;
                 if (!c->ws) {
                     if (strstr(c->in, "\r\n\r\n")) {
                         int r = handle_http(w, c);
-                        if (!r) goto drop;
-                        if (r == 2 && c->up_left <= 0 && !upload_more(w, c, NULL, 0)) goto drop;
+                        if (!r) { client_drop(w, c); continue; }
+                        if (r == 2 && c->up_left <= 0 && !upload_more(w, c, NULL, 0)) { client_drop(w, c); continue; }
                         c->inlen = 0;
-                    } else if (c->inlen >= (int)sizeof c->in - 1) goto drop;
-                } else if (ws_input(c)) goto drop;
+                        if (r == 1 && c->mirror) {   /* PLUG: who we are, and which build */
+                            c->id = i;
+                            unsigned char h[64], *p = h;
+                            *p++ = 0x30;
+                            put_u32(&p, MIR_PROTO); put_u32(&p, (uint32_t)NP); put_u32(&p, web_schema());
+                            *p++ = (unsigned char)i;
+                            *p++ = (unsigned char)strlen(VADER_VERSION_STR);
+                            memcpy(p, VADER_VERSION_STR, strlen(VADER_VERSION_STR)); p += strlen(VADER_VERSION_STR);
+                            if (ws_send(c->fd, h, (size_t)(p - h), 0)) { client_drop(w, c); continue; }
+                        }
+                    } else if (c->inlen >= (int)sizeof c->in - 1) { client_drop(w, c); continue; }
+                } else if (ws_input(w, c)) { client_drop(w, c); continue; }
             }
-            if (!c->ws && now - c->since > 10) goto drop;   /* a request that never came */
-            continue;
-        drop:
-            if (c->ws) __atomic_sub_fetch(&w->watchers, 1, __ATOMIC_RELAXED);
-            if (c->up) { fclose(c->up); c->up = NULL; unlink(c->up_tmp); }
-            close(c->fd);
-            c->fd = -1;
+            if (!c->ws && now - c->since > 10) client_drop(w, c);   /* a request that never came */
         }
-        /* a frame to every watcher, FPS times a second; the shape first when it changed */
+        /* PLUG: the whole state when it changed (and for a desktop that just came), then the parameter changes since, at once */
+        for (int i = 0; i < MAXC; i++) {
+            client_t *c = &cl[i];
+            if (c->fd < 0 || !c->mirror || !c->hello_ok) continue;
+            pthread_mutex_lock(&w->lock);
+            if (w->mir_state_ver != c->state_seen && w->mir_state_len > 0) {
+                int n = w->mir_state_len;
+                unsigned ver = w->mir_state_ver, pos = w->mir_state_pos;
+                memcpy(stbuf + 1, w->mir_state, (size_t)n);
+                pthread_mutex_unlock(&w->lock);
+                stbuf[0] = 0x31;
+                if (ws_send(c->fd, stbuf, (size_t)n + 1, 0)) { client_drop(w, c); continue; }
+                c->state_seen = ver;
+                c->cursor = pos;
+                continue;
+            }
+            if (w->mir_state_ver == c->state_seen && w->ring_head != c->cursor) {
+                if (w->ring_head - c->cursor > MIR_RING) {   /* too far behind: the whole state again */
+                    c->cursor = w->ring_head;
+                    __atomic_store_n(&w->mir_want_full, 1, __ATOMIC_RELEASE);
+                    pthread_mutex_unlock(&w->lock);
+                    continue;
+                }
+                unsigned char *p = msg + 3;
+                int cnt = 0;
+                while (c->cursor != w->ring_head && cnt < 400) {
+                    const mir_ent_t *e = &w->ring[c->cursor % MIR_RING];
+                    c->cursor++;
+                    if (e->origin == c->id) continue;   /* it made this change itself */
+                    memcpy(p, &e->idx, 2); memcpy(p + 2, &e->val, 4); p += 6; cnt++;
+                }
+                pthread_mutex_unlock(&w->lock);
+                if (cnt) {
+                    msg[0] = 0x32; msg[1] = (unsigned char)cnt; msg[2] = (unsigned char)(cnt >> 8);
+                    if (ws_send(c->fd, msg, (size_t)(p - msg), 0)) client_drop(w, c);
+                }
+                continue;
+            }
+            pthread_mutex_unlock(&w->lock);
+        }
+        /* PLUG: the Force's readout line when it changed */
+        for (int i = 0; i < MAXC; i++) {
+            client_t *c = &cl[i];
+            if (c->fd < 0 || !c->mirror || !c->hello_ok) continue;
+            pthread_mutex_lock(&w->lock);
+            if (c->rd_seen == w->mir_rd_ver) { pthread_mutex_unlock(&w->lock); continue; }
+            c->rd_seen = w->mir_rd_ver;
+            unsigned char *p = msg;
+            *p++ = 0x33;
+            put_f(&p, w->mir_rd_line);
+            size_t tl = strlen(w->mir_rd);
+            memcpy(p, w->mir_rd, tl); p += tl;
+            pthread_mutex_unlock(&w->lock);
+            if (ws_send(c->fd, msg, (size_t)(p - msg), 0)) client_drop(w, c);
+        }
+        /* a frame to every watcher, FPS times a second; the shape first when it changed. A plugged desktop gets every frame
+         * (60 a second) with the extras the desktop's screen draws; the phone page every second one (30), as before. */
         clock_gettime(CLOCK_MONOTONIC, &nowts);
         if ((nowts.tv_sec - next.tv_sec) * 1000000000L + (nowts.tv_nsec - next.tv_nsec) >= 0) {
             next.tv_nsec += 1000000000L / FPS;
             while (next.tv_nsec >= 1000000000L) { next.tv_nsec -= 1000000000L; next.tv_sec++; }
             if ((nowts.tv_sec - next.tv_sec) * 1000000000L + (nowts.tv_nsec - next.tv_nsec) > 200000000L) next = nowts;
+            frame_no++;
             int any = 0;
-            for (int i = 0; i < MAXC; i++) if (cl[i].fd >= 0 && cl[i].ws) any = 1;
+            for (int i = 0; i < MAXC; i++) if (cl[i].fd >= 0 && cl[i].ws && (cl[i].mirror ? cl[i].hello_ok : (frame_no & 1) == 0)) any = 1;
             if (any) {
                 ovl_view_t v;
                 overlay_read_view(w->ovl, &v);
@@ -457,6 +625,7 @@ static void *web_thread(void *arg) {
                 for (int i = 0; i < MAXC; i++) {
                     client_t *c = &cl[i];
                     if (c->fd < 0 || !c->ws) continue;
+                    if (c->mirror ? !c->hello_ok : (frame_no & 1)) continue;
                     if (c->shape_seen != sv) {
                         static ovl_shape_t sh;   /* the thread's own */
                         overlay_read_shape(w->ovl, &sh);
@@ -468,11 +637,11 @@ static void *web_thread(void *arg) {
                         put_u32(&p, OVL_PATHN);
                         for (int k = 0; k < OVL_PATHN; k++) { put_f(&p, sh.px[k]); put_f(&p, sh.py[k]); put_f(&p, sh.pz[k]); }
                         if (sh.has_img) for (int k = 0; k < OVL_IMG_N * OVL_IMG_N; k++) *p++ = (unsigned char)(sh.img[k] * 255);
-                        if (ws_send(c->fd, msg, (size_t)(p - msg), 0)) { __atomic_sub_fetch(&w->watchers, 1, __ATOMIC_RELAXED); close(c->fd); c->fd = -1; continue; }
+                        if (ws_send(c->fd, msg, (size_t)(p - msg), 0)) { client_drop(w, c); continue; }
                         c->shape_seen = sv;
                     }
                     unsigned char *p = msg;
-                    *p++ = 1;
+                    *p++ = c->mirror ? 0x21 : 1;
                     *p++ = (unsigned char)v.motion;
                     *p++ = 0; *p++ = 0;
                     put_f(&p, v.rot); put_f(&p, v.yaw); put_f(&p, v.tilt); put_f(&p, v.size); put_f(&p, v.sub_size);
@@ -481,12 +650,15 @@ static void *web_thread(void *arg) {
                     put_f(&p, (float)v.use_pos); put_f(&p, v.fx); put_f(&p, v.fy); put_f(&p, v.ox); put_f(&p, v.oy);
                     put_f(&p, (float)v.nballs); for (int k = 0; k < 16; k++) { put_f(&p, v.bx[k]); put_f(&p, v.by[k]); }
                     put_f(&p, v.ps); put_f(&p, v.pe); put_f(&p, v.style);
-                    if (ws_send(c->fd, msg, (size_t)(p - msg), 0)) { __atomic_sub_fetch(&w->watchers, 1, __ATOMIC_RELAXED); close(c->fd); c->fd = -1; }
+                    if (c->mirror) { for (int k = 0; k < 4; k++) put_f(&p, v.im[k]); put_f(&p, (float)v.pgctr); }
+                    if (ws_send(c->fd, msg, (size_t)(p - msg), 0)) client_drop(w, c);
                 }
             }
         }
     }
-    for (int i = 0; i < MAXC; i++) if (cl[i].fd >= 0) close(cl[i].fd);
+    for (int i = 0; i < MAXC; i++) client_drop(w, &cl[i]);
+    free(stbuf);
+    if (ds >= 0) close(ds);
     if (ms >= 0) close(ms);
     close(ls);
     return NULL;
@@ -497,6 +669,8 @@ void web_start(web_t *w, overlay_t *ovl, const char *shapes_dir) {
     w->ovl = ovl;
     if (shapes_dir) snprintf(w->shapes_dir, sizeof w->shapes_dir, "%s", shapes_dir);
     pthread_mutex_init(&w->lock, NULL);
+    w->mir_state = malloc(MIR_STATE_MAX);
+    w->port = WEB_PORT;
     snprintf(w->status, sizeof w->status, "STARTING");
     w->started = 1;
     if (pthread_create(&w->thread, NULL, web_thread, w)) { w->started = 0; snprintf(w->status, sizeof w->status, "NO THREAD"); }
@@ -508,6 +682,8 @@ void web_stop(web_t *w) {
     pthread_join(w->thread, NULL);
     w->started = 0;
     pthread_mutex_destroy(&w->lock);
+    free(w->mir_state);
+    w->mir_state = NULL;
 }
 
 unsigned web_version(web_t *w) {
@@ -527,7 +703,7 @@ unsigned web_get(web_t *w, char *status, int len, unsigned char *qr) {
     return v;
 }
 
-int web_port(void) { return WEB_PORT; }
+int web_port(void) { return WEB_PORT; }   /* the first port tried; the one in use is in web_t.port */
 
 int web_take_load(web_t *w, char *path, int len) {
     pthread_mutex_lock(&w->lock);
@@ -535,4 +711,42 @@ int web_take_load(web_t *w, char *path, int len) {
     if (got) { w->load_taken = w->load_ver; snprintf(path, (size_t)len, "%s", w->load_path); }
     pthread_mutex_unlock(&w->lock);
     return got;
+}
+
+/* ------------------------------------------------------------------------------------------------ PLUG, for the engine */
+int web_mirror_active(web_t *w) { return w->started ? __atomic_load_n(&w->mirror_n, __ATOMIC_RELAXED) : 0; }
+
+int web_mirror_take(web_t *w, mir_msg_t *out, int max) {
+    int n = 0;
+    pthread_mutex_lock(&w->lock);
+    while (w->in_tail != w->in_head && n < max) out[n++] = w->inbox[w->in_tail++ % MIR_INBOX];
+    pthread_mutex_unlock(&w->lock);
+    return n;
+}
+
+int web_mirror_want_full(web_t *w) { return __atomic_exchange_n(&w->mir_want_full, 0, __ATOMIC_ACQ_REL); }
+
+void web_mirror_push(web_t *w, const mir_ent_t *e, int n) {
+    if (n <= 0) return;
+    pthread_mutex_lock(&w->lock);
+    for (int i = 0; i < n; i++) w->ring[w->ring_head++ % MIR_RING] = e[i];
+    pthread_mutex_unlock(&w->lock);
+}
+
+void web_mirror_state(web_t *w, const char *txt, int len) {
+    if (!w->mir_state || len <= 0 || len > MIR_STATE_MAX) return;
+    pthread_mutex_lock(&w->lock);
+    memcpy(w->mir_state, txt, (size_t)len);
+    w->mir_state_len = len;
+    w->mir_state_pos = w->ring_head;
+    w->mir_state_ver++;
+    pthread_mutex_unlock(&w->lock);
+}
+
+void web_mirror_text(web_t *w, const char *readout, float line) {
+    pthread_mutex_lock(&w->lock);
+    snprintf(w->mir_rd, sizeof w->mir_rd, "%s", readout);
+    w->mir_rd_line = line;
+    w->mir_rd_ver++;
+    pthread_mutex_unlock(&w->lock);
 }

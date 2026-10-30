@@ -7,6 +7,10 @@
 #include "paths.hpp"
 #include "DistrhoPluginUtils.hpp"
 #include <string>
+#include <fstream>
+extern "C" {
+#include "vader_params.h"   /* the engine's parameter table: PLUG speaks in its indices */
+}
 
 START_NAMESPACE_DISTRHO
 
@@ -60,6 +64,14 @@ VaderPlugin::VaderPlugin() : Plugin(VG_NEXP, 16, 1), fEng(mpc_engine()), fInst(n
         fTrigState[i] = 0;
     }
     fLastPoll = std::chrono::steady_clock::now();
+    for (int i = 0; i < VG_NEXP; i++) fExp2Eng[i] = -1;
+    for (int k = 0; k < NP; k++) if (VG_ENG2EXP[k] >= 0 && VG_ENG2EXP[k] < VG_NEXP) fExp2Eng[VG_ENG2EXP[k]] = (int16_t)k;
+    if (!dir.empty()) {   /* the Force's address, remembered next to the Shapes folder */
+        size_t sl = dir.find_last_of('/');
+        fAddrFile = (sl == std::string::npos ? dir : dir.substr(0, sl)) + "/force_address.txt";
+        std::ifstream f(fAddrFile);
+        if (f) { std::getline(f, fForceAddr); while (!fForceAddr.empty() && (fForceAddr.back() == '\r' || fForceAddr.back() == '\n' || fForceAddr.back() == ' ')) fForceAddr.pop_back(); }
+    }
     if (!fInst) return;
     for (int i = 0; i < 16; i++) {
         char k[24], b[96];
@@ -179,6 +191,39 @@ void VaderPlugin::uiFire(int par) {
     std::lock_guard<std::mutex> g(fMutex);
     engSet(VG_PARS[par].key, "1");
     pollLocked();
+    if (fExp2Eng[par] >= 0) fMirror.sendFire((uint16_t)fExp2Eng[par]);
+}
+
+/* ---------------------------------------------------------------------------------------------- PLUG */
+void VaderPlugin::uiPlug(const std::string &address) {
+    if (!address.empty() && address != fForceAddr) {
+        fForceAddr = address;
+        if (!fAddrFile.empty()) { std::ofstream f(fAddrFile); if (f) f << address << "\n"; }
+    }
+    fMirror.plug(address);
+}
+
+/* the Force's state and changes, applied to this engine as if the host had set them (so every text and name comes out the
+ * same here); the host is not told (DPF has no DSP-to-host value path), the window reads fValues itself */
+void VaderPlugin::mirrorApply() {
+    bool any = false;
+    if (fMirror.takeState(fStateIn) && !fStateIn.empty()) {
+        engSet("state", fStateIn.c_str());
+        primeAll();
+        any = true;
+    }
+    if (fMirror.takeDeltas(fDeltas)) {
+        char b[48];
+        for (const MirrorClient::Delta &d : fDeltas) {
+            if (d.idx >= NP) continue;
+            snprintf(b, sizeof b, "%.9g", (double)d.val);
+            engSet(VP[d.idx].key, b);
+            const int e = VG_ENG2EXP[d.idx];
+            if (e >= 0 && VG_PARS[e].kind != VG_TRIG) fValues[e].store(d.val, std::memory_order_relaxed);
+        }
+        any = true;
+    }
+    if (any) { pollLocked(); bumpVersion(); }
 }
 
 /* ---------------------------------------------------------------------------------------------- DPF: description */
@@ -250,12 +295,14 @@ void VaderPlugin::setParameterValue(uint32_t index, float value) {
         if (rise) {
             engSet(P.key, "1");
             pollLocked();
+            if (fExp2Eng[index] >= 0) fMirror.sendFire((uint16_t)fExp2Eng[index]);   /* PLUG: the Force presses it too */
         }
         return;
     }
     snprintf(b, sizeof b, "%.9g", (double)value);
     engSet(P.key, b);
     fValues[index].store(value, std::memory_order_relaxed);
+    if (fExp2Eng[index] >= 0) fMirror.sendSet((uint16_t)fExp2Eng[index], value);   /* PLUG: and on the Force */
     /* these change the values the others show (a corner's or timbre's sound, a preset's everything) */
     if ((int)index == VGP_TIMBRE || (int)index == VGP_CORNER || (int)index == VGP_PRESET) pollLocked();
     bumpVersion();
@@ -336,6 +383,7 @@ void VaderPlugin::run(const float **, float **outputs, uint32_t frames, const Mi
         return;
     }
     std::lock_guard<std::mutex> g(fMutex);
+    mirrorApply();   /* PLUG: what the Force sent since the last block */
     /* the host's transport: the arpeggiator and the synced orbit follow its song position */
     {
         const TimePosition &tp = getTimePosition();
@@ -386,6 +434,10 @@ void VaderPlugin::run(const float **, float **outputs, uint32_t frames, const Mi
             produce(fRes.need_for_next(), limit);
             fRes.pull(&outL[j], &outR[j]);
         }
+    }
+    if (fMirror.plugged()) {   /* PLUG: the Force makes the sound; this copy of the engine only keeps the window right */
+        memset(outL, 0, sizeof(float) * frames);
+        memset(outR, 0, sizeof(float) * frames);
     }
     fPollAcc += frames;
     if (fPollAcc >= getSampleRate() / 25.0) {   /* 25 times a second, like the Force's wrapper */
