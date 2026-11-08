@@ -1,5 +1,7 @@
 # Third-party code in the VADER desktop plugins
 
+Everything in this table other than the VADER row was written by other people. It belongs to them and stays under the licence shown; the PolyForm Noncommercial license covers only L'Cronx's own code.
+
 | Part | Licence |
 |---|---|
 | VADER (engine, plugin, window) | PolyForm Noncommercial 1.0.0, see LICENSE |

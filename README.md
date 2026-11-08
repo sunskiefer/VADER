@@ -146,4 +146,16 @@ moved to the phone).
 
 ## License
 
-VADER (the Force plugin and the desktop plugins) is licensed under the PolyForm Noncommercial License 1.0.0 (see [LICENSE](LICENSE)). The source is public and free to use, change and share for any noncommercial purpose; selling VADER or using it commercially is not permitted. Bundled, each under its own licence: [mpc-vst-plugins](third_party/mpc-vst-plugins) (MIT), [LXR-02 Open-Source](third_party/lxr02open) by Brendan Clarke (not to be sold or used commercially; see its LICENSE), [Braids and Plaits](third_party/mutable) by Emilie Gillet (MIT), [stb_image](third_party/stb) (public domain / MIT), Chakra Petch (SIL Open Font License, `art/fonts`). The desktop plugins also bundle [DPF](third_party/DPF) (ISC) and what it carries; see [desktop/THIRD_PARTY.md](desktop/THIRD_PARTY.md).
+The code written by L'Cronx for VADER (the Force plugin and the desktop plugins) is licensed under the PolyForm Noncommercial License 1.0.0 (see [LICENSE](LICENSE)). The source is public and free to use, change and share for any noncommercial purpose. The point is to stop others selling VADER or using it commercially; it is and stays free.
+
+### Credits: other people's code stays theirs
+
+That license covers only L'Cronx's own code. The code below was written by other people, belongs to them, and stays under the licence its authors chose; VADER claims no ownership of it and the PolyForm license does not replace theirs. Their copyright notices and licence files are kept in the repo.
+
+* **LXR-02 Open-Source** ([third_party/lxr02open](third_party/lxr02open)), copyright 2026 Brendan Clarke, a port of the Sonic Potions LXR software: his own licence applies (not to be sold or used in a commercial product or activity; modified redistributions must include the complete source). Thank you, Brendan.
+* **Braids, Plaits and stmlib** ([third_party/mutable](third_party/mutable)) by Emilie Gillet (Mutable Instruments): MIT.
+* **FM6 algorithm table** from music-synthesizer-for-android (`fm_core.cc`, copyright 2012 Google Inc.): Apache License 2.0.
+* **mpc-vst-plugins** ([third_party/mpc-vst-plugins](third_party/mpc-vst-plugins)), the Force plugin framework: MIT.
+* **stb_image** ([third_party/stb](third_party/stb)): public domain / MIT.
+* **Chakra Petch** font (`art/fonts`): SIL Open Font License 1.1.
+* **DPF** ([third_party/DPF](third_party/DPF)) and what it carries, for the desktop plugins: ISC and others; see [desktop/THIRD_PARTY.md](desktop/THIRD_PARTY.md).
