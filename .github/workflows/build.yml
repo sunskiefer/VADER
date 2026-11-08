@@ -59,7 +59,7 @@ jobs:
             --entry build/pluginlist-entry.xml \
             --version "$VERSION" \
             --about "VADER by L'Cronx: an orbit-based vector synth for MPC OS, with shapes and pictures of your own" \
-            --id vader --repo sunskiefer/VADER --license MIT \
+            --id vader --repo sunskiefer/VADER --license PolyForm-Noncommercial-1.0.0 \
             -o dist
 
       - name: Catalog check

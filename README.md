@@ -146,5 +146,4 @@ moved to the phone).
 
 ## License
 
-VADER is MIT-licensed (see [LICENSE](LICENSE)). Bundled: [mpc-vst-plugins](third_party/mpc-vst-plugins) (MIT),
-[stb_image](third_party/stb) (public domain / MIT), Chakra Petch (SIL Open Font License, `art/fonts`). The desktop plugins also bundle [DPF](third_party/DPF) (ISC) and what it carries; see [desktop/THIRD_PARTY.md](desktop/THIRD_PARTY.md).
+VADER (the Force plugin and the desktop plugins) is licensed under the PolyForm Noncommercial License 1.0.0 (see [LICENSE](LICENSE)). The source is public and free to use, change and share for any noncommercial purpose; selling VADER or using it commercially is not permitted. Bundled, each under its own licence: [mpc-vst-plugins](third_party/mpc-vst-plugins) (MIT), [LXR-02 Open-Source](third_party/lxr02open) by Brendan Clarke (not to be sold or used commercially; see its LICENSE), [Braids and Plaits](third_party/mutable) by Emilie Gillet (MIT), [stb_image](third_party/stb) (public domain / MIT), Chakra Petch (SIL Open Font License, `art/fonts`). The desktop plugins also bundle [DPF](third_party/DPF) (ISC) and what it carries; see [desktop/THIRD_PARTY.md](desktop/THIRD_PARTY.md).
