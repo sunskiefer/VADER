@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.1 (Force and desktop, one release)
+
+Same sound and behaviour as 0.9.0; **only the license changed**. Not yet tested on a device.
+
+- VADER's own code (the Force plugin and the desktop plugins) is now licensed under the PolyForm Noncommercial License 1.0.0
+  instead of MIT: free to use, change and share for any noncommercial purpose, not for sale. The release zips carry that
+  license in their manifest. Earlier releases (0.9.0 and before) were published under MIT and stay as they were.
+- Third-party code bundled in VADER (LXR-02 Open-Source, Braids/Plaits and others) stays the property of its authors under
+  their own licences; the credits are in the README and `desktop/THIRD_PARTY.md`.
+- The Force and the desktop plugin must run the same version to PLUG, so update both to 0.9.1 together.
+
 ## 0.9.0 (Force and desktop, one release)
 
 Built for the Force (ARM) and the desktop plugins from the same sources. **Not yet tested on a device.**
