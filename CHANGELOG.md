@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.2 (Force and desktop, one release)
+
+Same sound and behaviour as 0.9.1; **only the picture on MAIN changed**.
+
+- The new VADER logo (the blue grid room with the glowing triangle) now fills the middle of the Force plugin's MAIN page, where the vectors were meant to be. Tap it to swap to the QR code and back, as before.
+- The Force and the desktop plugin must run the same version to PLUG, so update both to 0.9.2 together.
+
 ## 0.9.1 (Force and desktop, one release)
 
 Same sound and behaviour as 0.9.0; **only the license changed**. Tried on the Force (and the desktop plugin on a real Windows PC). The desktop zips now include the example samples, and desktop releases are full releases.

@@ -146,7 +146,7 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.9.1 was tried on the Force and on a real Windows PC.** It adds nothing to 0.9.0's sound except the new license
+**0.9.2 only changes the picture on MAIN (the new logo); 0.9.1 was tried on the Force and on a real Windows PC.** 0.9.1 added nothing to 0.9.0's sound except the new license
 (PolyForm Noncommercial 1.0.0). Offline it passes the engine test (every preset, shape, mode, voice, blend mode and
 filter), the VST2 host test, the modes and shapes test, the companion screen's server test, the desktop host test and
 the engine test as ARM code; the release zip passes the catalog check. See [CHANGELOG.md](CHANGELOG.md) for what each
