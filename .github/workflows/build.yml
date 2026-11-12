@@ -94,3 +94,6 @@ jobs:
               gh release edit "v$v" --prerelease=false --notes-file .github/RELEASE_NOTES.md && echo "v$v: now a full release"
             fi
           done
+          # the newest tested version is also the "Latest" release
+          L=$(python3 -c "import json; v=sorted({e['version'] for e in json.load(open('tested.json'))}, key=lambda x: tuple(int(n) for n in x.split('.'))); print(v[-1])")
+          gh release edit "v$L" --latest && echo "v$L: marked Latest"
