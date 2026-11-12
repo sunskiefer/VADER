@@ -742,19 +742,18 @@ def qr_eye_image():
     return im.resize((7 * m, 7 * m), Image.LANCZOS)
 
 
-def logo_tile(size):
-    """the logo sketch (art/vader_logo_sketch.png, transparent) cropped square round its triangle, on black"""
+LOGO_W, LOGO_H = 408, QR_TILE      # the logo fills the centre area (the QR tile's height, the area's width)
+
+
+def logo_tile(w, h):
+    """art/vader_logo_screen.png (the user's picture, opaque) scaled to cover w x h, cropped from the centre"""
     Image, _, _, _ = _pil()
-    im = Image.open(os.path.join(ROOT, "art", "vader_logo_sketch.png")).convert("RGBA")
-    w, h = im.size
-    cx, cy = int(w * 0.51), int(h * 0.42)
-    side = min(w, int(h * 0.78))
-    x0 = max(0, min(w - side, cx - side // 2))
-    y0 = max(0, min(h - side, cy - side // 2))
-    sq = im.crop((x0, y0, x0 + side, y0 + side)).resize((size, size), Image.LANCZOS)
-    out = Image.new("RGBA", (size, size), (0, 0, 0, 255))
-    out.alpha_composite(sq)
-    return out
+    im = Image.open(os.path.join(ROOT, "art", "vader_logo_screen.png")).convert("RGBA")
+    iw, ih = im.size
+    k = max(w / iw, h / ih)
+    im = im.resize((max(w, round(iw * k)), max(h, round(ih * k))), Image.LANCZOS)
+    x0, y0 = (im.size[0] - w) // 2, (im.size[1] - h) // 2
+    return im.crop((x0, y0, x0 + w, y0 + h))
 
 
 def vader_mark(size):
@@ -1151,10 +1150,10 @@ def build_page(sk, page_no, comps):
             kids.append(placed(mk, "mark", sk.index["q000"], (mx + (G.QR_N - G.QR_HOLE) // 2 * m, my + (G.QR_N - G.QR_HOLE) // 2 * m, hole, hole), False))
             # 0.6.1: over all of it, the logo: SHOW QR = LOGO (0) draws the opaque logo, QR (1) nothing, so the code shows;
             # a tap on it toggles (like any toggle button), and the setting is kept with the plugin
-            lg = sk.save(logo_tile(QR_TILE), "vd_logo_on.png")
-            lg_off = sk.save(Image.new("RGBA", (QR_TILE, QR_TILE), (0, 0, 0, 0)), "vd_logo_off.png")
-            lk = define("vdQrSwitch", TOGGLE_ACTIONS, [focus(QR_TILE, QR_TILE), button(lg_off, lg, 1, 1, QR_TILE, QR_TILE)])
-            kids.append(placed(lk, "qr show", sk.index["qr_show"], (QR_XY[0], QR_XY[1], QR_TILE, QR_TILE), True))
+            lg = sk.save(logo_tile(LOGO_W, LOGO_H), "vd_logo_on.png")
+            lg_off = sk.save(Image.new("RGBA", (LOGO_W, LOGO_H), (0, 0, 0, 0)), "vd_logo_off.png")
+            lk = define("vdQrSwitch", TOGGLE_ACTIONS, [focus(LOGO_W, LOGO_H), button(lg_off, lg, 1, 1, LOGO_W, LOGO_H)])
+            kids.append(placed(lk, "qr show", sk.index["qr_show"], (QR_XY[0] - (LOGO_W - QR_TILE) // 2, QR_XY[1], LOGO_W, LOGO_H), True))
         elif k == "envwin":
             window(d, ENV_BOX, 8)
             strip = sk.save(env_strip(), "vd_env.png")
