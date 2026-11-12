@@ -11,4 +11,4 @@ VADER as a VST3 and a VST2 plugin for Windows (x86_64) and Linux (x86_64), with 
 
 Install steps, folders and limits: docs/DESKTOP.md (also inside each zip).
 
-**Tested:** Linux (Steinberg VST3 validator 47/47, VST2 host test, screenshots of every page). Windows: cross-compiled and run under Wine only (VST2 host test, screenshots). **Not yet tried on real Windows or in a real DAW**, and the Windows VST3 was not run. Pre-release: please report what you find.
+**Tested:** Linux (Steinberg VST3 validator 47/47, VST2 host test, screenshots of every page). Windows: cross-compiled, run under Wine, and loaded and played on a real Windows PC by the author. The Windows VST3 was not run through a validator. Please report what you find.

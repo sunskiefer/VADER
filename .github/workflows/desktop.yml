@@ -75,6 +75,6 @@ jobs:
           target_commitish: ${{ github.sha }}
           name: "VADER desktop ${{ steps.ver.outputs.version }} (VST3 + VST2, Windows + Linux)"
           make_latest: false
-          prerelease: true
+          prerelease: false
           files: dist/*.zip
           body_path: .github/DESKTOP_RELEASE_NOTES.md
