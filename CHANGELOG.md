@@ -2,7 +2,7 @@
 
 ## 0.9.1 (Force and desktop, one release)
 
-Same sound and behaviour as 0.9.0; **only the license changed**. Not yet tested on a device.
+Same sound and behaviour as 0.9.0; **only the license changed**. Tried on the Force (and the desktop plugin on a real Windows PC). The desktop zips now include the example samples, and desktop releases are full releases.
 
 - VADER's own code (the Force plugin and the desktop plugins) is now licensed under the PolyForm Noncommercial License 1.0.0
   instead of MIT: free to use, change and share for any noncommercial purpose, not for sale. The release zips carry that

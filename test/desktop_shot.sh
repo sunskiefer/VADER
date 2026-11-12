@@ -13,7 +13,7 @@ xvfb-run -a -s "-screen 0 1600x1000x24 +extension GLX" bash -c '
   PID=$!
   sleep 2.5
   if [ "'"$PAGE"'" != "0" ]; then
-    X=$(( ('"$PAGE"' * '"$W"' / 7) + '"$W"' / 14 ))
+    X=$(( ('"$PAGE"' * '"$W"' / '"${NP:-13}"') + '"$W"' / (2 * '"${NP:-13}"') ))
     xdotool mousemove $X 15 click 1
     sleep 1.2
   fi

@@ -4,7 +4,7 @@
 
 A note plays four sound sources at once, one in each corner of a square. A point, the **orbiter**, travels around a
 **shape** inside that square, and where it is decides how much of each corner you hear. Move the point and the sound
-morphs. The shape can be one of fifteen built-in figures, or one you bring yourself: a drawing (SVG), a 3D wireframe
+morphs. The shape can be one of fifteen built-in figures, one of 35 maths shapes, a simulation (27 modes), or one you bring yourself: a drawing (SVG), a 3D wireframe
 (OBJ) or a picture (PNG/JPG), traced into a line. The screen draws that line, the orbiter with its trail of dots and the envelope,
 live, as glowing lines.
 
@@ -59,11 +59,16 @@ artwork; it is not affiliated with Beetlecrab Audio.
 - **Arpeggiator** with six directions, six rates synced to MPC, 1 to 4 octaves, latch, and a 16-step pattern
   (ON, ACCENT, TIE, OFF).
 - **Effects**: drive, chorus, ping-pong delay (synced, or free with TAP), reverb.
-- **16 presets** in MPC's PRESET menu, from INIT ORBIT to SHAPE SCOPE, and **999 slots for your own** (MY PRESETS).
+- **22 presets** in MPC's PRESET menu, from INIT ORBIT to the sample presets, and **999 slots for your own** (MY PRESETS).
 - **The IMAGE page**: a picture plays the sound. Four MODs read the picture under the orbiter (BRIGHT on a spectrogram
   colour scale, HUE, COLOUR, DEPTH as a landscape) or the outline (TURN, HEADING) and move CUTOFF, RESO, OCTAVE, PITCH,
   GEN 1, GEN 2, BLEND or LEVEL.
-- **Six pages**: MAIN, CORNERS, ORBIT, IMAGE, ARP, FX. Q-Links are mapped on every page.
+- **MODE**: 27 simulations the orbiter can follow instead of a shape (BOIDS, LORENZ, GRAVITY WELLS, THUNDER, ...), each with its own eight live-named knobs and three layers.
+- **35 maths shapes**: spirograph, harmonograph, Fourier drawing of any shape, mandala, times table, toy gears, Hilbert, Koch and more, each with four shape knobs.
+- **VOICES**: each corner can play VADER's own generators or one of 14 ZYNTH voices (analog, trio, wave, chip, macro, wheel, voice, noise, tone, metal, bazz, drone, texture, fx).
+- **SAMPLES and WINDOW**: a WAV per corner (54 examples included), one-shot or looped over 1 to 4 bars, rooted on C2, with START, END and LENGTH.
+- **PLAY and TRAVEL**: self play, drone chords, poly/dual/mono, randomize with undo, voice limit and CPU readout; speed LFO, stops at corners, path start/end, stretch, skew, morph, warp pad, sound balls, kaleidoscope, suborbit shapes (including MOBIUS).
+- **Twelve pages**: MAIN, CORNERS, ORBIT, IMAGE, ARP, FX, MODE, VOICES, PLAY, TRAVEL, SAMPLES, WINDOW. Q-Links are mapped on every page.
 
 ## The screen: on your phone
 
@@ -90,6 +95,8 @@ logo), with bigger controls around it; the envelope line stays, drawn by MPC fro
 |---|---|
 | ![a loaded picture on the screen](docs/img/main_user_shape.png) | ![the CORNERS page](docs/img/corners.png) |
 | ![the ORBIT page](docs/img/orbit.png) | ![the IMAGE page](docs/img/image.png) |
+| ![the MODE page](docs/img/mode.png) | ![the VOICES page](docs/img/voices.png) |
+| ![the SAMPLES page](docs/img/samples.png) | ![the TRAVEL page](docs/img/travel.png) |
 
 ## Install
 
@@ -106,6 +113,8 @@ MPC OS 3.x. The skin uses the MPC OS 3 format.
 
 VADER also builds as a desktop plugin with the orbit screen drawn in its own window. Install steps, folders and
 limits are in **[docs/DESKTOP.md](docs/DESKTOP.md)**; build it with `desktop/build.sh linux|windows`.
+
+The desktop zips include the example samples (inside `VADER.vst3`, and a `Samples` folder beside the VST2 file); the plugin finds them by itself.
 
 Presets you save on the desktop (MY PRESETS, the `USER ###.vader` files) also load on the Force; see the
 [user guide](docs/USER_GUIDE.md).
@@ -137,12 +146,11 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.6.1 was tried on a Force.** Offline it passes the framework's VST2 host test, VADER's own engine
-test (every preset, shape, blend mode and filter, the arpeggiator on MPC's clock, every example shape file, the state
-round trip) and the companion screen's server test (the page, the WebSocket stream, an upload) on x86, and the engine
-test as ARM code; the release zip passes the catalog check. 0.4.5 and 0.5.0 were tried on a Force (the sound is clean
-with the screen quiet; the overlay experiment of 0.5.x drew well but made MPC's own screen lag, which is why the screen
-moved to the phone).
+**0.9.1 was tried on the Force and on a real Windows PC.** It adds nothing to 0.9.0's sound except the new license
+(PolyForm Noncommercial 1.0.0). Offline it passes the engine test (every preset, shape, mode, voice, blend mode and
+filter), the VST2 host test, the modes and shapes test, the companion screen's server test, the desktop host test and
+the engine test as ARM code; the release zip passes the catalog check. See [CHANGELOG.md](CHANGELOG.md) for what each
+version added.
 
 ## License
 
