@@ -60,5 +60,3 @@ cp build/arm/vader.so "$PKG/"
 mkdir -p "$PKG/Shapes" && cp shapes/* "$PKG/Shapes/"
 mkdir -p "$PKG/Samples" && cp Samples/* "$PKG/Samples/"   # 0.8: example samples (vader 1..54)
 echo "-> $PKG"
-# 0.10.0: the same plugin in Akai's folder format (MPC OS 3.10.1: copy the folder into "VST2 Plugins" on a drive)
-python3 tools/sdk_folder.py

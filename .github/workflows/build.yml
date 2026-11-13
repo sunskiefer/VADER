@@ -48,27 +48,38 @@ jobs:
           esac
           echo "version=$V" >> "$GITHUB_OUTPUT"; echo "release=$REL" >> "$GITHUB_OUTPUT"; echo "version $V, release $REL"
 
+      # 0.10.1: the zips as the catalog reads them, made with the open-mpc release tools (third_party/open-mpc-release):
+      # -mpc-armv7.zip (Gen1 and Force), -mpc-aarch64.zip (Gen2) and -mpc-sdk.zip (Akai's one-folder format, MPC OS 3.10.1)
       - name: Package
         run: |
           VERSION="${{ steps.ver.outputs.version }}"
-          python3 third_party/mpc-vst-plugins/tools/release.py \
-            --so build/arm/vader.so \
-            --skin "build/skin/L'Cronx - VST - VADER" \
-            --extra shapes:Shapes \
-            --extra Samples:Samples \
-            --entry build/pluginlist-entry.xml \
-            --version "$VERSION" \
-            --about "VADER by L'Cronx: an orbit-based vector synth for MPC OS, with shapes and pictures of your own" \
-            --id vader --repo sunskiefer/VADER --license PolyForm-Noncommercial-1.0.0 \
-            -o dist
+          for A in arm arm64; do
+            python3 third_party/open-mpc-release/release.py \
+              --so build/$A/vader.so \
+              --skin "build/skin/L'Cronx - VST - VADER" \
+              --extra shapes:Shapes \
+              --extra Samples:Samples \
+              --entry build/pluginlist-entry.xml \
+              --version "$VERSION" \
+              --about "VADER by L'Cronx: an orbit-based vector synth for MPC OS, with shapes and pictures of your own" \
+              --id vader --repo sunskiefer/VADER --license PolyForm-Noncommercial-1.0.0 \
+              -o dist
+          done
+          python3 third_party/open-mpc-release/sdk_zip.py "dist/VADER-$VERSION-mpc-sdk.zip" \
+            "dist/VADER-$VERSION-mpc-armv7.zip" "dist/VADER-$VERSION-mpc-aarch64.zip"
 
-      # 0.10.0: the same plugin in Akai's folder format (MPC OS 3.10.1, 32-bit and 64-bit MPCs), beside the usual zip
-      - name: Package (Akai's plugin folder format)
-        run: python3 tools/sdk_folder.py --zip dist
+      # the apostrophe in L'Cronx must never break the installer
+      - name: Installer scripts parse (sh -n)
+        run: |
+          for a in armv7 aarch64; do
+            rm -rf chk && mkdir chk && (cd chk && unzip -q ../dist/*-mpc-$a.zip && sh -n */install.sh && sh -n */uninstall.sh && echo "$a: ok")
+          done
 
       - name: Catalog check
         if: steps.ver.outputs.release == '1'
-        run: python3 third_party/mpc-vst-plugins/tools/catalog_check.py dist/*-mpc-armv7.zip --catalog
+        run: |
+          python3 third_party/open-mpc-release/catalog_check.py dist/*-mpc-armv7.zip --catalog
+          python3 third_party/open-mpc-release/catalog_check.py dist/*-mpc-aarch64.zip --catalog
 
       - uses: actions/upload-artifact@v4
         with:

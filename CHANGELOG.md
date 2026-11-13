@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.10.1 (Force and desktop, one release)
+
+The same plugin as 0.10.0, packaged the way the Open MPC catalog reads it. **Not tried on a device yet** (offline only,
+2026-11-13).
+
+- Three zips, made with the catalog's current release tools (`third_party/open-mpc-release`):
+  `VADER-0.10.1-mpc-armv7.zip` (32-bit MPCs and the Force, with `install.sh`), `VADER-0.10.1-mpc-aarch64.zip` (the
+  64-bit MPCs: Live III, XL, One G2, Key G2, with `install.sh`) and `VADER-0.10.1-mpc-sdk.zip` (one folder for every MPC
+  on MPC OS 3.10.1 or later: copy it into `VST2 Plugins`).
+- Each plugin folder now has a `plugin.json`, so MPC OS 3.10.1 lists it when it is copied by hand.
+- In the `-mpc-sdk.zip` folder the two binaries, `Shapes` and `Samples` sit in the folder itself (0.10.0's zip had them
+  in `VST/` and `Content/`; VADER still finds its files in either layout).
+
 ## 0.10.0 (Force and desktop, one release)
 
 VADER for the newer MPCs and for Akai's plugin format (MPC OS 3.10.1). Same sound, pages, presets, PLUG and companion

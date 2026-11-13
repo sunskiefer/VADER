@@ -100,20 +100,21 @@ logo), with bigger controls around it; the envelope line stays, drawn by MPC fro
 
 ## Install
 
-Each release has two zips for MPC OS. Use the one that fits your machine:
+Each release has three zips for MPC OS. Use the one that fits your machine:
 
 **MPC OS 3.10.1 or later, any MPC or Force, no mod needed** (`VADER-<version>-mpc-sdk.zip`, since 0.10.0):
 
 1. On the MPC: Preferences, Enhancements (Beta): turn on Enable Enhancements and External Plugin Support.
 2. Unzip, and copy the `L'Cronx - VST - VADER` folder into a folder named exactly `VST2 Plugins` at the top of a USB
    stick, an SD card or the internal drive. It holds the 32-bit build (MPC X, Live, Live II, One, Key 61/37, Force)
-   and the 64-bit build (MPC Live III, XL).
+   and the 64-bit build (MPC Live III, XL, One G2, Key G2).
 3. Load it on a track: it is under External Plugins.
-4. Your own shapes go in the folder's `Content/Shapes`, samples in `Content/Samples`.
+4. Your own shapes go in the folder's `Shapes`, samples in its `Samples`.
 
-**A modded MPC or Force (root SSH access, MockbaMod for example)** (`VADER-<version>-mpc-armv7.zip`):
+**With the Open MPC Plugin Manager, or by SSH on a modded MPC or Force** (`VADER-<version>-mpc-armv7.zip` for the 32-bit
+MPCs and the Force, `VADER-<version>-mpc-aarch64.zip` for the 64-bit MPCs):
 
-1. Download it from [Releases](https://github.com/sunskiefer/VADER/releases).
+1. Download it from [Releases](https://github.com/sunskiefer/VADER/releases) (the Plugin Manager does this itself).
 2. Unzip it and follow `INSTALL.md` inside; the installer stops MPC, adds VADER to the plugin list and starts MPC again.
 3. Load it on a track: Plugin → VST → **VADER**.
 4. Put your own shapes in `L'Cronx - VST - VADER/Shapes/` inside the Synths folder you installed to.
@@ -159,12 +160,12 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.10.0 has not been tried on a device yet.** It adds the 64-bit build for the newer MPCs and the zip in Akai's plugin
+**0.10.1 has not been tried on a device yet.** 0.10.0 added the 64-bit build for the newer MPCs and the zip in Akai's plugin
 format (MPC OS 3.10.1); the sound and the pages are 0.9.2's. 0.9.1 was tried on the Force and on a real Windows PC.
 Offline (2026-11-13) it passes the engine test (every preset, shape, mode, voice, blend mode and filter) as x86, 32-bit
 ARM and 64-bit ARM code, the VST2 host test, the modes and shapes test, the companion screen's server test and the PLUG
-test (also served by the 64-bit ARM build, under qemu) and the desktop host test; the folder passes the checker of
-Akai's MPC Plugin SDK and the armv7 zip passes the catalog check. See [CHANGELOG.md](CHANGELOG.md) for what each
+test (also served by the 64-bit ARM build, under qemu) and the desktop host test; the folder in the `-mpc-sdk.zip` passes the checker of
+Akai's MPC Plugin SDK (one warning: `version.xml` has no `<uiversion>`) and the armv7 and aarch64 zips pass the catalog check. See [CHANGELOG.md](CHANGELOG.md) for what each
 version added.
 
 ## License
