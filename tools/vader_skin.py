@@ -213,8 +213,8 @@ def page_arp():
     c += [text("OCTAVE WALK", 16, 560, 18), radio("arp_walk", 150, 552, 420, h=42), hl("arp_human", 600, 548, 330, "HUMANIZE"), hl("arp_chain", 940, 548, 324, "CHAIN")]
     q = [("ARP", ["arp_on", "latch", "arp_mode", "arp_rate", "arp_oct", "note_len", "arp_steps", "arp_walk"]),
          ("STEPS 1-8", ["step%d" % (i + 1) for i in range(8)]), ("STEPS 9-16", ["step%d" % (i + 9) for i in range(8)]),
-         ("STEP OCT 1-8", ["stepo%d" % (i + 1) for i in range(8)]), ("STEP OCT 9-16", ["stepo%d" % (i + 9) for i in range(8)]),
-         ("HUMAN", ["arp_human", "arp_chain"])]
+         ]   # 0.10.0: no Q-Link sub-pages for STEP OCT 1-8, STEP OCT 9-16 and HUMAN (still on the page, by touch): MPC allows
+             # 32 tabs in all (Akai's SDK, docs/ui-reference.md) and VADER had 35
     return c, q
 
 

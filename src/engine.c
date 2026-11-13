@@ -513,7 +513,11 @@ static void rescan(vader_t *s) {
     if (s->pdir[0]) {   /* <plugin folder>/Samples */
         snprintf(root, sizeof root, "%s", s->pdir);
         char *sl_ = strrchr(root, '/');
-        if (sl_) { snprintf(sl_, sizeof root - (size_t)(sl_ - root), "/Samples"); scan_dir(s, root, "", "", 0); }
+        if (sl_) {
+            snprintf(sl_, sizeof root - (size_t)(sl_ - root), "/Content/Samples");   /* 0.10.0: Akai's layout */
+            if (access(root, R_OK) != 0) snprintf(sl_, sizeof root - (size_t)(sl_ - root), "/Samples");
+            scan_dir(s, root, "", "", 0);
+        }
     }
     {   /* the desktop plugin: samples shipped inside the plugin (VADER_SAMPLES_EXTRA, folders separated by '|') */
         const char *xs = getenv("VADER_SAMPLES_EXTRA");
@@ -1817,7 +1821,11 @@ static void *create(const char *data_dir) {
         char base[512];
         snprintf(base, sizeof base, "%s", data_dir);
         size_t bl = strlen(base);
-        if (bl > 7 && !strcmp(base + bl - 7, "/Shapes")) base[bl - 7] = 0;
+        if (bl > 7 && !strcmp(base + bl - 7, "/Shapes")) {
+            base[bl - 7] = 0;
+            bl -= 7;   /* 0.10.0: Akai's layout keeps the plugin's files in <plugin folder>/Content */
+            if (bl > 8 && !strcmp(base + bl - 8, "/Content")) base[bl - 8] = 0;
+        }
         else if (!strcmp(base, "Shapes") || !strcmp(base, "shapes")) snprintf(base, sizeof base, ".");
         snprintf(s->pdir, sizeof s->pdir, "%s/User Presets", base);
         snprintf(s->skin_dir, sizeof s->skin_dir, "%s/Plugin Skins", base);

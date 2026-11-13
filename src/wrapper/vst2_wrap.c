@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
@@ -143,6 +144,8 @@ typedef struct {
     int on_poll, text_poll, dirty_poll;        /* frames until the next "<key>_on" poll / readout poll (see housekeeping) */
     int playing;             /* HAS_TRANSPORT: last transport state sent */
     double ppq;              /* HAS_TRANSPORT: song position at the last block, to spot a jump back */
+    int p0_pending;          /* 0.10.0: a held write of 0 or 1 to parameter 0 (the host's load-time nudge, see setParameter) */
+    float p0_val, p0_prev;
     volatile char need_update_display;  /* deferred audioMasterUpdateDisplay -- see setParameter() */
     char last_rev[16];       /* HAS_DISPLAY_REV: the "display_rev" last seen */
     float last_norm[NPARAMS];   /* HAS_DISPLAY_REV: value last reported per param (-1 = never) */
@@ -237,7 +240,7 @@ static float settle(float pos, float cur, float last) {
     return dir > 0 ? ceilf(pos - 0.001f) : floorf(pos + 0.001f);
 }
 
-static void setParameter(AEffect *e, int32_t i, float n) {
+static void set_param_real(AEffect *e, int32_t i, float n) {
     wrap_t *w = e->object;
     TRACE(0, i, n);
     char buf[64];
@@ -350,7 +353,33 @@ static void setParameter(AEffect *e, int32_t i, float n) {
     if (p->refresh_display) w->need_update_display = 1;   /* deferred to processReplacing(), see the step_target branch above */
 }
 
+/* 0.10.0. The MPC host (docs/host-contract.md of Akai's SDK) writes 1.0 or 0.0 to parameter 0 and straight back to its old
+ * value every time it prepares the plugin. Parameter 0 is the focused corner's OVERTONE GEN 1: with CORNER SELECT on ALL
+ * that pair of writes would set every corner's GEN 1 to corner A's. So a write of exactly 0 or 1 to parameter 0 is held:
+ * the write of the old value that follows cancels it (the nudge, nothing reaches the engine); anything else (the next
+ * audio block, another write, a state save) lets it through, so a real turn to the end stop arrives one block late at most. */
+static void p0_flush(wrap_t *w) {
+    if (__atomic_exchange_n(&w->p0_pending, 0, __ATOMIC_ACQ_REL)) set_param_real(&w->fx, 0, w->p0_val);
+}
+static void setParameter(AEffect *e, int32_t i, float n) {
+    wrap_t *w = e->object;
+    if (i != 0) { p0_flush(w); set_param_real(e, i, n); return; }
+    if (__atomic_load_n(&w->p0_pending, __ATOMIC_ACQUIRE)) {
+        if (fabsf(n - w->p0_prev) < 1e-6f) { __atomic_store_n(&w->p0_pending, 0, __ATOMIC_RELEASE); return; }   /* the nudge: dropped */
+        if (n == 0.0f || n == 1.0f) { w->p0_val = n; return; }
+        __atomic_store_n(&w->p0_pending, 0, __ATOMIC_RELEASE);
+        set_param_real(e, 0, n);
+        return;
+    }
+    if (n == 0.0f || n == 1.0f) {
+        float cur = get_norm(w, 0);
+        if (fabsf(cur - n) > 1e-6f) { w->p0_prev = cur; w->p0_val = n; __atomic_store_n(&w->p0_pending, 1, __ATOMIC_RELEASE); return; }
+    }
+    set_param_real(e, 0, n);
+}
+
 static float getParameter(AEffect *e, int32_t i) {
+    if (i == 0 && __atomic_load_n(&((wrap_t *)e->object)->p0_pending, __ATOMIC_ACQUIRE)) return ((wrap_t *)e->object)->p0_val;
     float v = get_norm(e->object, i);
     TRACE(1, i, v);
     return v;
@@ -576,8 +605,8 @@ static void run_block(AEffect *e, float **in, float **out, int32_t n, int accumu
         i++;
     }
 }
-static void processReplacing(AEffect *e, float **in, float **out, int32_t n) { run_block(e, in, out, n, 0); }
-static void process(AEffect *e, float **in, float **out, int32_t n) { run_block(e, in, out, n, 1); }
+static void processReplacing(AEffect *e, float **in, float **out, int32_t n) { p0_flush(e->object); run_block(e, in, out, n, 0); }
+static void process(AEffect *e, float **in, float **out, int32_t n) { p0_flush(e->object); run_block(e, in, out, n, 1); }
 #else
 static void run_block(AEffect *e, float **out, int32_t n, int accumulate) {
     wrap_t *w = e->object;
@@ -589,8 +618,8 @@ static void run_block(AEffect *e, float **out, int32_t n, int accumulate) {
 #endif
 }
 
-static void processReplacing(AEffect *e, float **in, float **out, int32_t n) { (void)in; run_block(e, out, n, 0); }
-static void process(AEffect *e, float **in, float **out, int32_t n) { (void)in; run_block(e, out, n, 1); }
+static void processReplacing(AEffect *e, float **in, float **out, int32_t n) { p0_flush(e->object); (void)in; run_block(e, out, n, 0); }
+static void process(AEffect *e, float **in, float **out, int32_t n) { p0_flush(e->object); (void)in; run_block(e, out, n, 1); }
 #endif
 
 /* MIDI control from a sequencer or controller on the track's MIDI input (gen_vst.py cc_lines()): CC 20-35 move the
@@ -602,7 +631,8 @@ static void cc_set(wrap_t *w, int i, float n) {
     const param_t *p = &PARAMS[i];
     if (p->nopts > 1) n = roundf(clamp01(n) * (p->nopts - 1)) / (p->nopts - 1);
     else if (p->int_display && p->max > p->min) n = roundf(clamp01(n) * (p->max - p->min)) / (p->max - p->min);
-    setParameter(&w->fx, i, n);
+    if (i == 0) __atomic_store_n(&w->p0_pending, 0, __ATOMIC_RELEASE);   /* a newer value than a held write of parameter 0 */
+    set_param_real(&w->fx, i, n);
     w->cc_changed[i] = 1;
 }
 
@@ -765,6 +795,7 @@ static intptr_t dispatcher(AEffect *e, int32_t op, int32_t idx, intptr_t v, void
         return (!strcmp(p, "receiveVstEvents") || !strcmp(p, "receiveVstMidiEvent") ||
                 !strcmp(p, "receiveVstTimeInfo")) ? 1 : -1;
     case effGetChunk: {
+        p0_flush(w);
         /* LXRXXL: the engine answers with the length it needs (NUL included); grow and ask again when it is larger */
         int len = eng_get(w, "state", w->chunk ? w->chunk : (char *)"", w->chunk ? w->chunkCap : 0);
         if (len <= 0) return 0;
@@ -813,8 +844,16 @@ __attribute__((visibility("default"))) AEffect *VSTPluginMain(audioMasterCallbac
 #ifdef MODULE_SUBDIR
     char data_dir[600], here[512];
     const char *module_dir = MODULE_DIR;   /* an absolute MODULE_DIR is still the fallback */
-    if (mpc_plugin_dir(here, sizeof here) && snprintf(data_dir, sizeof data_dir, "%s/%s", here, MODULE_SUBDIR) < (int)sizeof data_dir)
-        module_dir = data_dir;
+    if (mpc_plugin_dir(here, sizeof here)) {
+        /* 0.10.0, Akai's folder layout (MPC OS 3.10.1): the binary is in <plugin folder>/VST and the plugin's own files
+         * in <plugin folder>/Content; the old layout (binary and Shapes in the plugin folder) still works */
+        size_t hl = strlen(here);
+        if (hl > 4 && !strcmp(here + hl - 4, "/VST")) here[hl - 4] = 0;
+        if (snprintf(data_dir, sizeof data_dir, "%s/Content/%s", here, MODULE_SUBDIR) < (int)sizeof data_dir && access(data_dir, R_OK) == 0)
+            module_dir = data_dir;
+        else if (snprintf(data_dir, sizeof data_dir, "%s/%s", here, MODULE_SUBDIR) < (int)sizeof data_dir)
+            module_dir = data_dir;
+    }
     w->dsp = g_api->create(module_dir);
 #else
     w->dsp = g_api->create(MODULE_DIR);

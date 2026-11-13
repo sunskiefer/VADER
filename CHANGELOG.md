@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.10.0 (Force and desktop, one release)
+
+VADER for the newer MPCs and for Akai's plugin format (MPC OS 3.10.1). Same sound, pages, presets, PLUG and companion
+screen as 0.9.2. **Not tried on a device yet**: checked offline only (2026-11-13), see the README's Status.
+
+- **A 64-bit build**, for the 64-bit MPCs (MPC Live III, XL and later). The 32-bit build (MPC X, Live, Live II, One,
+  Key 61/37, Force) is the same code.
+- **A second zip, `VADER-0.10.0-mpc-sdk.zip`**: the plugin as one folder in Akai's format (`plugin.json`, `version.xml`,
+  `VST/vader-arm32.so` and `VST/vader-arm64.so`, `Plugin Skins`, `Content/Shapes` and `Content/Samples`). On MPC OS 3.10.1
+  or later, turn on External Plugin Support and copy the folder into `VST2 Plugins` on a drive; `INSTALL.txt` in the zip
+  has the steps. It passes the checker of Akai's MPC Plugin SDK (`tools/validate.py`).
+- **`VADER-0.10.0-mpc-armv7.zip` stays as it was** (`install.sh`, `uninstall.sh`, the Shapes and Samples folders beside
+  the plugin), for a modded MPC or Force and the catalog.
+- VADER finds its shapes and samples in the folder's `Content` (Akai's layout) or beside the plugin (the old layout).
+- The MPC host writes to the first parameter and straight back every time it prepares a plugin. That parameter is the
+  selected corner's OVERTONE GEN 1: with CORNER SELECT on ALL, that would have set every corner's GEN 1 to corner A's on
+  each load. VADER now recognises that pair of writes and ignores it (`test/nudge_test.c`).
+- MPC allows 32 Q-Link tabs in all and VADER had 35, so three Q-Link sub-pages of the ARP page are gone: STEP OCT 1-8,
+  STEP OCT 9-16 and HUMAN. Their controls are still on the ARP page, by touch.
+- The Force and the desktop plugin must run the same version to PLUG, so update both to 0.10.0 together.
+
 ## 0.9.2 (Force and desktop, one release)
 
 Same sound and behaviour as 0.9.1; **only the picture on MAIN changed**.

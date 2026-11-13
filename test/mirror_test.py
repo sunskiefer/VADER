@@ -9,8 +9,10 @@ root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 tmp = os.path.join(root, "build", "host", "mirrorshapes")
 shutil.rmtree(tmp, ignore_errors=True); os.makedirs(tmp)
 env = dict(os.environ, VADER_WEB="1", VADER_BLOCKS="100000", VADER_REALTIME="1", VADER_DATA=tmp)
-p = subprocess.Popen([os.path.join(root, "build/host/skin_dump"), "1", "2"], env=env, stdout=subprocess.DEVNULL, cwd=root)
-time.sleep(0.8)
+# VADER_SKIN_DUMP: another build of skin_dump to test (test/arm_sim.sh: the 64-bit ARM one under qemu)
+dump = os.environ["VADER_SKIN_DUMP"].split() if os.environ.get("VADER_SKIN_DUMP") else [os.path.join(root, "build/host/skin_dump")]
+p = subprocess.Popen(dump + ["1", "2"], env=env, stdout=subprocess.DEVNULL, cwd=root)
+time.sleep(4.0 if os.environ.get("VADER_SKIN_DUMP") else 0.8)
 try:
     # the parameters, for indices and the schema
     hdr = open(os.path.join(root, "src", "vader_params.h")).read()

@@ -23,29 +23,36 @@ gcc -O1 -w -std=gnu11 -Isrc -o build/tools/shape_dump tools/shape_dump.c src/sha
 python3 tools/vader_skin.py "build/skin/$NAME/Plugin Skins"      # every page, from tools/vader_skin.py
 python3 tools/check_skin.py "build/skin/$NAME"                    # touch boxes, edges, Q-Links, as MPC loads it (open lists excepted)
 
-TGT="-target arm-linux-gnueabihf.2.31 -mcpu=generic+v7a+vfp3d16-d32-neon+thumb2 -ffp-contract=off"
 COMMON="-O2 -fPIC -fvisibility=hidden -ffunction-sections -fdata-sections -DNDEBUG -w -std=gnu11"
 [ "${VADER_NOSCREEN:-}" = 1 ] && COMMON="$COMMON -DNOSCREEN=1"   # a test build with no screen at all
-OBJS=""
-for f in $PLUGIN_SRCS src/wrapper/vst2_wrap.c; do
-  o="build/arm/$(echo "$f" | tr / _).o"
-  $ZIG cc $TGT $COMMON -Ibuild -I"$MPC_VST/wrapper" $INCS -c "$f" -o "$o"
-  OBJS="$OBJS $o"
-done
-for f in $ZYN_SRCS; do   # the ZYNTH voices (own include paths)
-  o="build/arm/$(echo "$f" | tr / _).o"
-  $ZIG cc $TGT $COMMON $ZINCS -c "$f" -o "$o"
-  OBJS="$OBJS $o"
-done
 CXXCOMMON="-O2 -fPIC -fvisibility=hidden -ffunction-sections -fdata-sections -DNDEBUG -w $CXXFLAGS_MI"
-for f in $CXX_SRCS; do   # the Mutable Instruments engines
-  o="build/arm/$(echo "$f" | tr / _).o"
-  $ZIG c++ $TGT $CXXCOMMON $CXXINCS -c "$f" -o "$o"
-  OBJS="$OBJS $o"
-done
-printf '{\n  global: VSTPluginMain;\n  local: *;\n};\n' > build/arm/exports.map
-$ZIG cc $TGT -shared -fPIC -Wl,--no-undefined -Wl,--version-script=build/arm/exports.map -Wl,--gc-sections -Wl,-s \
-  $OBJS -lm -ldl -lpthread -o build/arm/vader.so
+# one binary per CPU: build_so <out dir> <target flags>
+build_so() {
+  local D="$1" TGT="$2" OBJS="" f o
+  mkdir -p "$D"
+  for f in $PLUGIN_SRCS src/wrapper/vst2_wrap.c; do
+    o="$D/$(echo "$f" | tr / _).o"
+    $ZIG cc $TGT $COMMON -Ibuild -I"$MPC_VST/wrapper" $INCS -c "$f" -o "$o"
+    OBJS="$OBJS $o"
+  done
+  for f in $ZYN_SRCS; do   # the ZYNTH voices (own include paths)
+    o="$D/$(echo "$f" | tr / _).o"
+    $ZIG cc $TGT $COMMON $ZINCS -c "$f" -o "$o"
+    OBJS="$OBJS $o"
+  done
+  for f in $CXX_SRCS; do   # the Mutable Instruments engines
+    o="$D/$(echo "$f" | tr / _).o"
+    $ZIG c++ $TGT $CXXCOMMON $CXXINCS -c "$f" -o "$o"
+    OBJS="$OBJS $o"
+  done
+  printf '{\n  global: VSTPluginMain;\n  local: *;\n};\n' > "$D/exports.map"
+  $ZIG cc $TGT -shared -fPIC -Wl,--no-undefined -Wl,--version-script="$D/exports.map" -Wl,--gc-sections -Wl,-s \
+    $OBJS -lm -ldl -lpthread -o "$D/vader.so"
+}
+# 32-bit: MPC X, Live, Live II, One, Key 61/37, Force
+build_so build/arm "-target arm-linux-gnueabihf.2.31 -mcpu=generic+v7a+vfp3d16-d32-neon+thumb2 -ffp-contract=off"
+# 0.10.0, 64-bit: MPC Live III, XL and later (MPC OS 3.10.1, Akai's plugin folder format)
+build_so build/arm64 "-target aarch64-linux-gnu.2.31 -mcpu=generic -ffp-contract=off"
 PKG="build/package/$NAME"
 rm -rf build/package && mkdir -p "$PKG"
 cp -r "build/skin/$NAME/." "$PKG/"
@@ -53,3 +60,5 @@ cp build/arm/vader.so "$PKG/"
 mkdir -p "$PKG/Shapes" && cp shapes/* "$PKG/Shapes/"
 mkdir -p "$PKG/Samples" && cp Samples/* "$PKG/Samples/"   # 0.8: example samples (vader 1..54)
 echo "-> $PKG"
+# 0.10.0: the same plugin in Akai's folder format (MPC OS 3.10.1: copy the folder into "VST2 Plugins" on a drive)
+python3 tools/sdk_folder.py

@@ -100,12 +100,25 @@ logo), with bigger controls around it; the envelope line stays, drawn by MPC fro
 
 ## Install
 
-1. Download `VADER-<version>-mpc-armv7.zip` from [Releases](https://github.com/sunskiefer/VADER/releases).
-2. Unzip it and follow `INSTALL.md` inside. It needs root SSH access to the device (MockbaMod, for example); the
-   installer stops MPC, adds VADER to the plugin list and starts MPC again.
+Each release has two zips for MPC OS. Use the one that fits your machine:
+
+**MPC OS 3.10.1 or later, any MPC or Force, no mod needed** (`VADER-<version>-mpc-sdk.zip`, since 0.10.0):
+
+1. On the MPC: Preferences, Enhancements (Beta): turn on Enable Enhancements and External Plugin Support.
+2. Unzip, and copy the `L'Cronx - VST - VADER` folder into a folder named exactly `VST2 Plugins` at the top of a USB
+   stick, an SD card or the internal drive. It holds the 32-bit build (MPC X, Live, Live II, One, Key 61/37, Force)
+   and the 64-bit build (MPC Live III, XL).
+3. Load it on a track: it is under External Plugins.
+4. Your own shapes go in the folder's `Content/Shapes`, samples in `Content/Samples`.
+
+**A modded MPC or Force (root SSH access, MockbaMod for example)** (`VADER-<version>-mpc-armv7.zip`):
+
+1. Download it from [Releases](https://github.com/sunskiefer/VADER/releases).
+2. Unzip it and follow `INSTALL.md` inside; the installer stops MPC, adds VADER to the plugin list and starts MPC again.
 3. Load it on a track: Plugin → VST → **VADER**.
-4. Put your own shapes in `L'Cronx - VST - VADER/Shapes/` inside the Synths folder you installed to, or in a
-   folder called `VADER Shapes` at the top of your SD card or USB drive.
+4. Put your own shapes in `L'Cronx - VST - VADER/Shapes/` inside the Synths folder you installed to.
+
+With either, a folder called `VADER Shapes` (or `VADER Samples`) at the top of your SD card or USB drive is read too.
 
 MPC OS 3.x. The skin uses the MPC OS 3 format.
 
@@ -146,10 +159,12 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.9.2 only changes the picture on MAIN (the new logo); 0.9.1 was tried on the Force and on a real Windows PC.** 0.9.1 added nothing to 0.9.0's sound except the new license
-(PolyForm Noncommercial 1.0.0). Offline it passes the engine test (every preset, shape, mode, voice, blend mode and
-filter), the VST2 host test, the modes and shapes test, the companion screen's server test, the desktop host test and
-the engine test as ARM code; the release zip passes the catalog check. See [CHANGELOG.md](CHANGELOG.md) for what each
+**0.10.0 has not been tried on a device yet.** It adds the 64-bit build for the newer MPCs and the zip in Akai's plugin
+format (MPC OS 3.10.1); the sound and the pages are 0.9.2's. 0.9.1 was tried on the Force and on a real Windows PC.
+Offline (2026-11-13) it passes the engine test (every preset, shape, mode, voice, blend mode and filter) as x86, 32-bit
+ARM and 64-bit ARM code, the VST2 host test, the modes and shapes test, the companion screen's server test and the PLUG
+test (also served by the 64-bit ARM build, under qemu) and the desktop host test; the folder passes the checker of
+Akai's MPC Plugin SDK and the armv7 zip passes the catalog check. See [CHANGELOG.md](CHANGELOG.md) for what each
 version added.
 
 ## License

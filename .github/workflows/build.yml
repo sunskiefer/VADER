@@ -24,10 +24,10 @@ jobs:
       - name: Tests (x86, under valgrind)
         run: test/run_tests.sh
 
-      - name: Tests (ARM code, under qemu)
+      - name: Tests (ARM code, 32-bit and 64-bit, under qemu)
         run: test/arm_sim.sh
 
-      - name: Build (armv7, glibc 2.31)
+      - name: Build (armv7 and arm64, glibc 2.31)
         run: |
           if ! ./build.sh > build.log 2>&1; then
             tail -40 build.log | while IFS= read -r line; do echo "::error title=build.sh::$line"; done
@@ -61,6 +61,10 @@ jobs:
             --about "VADER by L'Cronx: an orbit-based vector synth for MPC OS, with shapes and pictures of your own" \
             --id vader --repo sunskiefer/VADER --license PolyForm-Noncommercial-1.0.0 \
             -o dist
+
+      # 0.10.0: the same plugin in Akai's folder format (MPC OS 3.10.1, 32-bit and 64-bit MPCs), beside the usual zip
+      - name: Package (Akai's plugin folder format)
+        run: python3 tools/sdk_folder.py --zip dist
 
       - name: Catalog check
         if: steps.ver.outputs.release == '1'
