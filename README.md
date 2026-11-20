@@ -66,7 +66,7 @@ artwork; it is not affiliated with Beetlecrab Audio.
 - **MODE**: 27 simulations the orbiter can follow instead of a shape (BOIDS, LORENZ, GRAVITY WELLS, THUNDER, ...), each with its own eight live-named knobs and three layers.
 - **35 maths shapes**: spirograph, harmonograph, Fourier drawing of any shape, mandala, times table, toy gears, Hilbert, Koch and more, each with four shape knobs.
 - **VOICES**: each corner can play VADER's own generators or one of 14 ZYNTH voices (analog, trio, wave, chip, macro, wheel, voice, noise, tone, metal, bazz, drone, texture, fx).
-- **SAMPLES and WINDOW**: a WAV per corner (54 examples included), one-shot, looped over 1 to 4 bars or OFF, rooted on C2, with START, END and LENGTH.
+- **SAMPLES and WINDOW**: a WAV per corner picked from a scrolling dropdown (54 examples included), one-shot, looped over 1 to 4 bars or OFF, rooted on C2, with START, END and LENGTH.
 - **PLAY and TRAVEL**: self play, drone chords, poly/dual/mono, randomize with undo, voice limit and CPU readout; speed LFO, stops at corners, path start/end, stretch, skew, morph, warp pad, sound balls, kaleidoscope, suborbit shapes (including MOBIUS).
 - **Twelve pages**: MAIN, CORNERS, ORBIT, IMAGE, ARP, FX, MODE, VOICES, PLAY, TRAVEL, SAMPLES, WINDOW. Q-Links are mapped on every page.
 
@@ -160,7 +160,7 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.10.2 has not been tried on a device yet.** 0.10.2 makes each corner's sample MODE the switch (OFF: the voice only; a sample mode: the sample only). 0.10.0 added the 64-bit build for the newer MPCs and the zip in Akai's plugin
+**0.10.3 has not been tried on a device yet.** 0.10.3 gives each corner a sample dropdown with a scrollbar and makes the desktop window pure black; 0.10.2 made each corner's sample MODE the switch (OFF: the voice only; a sample mode: the sample only). 0.10.0 added the 64-bit build for the newer MPCs and the zip in Akai's plugin
 format (MPC OS 3.10.1); the sound and the pages are 0.9.2's. 0.9.1 was tried on the Force and on a real Windows PC.
 Offline (2026-11-13) it passes the engine test (every preset, shape, mode, voice, blend mode and filter) as x86, 32-bit
 ARM and 64-bit ARM code, the VST2 host test, the modes and shapes test, the companion screen's server test and the PLUG

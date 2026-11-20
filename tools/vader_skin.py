@@ -81,6 +81,12 @@ def popup(key, x, y, w, caption, h=40, list_at=None, cols=2, ow=150, oh=40):
             "cols": cols, "ow": ow, "oh": oh}
 
 
+def picklist(key, x, y, w, caption, h=56, list_at=None):
+    """0.10.3: a dropdown of files with a scrollbar (the SAMPLES page): the field shows the chosen one; open, the list
+    shows PICK_ROWS rows, scrolled by the bar (touch), the data wheel or the arrows; tapping a row picks it"""
+    return {"kind": "picklist", "key": key, "x": x, "y": y, "w": w, "h": h, "caption": caption, "list_at": list_at}
+
+
 def field(key, x, y, w, caption, h=44):
     return {"kind": "field", "key": key, "x": x, "y": y, "w": w, "h": h, "caption": caption}
 
@@ -310,7 +316,7 @@ def page_samples():
     for ci, cl in enumerate("abcd"):
         x = 16 + ci * 316
         c += [title("CORNER " + cl.upper(), x, 70, 300),
-              hl("smp_" + cl, x, 92, 300, "SAMPLE", big=True),
+              picklist("smp_" + cl, x, 92, 300, "SAMPLE", h=56, list_at=(x if ci < 3 else x - 10, 152)),
               text("MODE", x, 180, 22),
               popup("smp_len_" + cl, x, 202, 300, "", h=48, list_at=(x if ci < 2 else x - 100, 254), cols=1, ow=300, oh=44),
               hl("smp_root_" + cl, x, 272, 300, "ROOT NOTE", big=True),
@@ -449,6 +455,21 @@ def line_strip(w, frames=101, lh=None):
         if x > 3:
             glow_line(fr, (3, lh // 2), (x, lh // 2), ACCENT, 6 if lh <= 16 else 8, glow=6)
         strip.alpha_composite(fr, (0, k * lh))
+    return strip
+
+
+def scrollbar_strip(w, h, frames=21):
+    """the pick list's scrollbar: a dark track, the thumb (a blue glowing block, a quarter of the track) from the top
+    (frame 0) to the bottom (last frame)"""
+    Image, ImageDraw, ImageFilter, _ = _pil()
+    strip = Image.new("RGBA", (w, h * frames), (0, 0, 0, 0))
+    d = ImageDraw.Draw(strip)
+    th = max(40, h // 4)
+    for f in range(frames):
+        y0 = f * h
+        d.rounded_rectangle([w // 2 - 5, y0 + 2, w // 2 + 5, y0 + h - 3], radius=5, fill=TRACK + (255,))
+        ty = y0 + 2 + int((h - 4 - th) * f / (frames - 1))
+        d.rounded_rectangle([w // 2 - 9, ty, w // 2 + 9, ty + th], radius=8, fill=ACCENT + (255,))
     return strip
 
 
@@ -882,9 +903,9 @@ def definition(key, actions, parts, ignore=False):
         "componentsData": parts}}
 
 
-def filmstrip(img, frames, w, h, drag="Horizontal", x=0, y=0):
+def filmstrip(img, frames, w, h, drag="Horizontal", x=0, y=0, invert=False):
     return sub("Knob", "Knob", {"version": 5, "knobType": "FilmStrip", "filmStrip": img, "numFrames": frames,
-                                "invert": False, "dragOrientation": drag, "handleName": "Data"}, B(x, y, w, h))
+                                "invert": invert, "dragOrientation": drag, "handleName": "Data"}, B(x, y, w, h))
 
 
 def button(on_img, off_img, bid, n, w, h, x=0, y=0):
@@ -1114,6 +1135,62 @@ def build_page(sk, page_no, comps):
                 okey = define("vdPopOpt_%s_%d_%d" % (key, o, ow), RADIO_ACTIONS, [button(on, off, o, len(opts), ow, oh)])
                 pp = placed(okey, "%s %s" % (key, name), sk.index[key], (ox, oy, ow, oh), False, cond=shown)
                 parts.append(pp)
+            for p_ in parts:
+                p_["bounds"]["showWhenDataModelInvalid"] = "Show"
+            top += parts
+        elif k == "picklist":
+            x, y, w, h = c["x"], c["y"], c["w"], c["h"]
+            corner = key[-1]
+            ci = "abcd".index(corner)
+            window(d, (x, y, w, h), 9, BTN_OFF + (255,))
+            cap = c["caption"]
+            d.text((x + 12, y + h / 2), cap, font=font(18), fill=INK_DIM + (255,), anchor="lm")
+            cw_ = font(18).getlength(cap) + 22
+            d.polygon([(x + w - 26, y + h / 2 - 4), (x + w - 14, y + h / 2 - 4), (x + w - 20, y + h / 2 + 4)], fill=ACCENT + (255,))
+            oi = sk.index[key + "__open"]
+            dk = define("vdPickField_%d_%d_%d" % (w, h, cw_), OPEN_ACTIONS,
+                        [focus(w, h), text_label("Value", 12 + cw_, 0, w - 44 - cw_, h, 22.0, "ffffff",
+                                                 "left verticallyCentred", handle="Text")])
+            kids.append(placed(dk, key + " field", oi, (x, y, w, h), True, extra={"Text": sk.index[key]}))
+            # the list: PICK_ROWS rows of live text (tap = pick), a scrollbar (drag; the data wheel when touched),
+            # the arrows, CLOSE
+            ROWS, RH, BAR = G.PICK_ROWS, 36, 34
+            lx, ly = c["list_at"] or (x, y + h + 4)
+            pw, ph = w, ROWS * RH + 14 + 46
+            lx = min(max(4, lx), W - pw - 4)
+            ly = min(max(64, ly), H - ph - 4)
+            shown = "IndexedEnabling/1/2/Parameter %d" % oi
+            panel = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
+            window(ImageDraw.Draw(panel), (0, 0, pw, ph), 12, (0, 0, 0, 250))
+            pimg = sk.save(panel, "vd_pick_%dx%d.png" % (pw, ph))
+            pk = define("vdPickPanel_%dx%d" % (pw, ph), [], [image(pimg, 0, 0, pw, ph)])
+            parts = [placed(pk, key + " list", oi, (lx, ly, pw, ph), False, cond=shown)]
+            rw = pw - 14 - BAR - 6
+            row_on = sk.save(button_img(rw, RH - 2, "", True), "vd_pickrow_%d_on.png" % rw)
+            row_off = sk.save(button_img(rw, RH - 2, "", False), "vd_pickrow_%d_off.png" % rw)
+            for i in range(ROWS):
+                rk = define("vdPickRow_%d_%d" % (rw, RH), TOGGLE_ACTIONS,
+                            [focus(rw, RH - 2), button(row_on, row_off, 1, 1, rw, RH - 2),
+                             text_label("Value", 10, 0, rw - 20, RH - 2, 22.0, "ffffff", "left verticallyCentred", handle="Text")])
+                parts.append(placed(rk, "%s row %d" % (key, i + 1), sk.index["smp_pick_%s%d" % (corner, i)], (lx + 7, ly + 7 + i * RH, rw, RH - 2), False,
+                                    extra={"Text": sk.index["smp_row_%s%d" % (corner, i)]}, cond=shown))
+            # the scrollbar: a vertical strip of frames with the thumb from top to bottom (21 frames keep it short)
+            bh = ROWS * RH - 2
+            strip = sk.save(scrollbar_strip(BAR, bh, 21), "vd_scroll_%d_%d.png" % (BAR, bh))
+            bk = define("vdPickBar_%d_%d" % (BAR, bh), KNOB_ACTIONS, [focus(BAR, bh), filmstrip(strip, 21, BAR, bh, "Vertical", 0, 0, invert=True)])
+            parts.append(placed(bk, key + " scroll", sk.index["smp_scroll_" + corner], (lx + pw - 7 - BAR, ly + 7, BAR, bh), False, cond=shown))
+            # the arrows and CLOSE
+            by_ = ly + 7 + ROWS * RH + 4
+            aw = (pw - 14 - 12) // 3
+            for j, (lab, tkey) in enumerate((("UP", "smp_up_" + corner), ("DOWN", "smp_dn_" + corner))):
+                on = sk.save(button_img(aw, 40, lab, True), "vd_pickbtn_%s_%d_on.png" % (lab, aw))
+                off = sk.save(button_img(aw, 40, lab, False), "vd_pickbtn_%s_%d_off.png" % (lab, aw))
+                ak = define("vdPickBtn_%s_%d" % (lab, aw), TOGGLE_ACTIONS, [focus(aw, 40), button(on, off, 1, 1, aw, 40)])
+                parts.append(placed(ak, "%s %s" % (key, lab), sk.index[tkey], (lx + 7 + j * (aw + 6), by_, aw, 40), False, cond=shown))
+            on = sk.save(button_img(aw, 40, "CLOSE", True), "vd_pickbtn_CLOSE_%d_on.png" % aw)
+            off = sk.save(button_img(aw, 40, "CLOSE", False), "vd_pickbtn_CLOSE_%d_off.png" % aw)
+            ck = define("vdPickClose_%d" % aw, OPEN_ACTIONS, [focus(aw, 40), button(on, off, 1, 1, aw, 40)])
+            parts.append(placed(ck, key + " close", oi, (lx + 7 + 2 * (aw + 6), by_, aw, 40), False, cond=shown))
             for p_ in parts:
                 p_["bounds"]["showWhenDataModelInvalid"] = "Show"
             top += parts

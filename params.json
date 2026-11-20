@@ -18323,6 +18323,774 @@
    "min": 0,
    "max": 1,
    "popup_of": "sub_shape"
+  },
+  {
+   "key": "smp_scroll_a",
+   "name": "SAMPLE A SCROLL",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "smp_scroll_b",
+   "name": "SAMPLE B SCROLL",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "smp_scroll_c",
+   "name": "SAMPLE C SCROLL",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "smp_scroll_d",
+   "name": "SAMPLE D SCROLL",
+   "default": 0,
+   "min": 0,
+   "max": 100,
+   "display": "int"
+  },
+  {
+   "key": "smp_pick_a0",
+   "name": "SAMPLE A PICK 1",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a1",
+   "name": "SAMPLE A PICK 2",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a2",
+   "name": "SAMPLE A PICK 3",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a3",
+   "name": "SAMPLE A PICK 4",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a4",
+   "name": "SAMPLE A PICK 5",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a5",
+   "name": "SAMPLE A PICK 6",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a6",
+   "name": "SAMPLE A PICK 7",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a7",
+   "name": "SAMPLE A PICK 8",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a8",
+   "name": "SAMPLE A PICK 9",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_a9",
+   "name": "SAMPLE A PICK 10",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b0",
+   "name": "SAMPLE B PICK 1",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b1",
+   "name": "SAMPLE B PICK 2",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b2",
+   "name": "SAMPLE B PICK 3",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b3",
+   "name": "SAMPLE B PICK 4",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b4",
+   "name": "SAMPLE B PICK 5",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b5",
+   "name": "SAMPLE B PICK 6",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b6",
+   "name": "SAMPLE B PICK 7",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b7",
+   "name": "SAMPLE B PICK 8",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b8",
+   "name": "SAMPLE B PICK 9",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_b9",
+   "name": "SAMPLE B PICK 10",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c0",
+   "name": "SAMPLE C PICK 1",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c1",
+   "name": "SAMPLE C PICK 2",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c2",
+   "name": "SAMPLE C PICK 3",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c3",
+   "name": "SAMPLE C PICK 4",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c4",
+   "name": "SAMPLE C PICK 5",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c5",
+   "name": "SAMPLE C PICK 6",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c6",
+   "name": "SAMPLE C PICK 7",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c7",
+   "name": "SAMPLE C PICK 8",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c8",
+   "name": "SAMPLE C PICK 9",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_c9",
+   "name": "SAMPLE C PICK 10",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d0",
+   "name": "SAMPLE D PICK 1",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d1",
+   "name": "SAMPLE D PICK 2",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d2",
+   "name": "SAMPLE D PICK 3",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d3",
+   "name": "SAMPLE D PICK 4",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d4",
+   "name": "SAMPLE D PICK 5",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d5",
+   "name": "SAMPLE D PICK 6",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d6",
+   "name": "SAMPLE D PICK 7",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d7",
+   "name": "SAMPLE D PICK 8",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d8",
+   "name": "SAMPLE D PICK 9",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_pick_d9",
+   "name": "SAMPLE D PICK 10",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_up_a",
+   "name": "SAMPLE A UP",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_up_b",
+   "name": "SAMPLE B UP",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_up_c",
+   "name": "SAMPLE C UP",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_up_d",
+   "name": "SAMPLE D UP",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_dn_a",
+   "name": "SAMPLE A DOWN",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_dn_b",
+   "name": "SAMPLE B DOWN",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_dn_c",
+   "name": "SAMPLE C DOWN",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_dn_d",
+   "name": "SAMPLE D DOWN",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "momentary": true
+  },
+  {
+   "key": "smp_row_a0",
+   "name": "SAMPLE A ROW 1",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a1",
+   "name": "SAMPLE A ROW 2",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a2",
+   "name": "SAMPLE A ROW 3",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a3",
+   "name": "SAMPLE A ROW 4",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a4",
+   "name": "SAMPLE A ROW 5",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a5",
+   "name": "SAMPLE A ROW 6",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a6",
+   "name": "SAMPLE A ROW 7",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a7",
+   "name": "SAMPLE A ROW 8",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a8",
+   "name": "SAMPLE A ROW 9",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_a9",
+   "name": "SAMPLE A ROW 10",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b0",
+   "name": "SAMPLE B ROW 1",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b1",
+   "name": "SAMPLE B ROW 2",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b2",
+   "name": "SAMPLE B ROW 3",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b3",
+   "name": "SAMPLE B ROW 4",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b4",
+   "name": "SAMPLE B ROW 5",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b5",
+   "name": "SAMPLE B ROW 6",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b6",
+   "name": "SAMPLE B ROW 7",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b7",
+   "name": "SAMPLE B ROW 8",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b8",
+   "name": "SAMPLE B ROW 9",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_b9",
+   "name": "SAMPLE B ROW 10",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c0",
+   "name": "SAMPLE C ROW 1",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c1",
+   "name": "SAMPLE C ROW 2",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c2",
+   "name": "SAMPLE C ROW 3",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c3",
+   "name": "SAMPLE C ROW 4",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c4",
+   "name": "SAMPLE C ROW 5",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c5",
+   "name": "SAMPLE C ROW 6",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c6",
+   "name": "SAMPLE C ROW 7",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c7",
+   "name": "SAMPLE C ROW 8",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c8",
+   "name": "SAMPLE C ROW 9",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_c9",
+   "name": "SAMPLE C ROW 10",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d0",
+   "name": "SAMPLE D ROW 1",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d1",
+   "name": "SAMPLE D ROW 2",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d2",
+   "name": "SAMPLE D ROW 3",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d3",
+   "name": "SAMPLE D ROW 4",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d4",
+   "name": "SAMPLE D ROW 5",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d5",
+   "name": "SAMPLE D ROW 6",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d6",
+   "name": "SAMPLE D ROW 7",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d7",
+   "name": "SAMPLE D ROW 8",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d8",
+   "name": "SAMPLE D ROW 9",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_row_d9",
+   "name": "SAMPLE D ROW 10",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "display": "string"
+  },
+  {
+   "key": "smp_a__open",
+   "name": "smp_a list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "smp_a"
+  },
+  {
+   "key": "smp_b__open",
+   "name": "smp_b list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "smp_b"
+  },
+  {
+   "key": "smp_c__open",
+   "name": "smp_c list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "smp_c"
+  },
+  {
+   "key": "smp_d__open",
+   "name": "smp_d list",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "popup_of": "smp_d"
   }
  ]
 }

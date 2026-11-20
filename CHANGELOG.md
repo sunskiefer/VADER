@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.3 (Force and desktop, one release)
+
+**Not tried on a device yet** (offline only, 2026-11-20).
+
+- SAMPLES page: each corner's SAMPLE is a **dropdown with a scrollbar** instead of a number line. Tap the field and the
+  list drops over the page: ten files at a time, the chosen one marked, OFF first. Scroll with the bar (drag it), the
+  data wheel (touch the bar first), the UP / DOWN tiles, or the mouse wheel on the desktop; tap a file to pick it; CLOSE
+  closes. Nothing else on the page moved. (New parameters are appended, so saved projects keep their values.)
+- Desktop: the window is pure black like the Force (the navy gradient and the screen's tint are gone); text stays
+  white, blue only as the glow on lines and lit tiles.
+
 ## 0.10.2 (Force and desktop, one release)
 
 **Not tried on a device yet** (offline only, 2026-11-20).

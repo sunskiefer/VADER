@@ -31,6 +31,10 @@ int main(int argc, char **argv) {
         }
     }
     E->set_param(s, "f_cutoff", "0.64");
+    if (getenv("VADER_PICK")) {   /* 0.10.3: the preview with corner A's sample list dropped down, scrolled a little */
+        E->set_param(s, "smp_a", "7");
+        E->set_param(s, "smp_scroll_a", "10");
+    }
     uint8_t on[3] = {0x90, 48, 100}, on2[3] = {0x90, 55, 100};
     E->midi(s, on, 3);
     E->midi(s, on2, 3);

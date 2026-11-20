@@ -2,7 +2,7 @@ ok:   entry point found
 ok:   AEffect magic
 ok:   effect name 'VADER'
 ok:   vendor 'L'Cronx'
-ok:   at least 147 parameters (got 282)
+ok:   at least 147 parameters (got 334)
 ok:   programs (1; DPF's VST2 has one: presets are the PRESET parameter)
 ok:   2 outputs, no inputs
 ok:   unique id AnVd
@@ -28,17 +28,17 @@ ok:   no NaN/Inf at 22050 Hz
 ok:   note is audible at 22050 Hz (rms 0.0473)
       first sound at host sample 2224 (note at 2205, latency 32)
 ok:   sound starts when it should
-ok:   ORBIT SPEED found (index 99)
+ok:   ORBIT SPEED found (index 103)
 ok:   parameter round trip 0.8000
-ok:   state chunk 8983 bytes
+ok:   state chunk 9759 bytes
 ok:   state restores the parameter (0.8000)
-      cpu at 44100 Hz: 2.8% of one core (10 voices)
+      cpu at 44100 Hz: 2.4% of one core (10 voices)
 ok:   faster than real time with room to spare at 44100 Hz
-      cpu at 48000 Hz: 3.4% of one core (10 voices)
+      cpu at 48000 Hz: 2.7% of one core (10 voices)
 ok:   faster than real time with room to spare at 48000 Hz
-      cpu at 96000 Hz: 3.4% of one core (10 voices)
+      cpu at 96000 Hz: 3.0% of one core (10 voices)
 ok:   faster than real time with room to spare at 96000 Hz
-ok:   TIMBRE and ORBIT SPEED found (1, 99)
+ok:   TIMBRE and ORBIT SPEED found (1, 103)
 ok:   state identical after restoring parameters, then the chunk
 ok:   state identical after restoring the chunk, then parameters
 ok:   PRESET 5 selected

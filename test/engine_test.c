@@ -530,6 +530,26 @@ int main(void) {
         CHECK(fabs(back.rms - on_.rms) < 0.3 * on_.rms, "back to LOOP 1 BAR: the same sample again (rms %.4f vs %.4f)", back.rms, on_.rms);
         setp(t, "smp_a", 499);   /* past the last file: clamped to the last one */
         CHECK((int)getp(t, "smp_a") <= 54 && (int)getp(t, "smp_a") > 0, "a SAMPLE number past the list is clamped to the last file (%g)", getp(t, "smp_a"));
+        /* 0.10.3: the pick list: rows follow the scrollbar, a row's trigger picks that file, OFF is the first entry */
+        {
+            char r0[96], r1[96], r9[96];
+            setp(t, "smp_scroll_a", 0); drain(t);
+            E->get_param(t, "smp_row_a0", r0, sizeof r0); E->get_param(t, "smp_row_a1", r1, sizeof r1);
+            CHECK(strstr(r0, "OFF") != NULL && strlen(r1) > 3, "pick list: at the top OFF comes first, then the files (row 2: '%s')", r1);
+            setp(t, "smp_pick_a3", 1); drain(t);
+            CHECK((int)getp(t, "smp_a") == 3, "pick list: tapping row 4 picks file 3 (SAMPLE A %g)", getp(t, "smp_a"));
+            E->get_param(t, "smp_row_a3", r1, sizeof r1);
+            CHECK(r1[0] == '>', "pick list: the chosen row is marked ('%s')", r1);
+            setp(t, "smp_scroll_a", 100); drain(t);
+            E->get_param(t, "smp_row_a9", r9, sizeof r9);
+            CHECK(strlen(r9) > 3 && strstr(r9, "54") != NULL, "pick list: scrolled to the end the last row is the last file ('%s')", r9);
+            setp(t, "smp_pick_a9", 1); drain(t);
+            CHECK((int)getp(t, "smp_a") == 54, "pick list: the last row picks the last file (%g)", getp(t, "smp_a"));
+            setp(t, "smp_up_a", 1); drain(t);
+            CHECK(getp(t, "smp_scroll_a") < 100, "pick list: UP scrolls back (%g)", getp(t, "smp_scroll_a"));
+            setp(t, "smp_a", 1); drain(t);
+            CHECK(getp(t, "smp_scroll_a") < 20, "pick list: setting SAMPLE 1 by number scrolls the list to it (%g)", getp(t, "smp_scroll_a"));
+        }
         setp(t, "smp_len_a", 1); setp(t, "smp_a", 1); setp(t, "a_level", 0); setp(t, "b_level", 1.0); setp(t, "smp_b", 3); setp(t, "smp_len_b", 0);
         /* corner B: a sample chosen but not yet loaded must be silent, never the voice: read at once, before the loader is done */
         note(t, 1, 60, 100); none = run(t, 2); note(t, 0, 60, 0); run(t, 100);

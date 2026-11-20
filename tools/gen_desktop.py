@@ -27,7 +27,7 @@ OUT = os.path.join(ROOT, "desktop", "gen")
 TAB_H = 40                      # the tab row above the 1280 x 628 pages
 CANVAS_W, CANVAS_H = V.W, V.H + TAB_H
 K = dict(HLINE=0, TOGGLE=1, BUTTON=2, RADIO=3, POPUP=4, FIELD=5, FADER=6, TITLE=7, TEXT=8, METER=9, ENVWIN=10,
-         SCREEN=11, READOUT=12, PRESETS=13, LIVETEXT=14)
+         SCREEN=11, READOUT=12, PRESETS=13, LIVETEXT=14, PICKLIST=15)
 SKIP_KEYS = {"web_url", "qr_show"}           # the phone's address and the logo/QR switch: nothing to show on a desktop
 HIDDEN_KEYS = {"qr_show", "motion"}          # not host parameters (motion stays on)
 
@@ -146,8 +146,12 @@ def main():
                 return None
             e["par"] = exp_index[key]
         lab = c.get("label") or c.get("caption")
-        if k == "field" or k == "popup":
+        if k == "field" or k == "popup" or k == "picklist":
             e["label"] = c.get("caption") or ""
+        if k == "picklist":   # 0.10.3: the dropdown of files; aux = the corner, lx/ly = where the list drops
+            e["aux"] = "abcd".index(key[-1])
+            la = c.get("list_at") or (c["x"], c["y"] + c["h"] + 4)
+            e["lx"], e["ly"] = la[0], la[1] + dy
         else:
             e["label"] = lab or byname[key]["name"]
         if k == "radio":
@@ -232,7 +236,13 @@ def main():
     emit_page("STRIPE", stripe)
     # which engine keys the window reads for text (dynamic display)
     L.append("static const int16_t VG_TEXT_PARS[] = {%s};" % ", ".join(
-        str(exp_index[k]) for k in ("file", "user_slot", "preset", "shape")))
+        str(exp_index[k]) for k in ("file", "user_slot", "preset", "shape", "smp_a", "smp_b", "smp_c", "smp_d")))
+    L.append("#define VG_NTEXT 8")
+    L.append("#define VG_PICK_ROWS %d" % G.PICK_ROWS)
+    L.append("static const int16_t VG_PICK_SCROLL[4] = {%s};" % ", ".join(str(exp_index["smp_scroll_" + c]) for c in "abcd"))
+    L.append("static const int16_t VG_PICK_UP[4] = {%s};" % ", ".join(str(exp_index["smp_up_" + c]) for c in "abcd"))
+    L.append("static const int16_t VG_PICK_DN[4] = {%s};" % ", ".join(str(exp_index["smp_dn_" + c]) for c in "abcd"))
+    L.append("static const int16_t VG_PICK_PICK[4][%d] = {%s};" % (G.PICK_ROWS, ", ".join("{" + ", ".join(str(exp_index["smp_pick_%s%d" % (c, i)]) for i in range(G.PICK_ROWS)) + "}" for c in "abcd")))
     os.makedirs(OUT, exist_ok=True)
     open(os.path.join(OUT, "vader_gen.h"), "w").write("\n".join(L) + "\n")
 

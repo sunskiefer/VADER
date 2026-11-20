@@ -54,7 +54,7 @@ ok:   plays on it (rms 0.084)
 ok: the screen sent 17 changed tiles (of 23 changes) after a shape change
 ok: a moving orbit changes 10 pieces per update
 ok: steady play: the screen reports 6.1 pieces a poll on average, 10 at most
-ok: live screen: a frame draws 15368 lit pixels in 56.3 ms (timing not checked)
+ok: live screen: a frame draws 15368 lit pixels in 43.5 ms (timing not checked)
 ok: live screen: the box found at 312,286 on a display picture (found 1)
 ok: live screen: not found with the corner covered
 ok: a fast orbiter: MPC shows at most 14 trail tiles (the trail is 14 long)
@@ -64,16 +64,16 @@ ok: the orbiter passes behind the path point and in front of it (174 / 226 updat
 ok: full ORBIT SIZE and SUBORBIT SIZE: both balls at their last colour
 ok: small ORBIT SIZE: the path point's first colour; SUBORBIT SIZE 50: the orbiter's colour 4 (0, 3)
 ok: MOTION off: no balls
-ok: state round trip (5608 bytes, 0 differences)
+ok: state round trip (5676 bytes, 0 differences)
 ok: no note keeps sounding after a preset change (rms 0.00000 after 6 s)
 ok: save to MY PRESET 123 ("USER 123   SAVED")
 ok: slot 122 shows empty, slot 123 loads back (preset 3, B tune 7)
 ok: STAR, size 100, turned: picture 36, frame 3
 ok: IMAGE: crescent.png BRIGHT -> LEVEL changes the sound (rms 0.065 -> 0.031), meter 0..100
 ok: IMAGE: all 6 sources x 8 destinations play clean (0 bad)
-(your shape's pictures: loaded and written in 3.22 s)
+(your shape's pictures: loaded and written in 2.99 s)
 ok: your shape's pictures: 8 of 8 strips written at the skin's sizes, the screen shows picture 180
-cpu: 16 voices x 4 corners, ladder filters, AM+PM, all effects: 3871.1 us per 128-frame block on this machine (block = 2902 us)
+cpu: 16 voices x 4 corners, ladder filters, AM+PM, all effects: 3801.0 us per 128-frame block on this machine (block = 2902 us)
 ok: SAMPLE A MODE starts OFF (5)
 ok: MODE OFF: corner A plays its voice (rms 0.0378)
 ok: MODE LOOP 1 BAR: sample 1 plays on corner A, not the voice (rms 0.0023 vs voice 0.0378)
@@ -81,6 +81,13 @@ ok: MODE OFF keeps the SAMPLE number (1)
 ok: MODE OFF again: the voice is back (rms 0.0373 vs 0.0378)
 ok: back to LOOP 1 BAR: the same sample again (rms 0.0023 vs 0.0023)
 ok: a SAMPLE number past the list is clamped to the last file (54)
+ok: pick list: at the top OFF comes first, then the files (row 2: '  vader 1.wav')
+ok: pick list: tapping row 4 picks file 3 (SAMPLE A 3)
+ok: pick list: the chosen row is marked ('> vader 3.wav')
+ok: pick list: scrolled to the end the last row is the last file ('  vader 54.wav')
+ok: pick list: the last row picks the last file (54)
+ok: pick list: UP scrolls back (98)
+ok: pick list: setting SAMPLE 1 by number scrolls the list to it (0)
 ok: a sample still loading (or not found) is silence, not the voice (rms 0.00000)
 
 PASSED
@@ -140,7 +147,7 @@ ok:   plays on it (rms 0.084)
 ok: the screen sent 17 changed tiles (of 23 changes) after a shape change
 ok: a moving orbit changes 10 pieces per update
 ok: steady play: the screen reports 6.1 pieces a poll on average, 10 at most
-ok: live screen: a frame draws 15368 lit pixels in 48.0 ms (timing not checked)
+ok: live screen: a frame draws 15368 lit pixels in 41.6 ms (timing not checked)
 ok: live screen: the box found at 312,286 on a display picture (found 1)
 ok: live screen: not found with the corner covered
 ok: a fast orbiter: MPC shows at most 14 trail tiles (the trail is 14 long)
@@ -150,16 +157,16 @@ ok: the orbiter passes behind the path point and in front of it (174 / 226 updat
 ok: full ORBIT SIZE and SUBORBIT SIZE: both balls at their last colour
 ok: small ORBIT SIZE: the path point's first colour; SUBORBIT SIZE 50: the orbiter's colour 4 (0, 3)
 ok: MOTION off: no balls
-ok: state round trip (5608 bytes, 0 differences)
+ok: state round trip (5676 bytes, 0 differences)
 ok: no note keeps sounding after a preset change (rms 0.00000 after 6 s)
 ok: save to MY PRESET 123 ("USER 123   SAVED")
 ok: slot 122 shows empty, slot 123 loads back (preset 3, B tune 7)
 ok: STAR, size 100, turned: picture 36, frame 3
 ok: IMAGE: crescent.png BRIGHT -> LEVEL changes the sound (rms 0.065 -> 0.031), meter 0..100
 ok: IMAGE: all 6 sources x 8 destinations play clean (0 bad)
-(your shape's pictures: loaded and written in 2.72 s)
+(your shape's pictures: loaded and written in 2.47 s)
 ok: your shape's pictures: 8 of 8 strips written at the skin's sizes, the screen shows picture 180
-cpu: 16 voices x 4 corners, ladder filters, AM+PM, all effects: 3814.5 us per 128-frame block on this machine (block = 2902 us)
+cpu: 16 voices x 4 corners, ladder filters, AM+PM, all effects: 3942.5 us per 128-frame block on this machine (block = 2902 us)
 ok: SAMPLE A MODE starts OFF (5)
 ok: MODE OFF: corner A plays its voice (rms 0.0378)
 ok: MODE LOOP 1 BAR: sample 1 plays on corner A, not the voice (rms 0.0023 vs voice 0.0378)
@@ -167,6 +174,13 @@ ok: MODE OFF keeps the SAMPLE number (1)
 ok: MODE OFF again: the voice is back (rms 0.0373 vs 0.0378)
 ok: back to LOOP 1 BAR: the same sample again (rms 0.0023 vs 0.0023)
 ok: a SAMPLE number past the list is clamped to the last file (54)
+ok: pick list: at the top OFF comes first, then the files (row 2: '  vader 1.wav')
+ok: pick list: tapping row 4 picks file 3 (SAMPLE A 3)
+ok: pick list: the chosen row is marked ('> vader 3.wav')
+ok: pick list: scrolled to the end the last row is the last file ('  vader 54.wav')
+ok: pick list: the last row picks the last file (54)
+ok: pick list: UP scrolls back (98)
+ok: pick list: setting SAMPLE 1 by number scrolls the list to it (0)
 ok: a sample still loading (or not found) is silence, not the voice (rms 0.00000)
 
 PASSED
@@ -174,13 +188,13 @@ page ok 16507
 /icon.png ok 12401
 /manifest.json ok 352
 handshake ok
-frames in 1.5 s: {1: 47, 2: 1}
+frames in 1.5 s: {1: 46, 2: 1}
 upload ok: ['from_phone.png', 'crescent.png']
 engine stopped
-found: VADER 6731 0.10.2
-hello ok: proto 1, 2232 parameters, schema 17314e15, version 0.10.2
+found: VADER 6731 0.10.3
+hello ok: proto 1, 2328 parameters, schema 031b60c5, version 0.10.3
 other build refused ok
-state ok: 5585 bytes, 453 lines
+state ok: 5653 bytes, 457 lines
 screen frames per second: 61
 delta ok: orb_speed reached the other desktop (1 deltas), not its sender
 readout ok: ORBIT SPEED  [A]   12

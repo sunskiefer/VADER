@@ -59,6 +59,7 @@ VaderPlugin::VaderPlugin() : Plugin(VG_NEXP, 16, 1), fEng(mpc_engine()), fInst(n
     if (fInst) fBus = (overlay_t *)vader_view_bus(fInst);
     fReadout[0] = 0;
     for (auto &t : fTexts) t[0] = 0;
+    for (auto &c : fRows) for (auto &r : c) r[0] = 0;
     for (int i = 0; i < VG_NEXP; i++) {
         fValues[i].store(VG_PARS[i].def);
         fTrigState[i] = 0;
@@ -141,16 +142,23 @@ void VaderPlugin::pollLocked() {
             }
         }
     }
-    char line[96], t[4][96];
+    char line[96], t[VG_NTEXT][96], rows[4][VG_PICK_ROWS][96];
     if (!engGet("readout", line, sizeof line)) line[0] = 0;
-    for (int s = 0; s < 4; s++) {
+    for (int s = 0; s < VG_NTEXT; s++) {
         char k[64];
         snprintf(k, sizeof k, "%s_display", VG_PARS[VG_TEXT_PARS[s]].key);
         if (!engGet(k, t[s], sizeof t[s])) t[s][0] = 0;
     }
+    for (int c = 0; c < 4; c++)
+        for (int i = 0; i < VG_PICK_ROWS; i++) {
+            char k[32];
+            snprintf(k, sizeof k, "smp_row_%c%d", 'a' + c, i);
+            if (!engGet(k, rows[c][i], sizeof rows[c][i])) rows[c][i][0] = 0;
+        }
     spin_lock(fTextLock);
     setTextLocked(fReadout, line);
-    for (int s = 0; s < 4; s++) setTextLocked(fTexts[s], t[s]);
+    for (int s = 0; s < VG_NTEXT; s++) setTextLocked(fTexts[s], t[s]);
+    for (int c = 0; c < 4; c++) for (int i = 0; i < VG_PICK_ROWS; i++) setTextLocked(fRows[c][i], rows[c][i]);
     spin_unlock(fTextLock);
     if (changed) bumpVersion();
     fLastPoll = std::chrono::steady_clock::now();
@@ -172,6 +180,13 @@ void VaderPlugin::uiReadout(char *buf, int n) const {
 void VaderPlugin::uiText(int slot, char *buf, int n) const {
     spin_lock(fTextLock);
     snprintf(buf, (size_t)n, "%s", fTexts[slot]);
+    spin_unlock(fTextLock);
+}
+
+void VaderPlugin::uiRow(int c, int i, char *buf, int n) const {
+    if (c < 0 || c > 3 || i < 0 || i >= VG_PICK_ROWS) { buf[0] = 0; return; }
+    spin_lock(fTextLock);
+    snprintf(buf, (size_t)n, "%s", fRows[c][i]);
     spin_unlock(fTextLock);
 }
 

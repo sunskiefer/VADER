@@ -28,6 +28,7 @@ static const Col ACCENT = {58, 160, 255}, TRACK = {34, 68, 108}, INK = {255, 255
                  CYAN = {125, 252, 255};
 static const Col PATH_COLS[6] = {{255, 225, 74}, {255, 176, 32}, {255, 128, 26}, {255, 84, 40}, {255, 52, 90}, {255, 60, 170}};
 static const Col ORB_COLS[6] = {{70, 120, 255}, {60, 175, 255}, {125, 252, 255}, {90, 255, 200}, {110, 255, 140}, {190, 255, 90}};
+static const int PICK_BAR = 34, PICK_RH = 36;   /* 0.10.3: the pick list's scrollbar width and row height */
 static int colStep(float s) { return std::max(0, std::min(5, (int)floorf(s * 6))); }
 
 class VaderUI : public UI {
@@ -101,6 +102,8 @@ private:
         const VgCtl *c = nullptr;
         Bind b;
         bool preset = false;
+        int pick = -1;        /* 0.10.3: >= 0: the corner's sample pick list (rows from the engine, a scrollbar) */
+        bool barDrag = false;
         int n = 0, cols = 2, ow = 150, oh = 40;
         float lx = 0, ly = 0, pw = 0, ph = 0;
     };
@@ -190,7 +193,7 @@ private:
     void valueText(const Bind &b, char *out, int n) const {
         if (!b.n) { out[0] = 0; return; }
         const int par = b.par[0];
-        for (int s = 0; s < 4; s++)
+        for (int s = 0; s < VG_NTEXT; s++)
             if (VG_TEXT_PARS[s] == par && fP) { fP->uiText(s, out, n); if (out[0]) return; }
         const VgPar &P = VG_PARS[par];
         const float v = fv[par];
@@ -308,6 +311,9 @@ private:
     void drawScreen(const R &r);
     void drawEnv(const R &r);
     void drawPopup();
+    R pickBar(const Pop &p) const { return {p.lx + p.pw - 7 - PICK_BAR, p.ly + 7, (float)PICK_BAR, (float)(VG_PICK_ROWS * PICK_RH - 2)}; }
+    R pickBtn(const Pop &p, int j) const { const float aw = (float)((int)(p.pw - 14 - 12) / 3); return {p.lx + 7 + j * (aw + 6), p.ly + 7 + VG_PICK_ROWS * PICK_RH + 4, aw, 40}; }
+    void pickScrollTo(const Pop &p, float frac) { Bind b; b.n = 1; b.par[0] = VG_PICK_SCROLL[p.pick]; beginEdit(b); setBound(b, 100.f * std::min(1.f, std::max(0.f, frac))); endEdit(b); }
     void prepareScreenData();
     void project(float rot, float yaw, float tilt);
     void pathAt(float t, float &x, float &y) const {
@@ -389,13 +395,7 @@ void VaderUI::drawScreen(const R &r) {
     // the glass: a dark panel with a soft vignette
     beginPath();
     roundedRect(r.x, r.y, r.w, r.h, 12);
-    fillColor(2, 5, 12, 235);
-    fill();
-    Paint vg = radialGradient(r.x + r.w / 2, r.y + r.h / 2, std::min(r.w, r.h) * 0.2f, std::max(r.w, r.h) * 0.75f,
-                              Color(14, 24, 48, 140), Color(0, 0, 0, 0));
-    beginPath();
-    roundedRect(r.x, r.y, r.w, r.h, 12);
-    fillPaint(vg);
+    fillColor(0, 0, 0, 255);
     fill();
     strk(TRACK, 255, 2);
     beginPath();
@@ -415,7 +415,7 @@ void VaderUI::drawScreen(const R &r) {
     {
         const float L = S * 0.06f;
         lineCap(NanoVG::ROUND);
-        strk(Col{70, 120, 180}, 230, std::max(1.5f, 2 * k));
+        strk(ACCENT, 200, std::max(1.5f, 2 * k));
         const float cs[4][4] = {{c0, r0, 1, 1}, {c1, r0, -1, 1}, {c0, r1, 1, -1}, {c1, r1, -1, -1}};
         for (auto &q : cs) {
             beginPath();
@@ -425,10 +425,10 @@ void VaderUI::drawScreen(const R &r) {
             stroke();
         }
         const float fs = std::max(13.f, S * 0.055f);
-        text_(r.x + 8.f, r0 + fs * 0.4f, "A", fs, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});   // on the side walls
-        text_(r.x + r.w - 8.f, r0 + fs * 0.4f, "B", fs, ALIGN_RIGHT | ALIGN_MIDDLE, Col{90, 140, 200});
-        text_(r.x + 8.f, r1 - fs * 0.4f, "C", fs, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});
-        text_(r.x + r.w - 8.f, r1 - fs * 0.4f, "D", fs, ALIGN_RIGHT | ALIGN_MIDDLE, Col{90, 140, 200});
+        text_(r.x + 8.f, r0 + fs * 0.4f, "A", fs, ALIGN_LEFT | ALIGN_MIDDLE, INK_DIM);   // on the side walls
+        text_(r.x + r.w - 8.f, r0 + fs * 0.4f, "B", fs, ALIGN_RIGHT | ALIGN_MIDDLE, INK_DIM);
+        text_(r.x + 8.f, r1 - fs * 0.4f, "C", fs, ALIGN_LEFT | ALIGN_MIDDLE, INK_DIM);
+        text_(r.x + r.w - 8.f, r1 - fs * 0.4f, "D", fs, ALIGN_RIGHT | ALIGN_MIDDLE, INK_DIM);
     }
     const bool haveShape = fShapeVer != ~0u;
     if (haveShape) {
@@ -575,7 +575,7 @@ void VaderUI::drawScreen(const R &r) {
             else { ball(fx, fy, RP, pc, 18); ball(ox, oy, RO, oc, 26); }
         }
     } else {
-        text_(CX, CY, "waiting for the engine", 16, ALIGN_CENTER | ALIGN_MIDDLE, Col{90, 140, 200});
+        text_(CX, CY, "waiting for the engine", 16, ALIGN_CENTER | ALIGN_MIDDLE, INK_DIM);
     }
     // the corner bars: how much of each corner is heard
     {
@@ -591,7 +591,7 @@ void VaderUI::drawScreen(const R &r) {
             if (wv > 0.002f) {
                 glowLine(x0 + 18, by + bh / 2, x0 + 18 + (w - 18) * wv, by + bh / 2, CYAN, bh, 0.9f);
             }
-            text_(x0, by + bh / 2, names[i], 14, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});
+            text_(x0, by + bh / 2, names[i], 14, ALIGN_LEFT | ALIGN_MIDDLE, INK_DIM);
         }
     }
     // scanlines
@@ -742,6 +742,7 @@ void VaderUI::drawCtl(const VgCtl &c) {
         }
         break;
     }
+    case VGK_PICKLIST:
     case VGK_POPUP: {
         const Bind b = bindOf(c);
         if (!b.n) break;
@@ -796,7 +797,7 @@ void VaderUI::drawStripe() {
     // the mark and the name, then the line the Force shows across the top: the control last touched, with its value
     const float y0 = VG_TAB_H;
     text_(18, y0 + 24, "VADER", 36, ALIGN_LEFT | ALIGN_MIDDLE, Col{200, 228, 255});
-    text_(20, y0 + 46, "L'CRONX", 12, ALIGN_LEFT | ALIGN_MIDDLE, Col{90, 140, 200});
+    text_(20, y0 + 46, "L'CRONX", 12, ALIGN_LEFT | ALIGN_MIDDLE, INK_DIM);
     char line[96];
     if (fP) fP->uiReadout(line, sizeof line); else line[0] = 0;
     float readLine = fReadLine;
@@ -883,10 +884,28 @@ void VaderUI::drawPopup() {
     fill();
     beginPath();
     roundedRect(p.lx, p.ly, p.pw, p.ph, 12);
-    fillColor(3, 8, 16, 250);
+    fillColor(0, 0, 0, 250);
     fill();
     strk(ACCENT, 255, 2);
     stroke();
+    if (p.pick >= 0) {   /* 0.10.3: the rows, the scrollbar, UP / DOWN / CLOSE */
+        for (int i = 0; i < VG_PICK_ROWS; i++) {
+            const R r = {p.lx + 7, p.ly + 7 + i * (float)PICK_RH, (float)p.ow, (float)p.oh};
+            char nm[96];
+            if (fP) fP->uiRow(p.pick, i, nm, sizeof nm); else nm[0] = 0;
+            const bool on = nm[0] == '>';
+            drawButton(r, "", on, isHover(r));
+            text_(r.x + 10, r.y + r.h / 2 + 1, nm, 19, ALIGN_LEFT | ALIGN_MIDDLE, on ? INK : INK_DIM);
+        }
+        const R bar = pickBar(p);
+        beginPath(); roundedRect(bar.x + bar.w / 2 - 5, bar.y + 2, 10, bar.h - 4, 5); colr(TRACK); fill();
+        const float frac = fv[VG_PICK_SCROLL[p.pick]] / 100.f, th = std::max(40.f, bar.h / 4);
+        const float ty = bar.y + 2 + (bar.h - 4 - th) * frac;
+        beginPath(); roundedRect(bar.x + bar.w / 2 - 9, ty, 18, th, 8); colr(ACCENT); fill();
+        const R b1 = pickBtn(p, 0), b2 = pickBtn(p, 1), b3 = pickBtn(p, 2);
+        drawButton(b1, "UP", false, isHover(b1)); drawButton(b2, "DOWN", false, isHover(b2)); drawButton(b3, "CLOSE", false, isHover(b3));
+        return;
+    }
     const int cur = p.b.n ? (int)lroundf(fv[p.b.par[0]]) : -1;
     for (int o = 0; o < p.n; o++) {
         const R r = {p.lx + 7 + (o % p.cols) * (p.ow + 6.f), p.ly + 7 + (o / p.cols) * (p.oh + 6.f), (float)p.ow, (float)p.oh};
@@ -908,19 +927,12 @@ void VaderUI::onNanoDisplay() {
     // the ground, over the whole window
     beginPath();
     rect(0, 0, W, H);
-    fillColor(4, 7, 13, 255);
+    fillColor(0, 0, 0, 255);   /* 0.10.3: pure black, as the Force (no gradient, no blue tint) */
     fill();
     save();
     translate(fOx, fOy);
     scale(fScale, fScale);
     intersectScissor(0, 0, VG_CANVAS_W, VG_CANVAS_H);
-    {
-        Paint g = radialGradient(VG_CANVAS_W * 0.5f, VG_CANVAS_H * 0.45f, 120, 900, Color(16, 30, 56, 255), Color(5, 8, 14, 255));
-        beginPath();
-        rect(0, 0, VG_CANVAS_W, VG_CANVAS_H);
-        fillPaint(g);
-        fill();
-    }
     if (fP) {
         // the values: from the plugin (the engine changes some by itself: a preset, a corner)
         for (int i = 0; i < VG_NEXP; i++) fv[i] = fP->uiValue(i);
@@ -962,6 +974,16 @@ void VaderUI::openPopup(const VgCtl &c, bool preset) {
     p.c = &c;
     p.b = bindOf(c);
     p.preset = preset;
+    if (c.kind == VGK_PICKLIST) {   /* 0.10.3: the dropdown of files */
+        p.pick = c.aux;
+        p.n = VG_PICK_ROWS; p.cols = 1; p.ow = c.w - 14 - PICK_BAR - 6; p.oh = PICK_RH - 2;
+        p.pw = (float)c.w;
+        p.ph = VG_PICK_ROWS * PICK_RH + 14 + 46;
+        p.lx = std::min(std::max(4.f, (float)c.lx), VG_CANVAS_W - p.pw - 4);
+        p.ly = std::min(std::max((float)VG_TAB_H + 64, (float)c.ly), VG_CANVAS_H - p.ph - 4);
+        fPop = p;
+        return;
+    }
     if (preset) { p.n = 16; p.cols = 4; p.ow = 150; p.oh = 40; }
     else { p.n = VG_PARS[p.b.par[0]].nopts; p.cols = std::max(1, (int)c.cols); p.ow = c.ow; p.oh = c.oh; }
     const int rows = (p.n + p.cols - 1) / p.cols;
@@ -1012,6 +1034,7 @@ void VaderUI::clickCtl(const VgCtl &c, double x, double y, bool) {
             }
         break;
     case VGK_POPUP:
+    case VGK_PICKLIST:
         openPopup(c, false);
         break;
     case VGK_FIELD: {
@@ -1054,8 +1077,23 @@ bool VaderUI::onMouse(const MouseEvent &ev) {
     if (fAddrEdit && ev.press) fAddrEdit = false;
     if (ev.button != 1) return false;
     if (!ev.press) {
+        fPop.barDrag = false;
         if (fDrag.on) { endEdit(fDrag.b); fDrag.on = false; }
         fPressedBtn = nullptr;
+        return true;
+    }
+    if (fPop.open && fPop.pick >= 0) {   /* 0.10.3: the pick list stays open until CLOSE or a click outside */
+        const Pop p = fPop;
+        const R bar = pickBar(p);
+        if (inside(bar, x, y)) { fPop.barDrag = true; pickScrollTo(p, (float)((y - bar.y - 20) / std::max(1.f, bar.h - 40))); return true; }
+        if (inside(pickBtn(p, 0), x, y)) { if (fP) fP->uiFire(VG_PICK_UP[p.pick]); return true; }
+        if (inside(pickBtn(p, 1), x, y)) { if (fP) fP->uiFire(VG_PICK_DN[p.pick]); return true; }
+        if (inside(pickBtn(p, 2), x, y)) { fPop.open = false; return true; }
+        for (int i = 0; i < VG_PICK_ROWS; i++) {
+            const R r = {p.lx + 7, p.ly + 7 + i * (float)PICK_RH, (float)p.ow, (float)p.oh};
+            if (inside(r, x, y)) { if (fP) fP->uiFire(VG_PICK_PICK[p.pick][i]); fPop.open = false; return true; }
+        }
+        if (!inside({p.lx, p.ly, p.pw, p.ph}, x, y)) fPop.open = false;
         return true;
     }
     if (fPop.open) {
@@ -1082,6 +1120,14 @@ bool VaderUI::onMouse(const MouseEvent &ev) {
 }
 
 bool VaderUI::onMotion(const MotionEvent &ev) {
+    if (fPop.open && fPop.pick >= 0 && fPop.barDrag) {
+        double x, y;
+        toCanvas(ev.pos.getX(), ev.pos.getY(), x, y);
+        const R bar = pickBar(fPop);
+        pickScrollTo(fPop, (float)((y - bar.y - 20) / std::max(1.f, bar.h - 40)));
+        fMx = x; fMy = y;
+        return true;
+    }
     double x, y;
     toCanvas(ev.pos.getX(), ev.pos.getY(), x, y);
     fMx = x;
@@ -1116,6 +1162,7 @@ bool VaderUI::onMotion(const MotionEvent &ev) {
 bool VaderUI::onScroll(const ScrollEvent &ev) {
     double x, y;
     toCanvas(ev.pos.getX(), ev.pos.getY(), x, y);
+    if (fPop.open && fPop.pick >= 0) { if (fP) fP->uiFire(ev.delta.getY() > 0 ? VG_PICK_UP[fPop.pick] : VG_PICK_DN[fPop.pick]); return true; }
     if (fPop.open) return true;
     if (const VgCtl *c = hit(x, y)) {
         const Bind b = bindOf(*c);

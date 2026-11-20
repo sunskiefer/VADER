@@ -47,10 +47,14 @@ def main(skin, out_dir, args):
             cache[name] = Image.open(os.path.join(skin, name)).convert("RGBA")
         return cache[name]
 
+    pick_open = {int(p) for p in (os.environ.get("VADER_PICK") or "").split(",") if p.strip().isdigit()}   # 0.10.3: open-flag parameter indices drawn open
+
     def visible(c):
         for h in c["bounds"].get("additionalInvalidatingHandles", []):
             if h.startswith("IndexedEnabling/"):
                 _, i, n, p = h.split("/")
+                if int(p.split()[1]) in pick_open:
+                    return True
                 v = vals.get(int(p.split()[1]), (0, ""))[0]
                 if round(v * (int(n) - 1)) != int(i):
                     return False

@@ -261,6 +261,33 @@ static void smp_front_sync(vader_t *s) {
     s->g[G_SMP_LN] = P[S_A_SSTART + c * 3 + 2];
     mark(s, P_SMP_ST); mark(s, P_SMP_EN); mark(s, P_SMP_LN);
 }
+/* 0.10.3: the SAMPLES page's pick lists: PICK_ROWS rows of file names per corner, from the scrollbar's position */
+#define PICK_ROWS 10
+static int pick_offset(vader_t *s, int c) {
+    int span = s->nwavs + 1 - PICK_ROWS;   /* entries: OFF, then the files */
+    if (span < 0) span = 0;
+    return (int)(s->g[G_SMP_SCROLL_A + c] / 100.0f * span + 0.5f);
+}
+static void pick_mark(vader_t *s, int c) { for (int i = 0; i < PICK_ROWS; i++) mark(s, P_SMP_ROW_A0 + c * PICK_ROWS + i); }
+static void pick_mark_all(vader_t *s) { for (int c = 0; c < 4; c++) pick_mark(s, c); }
+static void pick_row_text(vader_t *s, int c, int i, char *buf, int len) {
+    int e = pick_offset(s, c) + i;
+    int cur = (int)s->g[G_SMP_A + c];
+    const char *nm = e == 0 ? "OFF" : e - 1 < s->nwavs ? s->wavs[e - 1].label : "";
+    snprintf(buf, (size_t)len, "%s%s", e == cur && nm[0] ? "> " : "  ", nm);
+}
+static void pick_scroll_to(vader_t *s, int c) {   /* the chosen file into view */
+    int span = s->nwavs + 1 - PICK_ROWS, cur = (int)s->g[G_SMP_A + c];
+    if (span <= 0) return;
+    int off = pick_offset(s, c);
+    if (cur >= off && cur < off + PICK_ROWS) return;
+    int want = cur - PICK_ROWS / 2;
+    if (want < 0) want = 0;
+    if (want > span) want = span;
+    s->g[G_SMP_SCROLL_A + c] = 100.0f * want / span;
+    mark(s, P_SMP_SCROLL_A + c);
+}
+
 static void mark_corner_view(vader_t *s) {
     smp_front_sync(s);
     for (int p = 0; p < NP; p++)
@@ -548,6 +575,7 @@ static void rescan(vader_t *s) {
     mark(s, P_FILE);
     for (int c = 0; c < 4; c++) mark(s, P_SMP_A + c);
     smp_sync_all(s);
+    pick_mark_all(s);   /* 0.10.3: the pick lists show the new folder */
 }
 
 /* ---- 0.8: samples */
@@ -2120,7 +2148,9 @@ static void set_param(void *p, const char *key, const char *val) {
         if (q->slot >= G_SMP_A && q->slot <= G_SMP_D) {
             if (s->nwavs > 0 && v > (float)s->nwavs) { s->g[q->slot] = (float)s->nwavs; mark(s, i); }   /* 0.10.2: no number past the last file */
             smp_request(s, q->slot - G_SMP_A);
+            pick_scroll_to(s, q->slot - G_SMP_A); pick_mark(s, q->slot - G_SMP_A);   /* 0.10.3: the list follows */
         }
+        if (q->slot >= G_SMP_SCROLL_A && q->slot <= G_SMP_SCROLL_D) pick_mark(s, q->slot - G_SMP_SCROLL_A);
         if (q->slot == G_USER_SLOT) s->ustatus[0] = 0;
         if (q->slot == G_ARP_ON && !(int)v) { s->nheld = 0; arp_release(s); }
         if (q->slot == G_MOTION) s->shape_wait = 0;
@@ -2143,7 +2173,22 @@ static void set_param(void *p, const char *key, const char *val) {
             }
             else if (i == P_RANDOMIZE) randomize(s);
             else if (i == P_UNDO_RANDOM) undo_random(s);
-            else if (i == P_RESCAN) { rescan(s); memset(s->uknown, 0, sizeof s->uknown); }
+            else if (i == P_RESCAN) { rescan(s); memset(s->uknown, 0, sizeof s->uknown); pick_mark_all(s); }
+            else if (i >= P_SMP_PICK_A0 && i < P_SMP_PICK_A0 + 4 * PICK_ROWS) {   /* 0.10.3: a row of a corner's pick list */
+                int c = (i - P_SMP_PICK_A0) / PICK_ROWS, e = pick_offset(s, c) + (i - P_SMP_PICK_A0) % PICK_ROWS;
+                if (e <= s->nwavs) { s->g[G_SMP_A + c] = (float)e; mark(s, P_SMP_A + c); smp_request(s, c); pick_mark(s, c); }
+            }
+            else if (i >= P_SMP_UP_A && i <= P_SMP_DN_D) {   /* the list's arrows: one row */
+                int c = (i - P_SMP_UP_A) % 4, dir = i >= P_SMP_DN_A ? 1 : -1;
+                int span = s->nwavs + 1 - PICK_ROWS;
+                if (span > 0) {
+                    int off = pick_offset(s, c) + dir;
+                    if (off < 0) off = 0;
+                    if (off > span) off = span;
+                    s->g[G_SMP_SCROLL_A + c] = 100.0f * off / span;
+                    mark(s, P_SMP_SCROLL_A + c); pick_mark(s, c);
+                }
+            }
             else if (i == P_SAVE_USER) { save_user(s); mark(s, P_USER_SLOT); }
             else if (i == P_LOAD_USER) { load_user(s); mark(s, P_USER_SLOT); }
         }
@@ -2198,6 +2243,7 @@ static int get_param(void *p, const char *key, char *buf, int len) {
         case K_STR:
             if (q->slot >= 10 && q->slot < 26) { char nm[32]; cn_name(s, edit(s), (q->slot - 10) / 4, (q->slot - 10) % 4, nm, sizeof nm); return snprintf(buf, (size_t)len, "%s", nm) + 1; }
             if (q->slot == 26) return snprintf(buf, (size_t)len, "%s", s->cpu_text) + 1;
+            if (q->slot >= 30 && q->slot < 30 + 4 * PICK_ROWS) { pick_row_text(s, (q->slot - 30) / PICK_ROWS, (q->slot - 30) % PICK_ROWS, buf, len); return (int)strlen(buf) + 1; }
             if (q->slot >= 2 && q->slot < 10) { char nm[32]; mk_name(s, edit(s), q->slot - 2, nm, sizeof nm); return snprintf(buf, (size_t)len, "%s", nm) + 1; }
             return snprintf(buf, (size_t)len, "%s", i == P_WEB_URL ? s->web_text : s->readout);
         case K_DISP:

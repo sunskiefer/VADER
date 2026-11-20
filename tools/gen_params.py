@@ -301,6 +301,14 @@ SOUND_LATE2 = [("sh_a", "SHAPE A", 0.5, 0, 1, None, False), ("sh_b", "SHAPE B", 
                ("mk%d" % (i + 1), "MODE KNOB %d" % (i + 1), 0.5, 0, 1, None, False) for i in range(8)]
 POPUPS_LATE = ["im%d_%s" % (i + 1, f) for i in range(4) for f in ("src", "to")] 
 POPUPS_LATE2 = ["orb_dir", "sim_mode"]
+# 0.10.3, appended: the SAMPLES page's pick lists (one per corner): a dropdown of the WAV files with a scrollbar.
+# SCROLL (0..100, the scrollbar; the data wheel turns it) picks which PICK_ROWS files show; the rows are live text
+# (STR, the engine writes "OFF" / the file names, the chosen one marked); tapping a row fires its PICK trigger.
+PICK_ROWS = 10
+GLOBAL_LATE6 = [("smp_scroll_%s" % c, "SAMPLE %s SCROLL" % c.upper(), 0, 0, 100, None, True) for c in "abcd"]
+TRIGGERS_LATE4 = [("smp_pick_%s%d" % (c, i), "SAMPLE %s PICK %d" % (c.upper(), i + 1)) for c in "abcd" for i in range(PICK_ROWS)] + \
+                 [("smp_up_%s" % c, "SAMPLE %s UP" % c.upper()) for c in "abcd"] + [("smp_dn_%s" % c, "SAMPLE %s DOWN" % c.upper()) for c in "abcd"]
+POPUPS_LATE4 = ["smp_%s" % c for c in "abcd"]
 POPUPS_LATE3 = ["%s_eng" % c for c in "abcd"] + ["self_scale", "drone_chord", "spd_curve"] + ["%s_rmode" % c for c in "abcd"] + ["smp_len_%s" % c for c in "abcd"] + ["sub_dir", "sub_shape"]
 
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
@@ -337,7 +345,7 @@ def build():
             snd_slots.append("%s_%s" % (c, f))
     for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2 + SOUND_LATE3 + SOUND_LATE4 + SOUND_LATE5 + SOUND_LATE6:
         snd_slots.append(k)
-    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3 + GLOBAL_LATE4 + GLOBAL_LATE5]
+    glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3 + GLOBAL_LATE4 + GLOBAL_LATE5 + GLOBAL_LATE6]
 
     # 1. the main page's corner knobs
     for i, (f, name) in enumerate(FRONT):
@@ -445,6 +453,17 @@ def build():
         params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
         rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
     for k in POPUPS_LATE3:
+        params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
+        rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
+    # 0.10.3 (appended): the sample pick lists
+    for k, name, d, lo, hi, opts, isint in GLOBAL_LATE6:
+        add(k, name, d, lo, hi, opts, isint, "GLOB", glob_slots.index(k), None)
+    for k, name in TRIGGERS_LATE4:
+        add(k, name, 0, 0, 1, None, False, "TRIG", 0, {"momentary": True})
+    for ci, c in enumerate("abcd"):
+        for i in range(PICK_ROWS):
+            add("smp_row_%s%d" % (c, i), "SAMPLE %s ROW %d" % (c.upper(), i + 1), 0, 0, 1, None, False, "STR", 30 + ci * PICK_ROWS + i, {"display": "string"})
+    for k in POPUPS_LATE4:
         params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
         rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
     return params, rows, snd_slots, glob_slots

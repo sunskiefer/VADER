@@ -32,6 +32,7 @@ public:
     void uiReadout(char *buf, int n) const;                /* the line the Force shows across the top: "NAME   value" */
     void uiText(int slot, char *buf, int n) const;         /* VG_TEXT_PARS[slot]'s text: FILE, MY PRESET SLOT, PRESET, SHAPE */
     bool uiPresetName(int i, char *buf, int n);
+    void uiRow(int corner, int row, char *buf, int n) const;   /* 0.10.3: a pick list's row text */
     overlay_t *uiViewBus() { return fMirror.plugged() ? fMirror.bus() : fBus; }   /* the orbit screen's data: the Force's while plugged */
     /* PLUG (0.9): the window's button. plug("") finds the Force on the network; an address (or address:port) is remembered */
     void uiPlug(const std::string &address);
@@ -89,7 +90,8 @@ private:
     std::atomic<unsigned> fVersion;
     mutable std::atomic_flag fTextLock = ATOMIC_FLAG_INIT;
     char fReadout[96];
-    char fTexts[4][96];
+    char fTexts[VG_NTEXT][96];
+    char fRows[4][VG_PICK_ROWS][96];   /* 0.10.3: the SAMPLES page's pick lists, as the engine writes them */
     std::string fPresetNames[16];
     VaderResampler fRes;
     Ev fEv[EVMAX];
