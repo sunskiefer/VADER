@@ -222,7 +222,8 @@
    "default": 0.05,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "decay",
@@ -230,7 +231,8 @@
    "default": 0.4,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "sustain",
@@ -238,7 +240,8 @@
    "default": 0.7,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "release",
@@ -246,7 +249,8 @@
    "default": 0.35,
    "min": 0,
    "max": 1,
-   "dynamic_display": true
+   "dynamic_display": true,
+   "dynamic_name": true
   },
   {
    "key": "vib_speed",
@@ -19091,6 +19095,134 @@
    "min": 0,
    "max": 1,
    "popup_of": "smp_d"
+  },
+  {
+   "key": "a_attack",
+   "name": "A ATTACK",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_decay",
+   "name": "A DECAY",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_sustain",
+   "name": "A SUSTAIN",
+   "default": 0.7,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "a_release",
+   "name": "A RELEASE",
+   "default": 0.35,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_attack",
+   "name": "B ATTACK",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_decay",
+   "name": "B DECAY",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_sustain",
+   "name": "B SUSTAIN",
+   "default": 0.7,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "b_release",
+   "name": "B RELEASE",
+   "default": 0.35,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_attack",
+   "name": "C ATTACK",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_decay",
+   "name": "C DECAY",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_sustain",
+   "name": "C SUSTAIN",
+   "default": 0.7,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "c_release",
+   "name": "C RELEASE",
+   "default": 0.35,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_attack",
+   "name": "D ATTACK",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_decay",
+   "name": "D DECAY",
+   "default": 0.4,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_sustain",
+   "name": "D SUSTAIN",
+   "default": 0.7,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "d_release",
+   "name": "D RELEASE",
+   "default": 0.35,
+   "min": 0,
+   "max": 1,
+   "dynamic_display": true
   }
  ]
 }

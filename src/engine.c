@@ -75,8 +75,8 @@ typedef struct {
     float vel;
     float freq, target;          /* Hz, with glide */
     float cents, pan;            /* unison spread */
-    int stage;                   /* 0 attack, 1 decay, 2 sustain, 3 release */
-    float env;
+    int stage[4];                /* 0.10.4: each corner's own envelope: 0 attack, 1 decay, 2 sustain, 3 release */
+    float env[4];
     float ph[4][2];              /* generator phases */
     double sp[4];                /* 0.8: each corner's sample position */
     float s1[4][2], s2[4][2];    /* SVF states (two stages) */
@@ -288,10 +288,15 @@ static void pick_scroll_to(vader_t *s, int c) {   /* the chosen file into view *
     mark(s, P_SMP_SCROLL_A + c);
 }
 
+static void env_update(vader_t *s);
+static int env_slot_of(int slot, int c);
+static void mark_env_front(vader_t *s) { for (int k = S_ATTACK; k <= S_RELEASE; k++) mark(s, SND_P[k]); }
 static void mark_corner_view(vader_t *s) {
     smp_front_sync(s);
     for (int p = 0; p < NP; p++)
         if (VP[p].kind == K_FRONT) mark(s, p);
+    mark_env_front(s);
+    env_update(s);
 }
 static void mark_sound(vader_t *s) {
     smp_front_sync(s);
@@ -846,8 +851,11 @@ static void apply_kv(vader_t *s, int t, const kv_t *kv) {
     for (; kv->key; kv++) {
         int p = find(kv->key);
         if (p < 0) continue;
-        if (VP[p].kind == K_SND) T(t)[VP[p].slot] = kv->v;
-        else if (VP[p].kind == K_GLOB) s->g[VP[p].slot] = kv->v;
+        if (VP[p].kind == K_SND) {
+            T(t)[VP[p].slot] = kv->v;
+            if (VP[p].slot >= S_ATTACK && VP[p].slot <= S_RELEASE)   /* the envelope: every corner */
+                for (int c = 0; c < 4; c++) T(t)[env_slot_of(VP[p].slot, c)] = kv->v;
+        } else if (VP[p].kind == K_GLOB) s->g[VP[p].slot] = kv->v;
     }
 }
 
@@ -943,6 +951,19 @@ static voice_t *alloc_voice(vader_t *s, int t) {
     return free_v;
 }
 
+static void voice_release(voice_t *v) { for (int c = 0; c < 4; c++) v->stage[c] = 3; }
+static float voice_env(const voice_t *v) {   /* the voice's loudest corner envelope (the orbiter, the shape sound, the screen) */
+    float e = v->env[0];
+    for (int c = 1; c < 4; c++) if (v->env[c] > e) e = v->env[c];
+    return e;
+}
+/* 0.10.4: the main page's ATTACK/DECAY/SUSTAIN/RELEASE are the selected corner's (ALL: corner A's) */
+static int env_slot_of(int slot, int c) { return S_A_ATTACK + c * 4 + (slot - S_ATTACK); }
+static float env_front(vader_t *s, int slot) {
+    int c = (int)s->g[G_CORNER];
+    if (c > 3) c = 0;
+    return T(edit(s))[env_slot_of(slot, c)];
+}
 static void voice_on(vader_t *s, int t, int note, int key, float vel) {
     static const int UNI[4] = {1, 2, 4, 8};
     int u = UNI[(int)T(t)[S_UNISON] & 3];
@@ -983,7 +1004,7 @@ static void voice_off(vader_t *s, int key) {
         voice_t *v = &s->v[i];
         if (v->active && !v->released && v->key == key) {
             if (s->pedal) v->held_by_pedal = 1;
-            else { v->released = 1; v->stage = 3; }
+            else { v->released = 1; voice_release(v); }
         }
     }
 }
@@ -991,7 +1012,7 @@ static void voice_off(vader_t *s, int key) {
 static void all_off(vader_t *s, int hard) {
     for (int i = 0; i < MAXV; i++) {
         if (hard) s->v[i].active = 0;
-        else if (s->v[i].active) { s->v[i].released = 1; s->v[i].stage = 3; }
+        else if (s->v[i].active) { s->v[i].released = 1; voice_release(&s->v[i]); }
     }
 }
 
@@ -1335,9 +1356,9 @@ static void corner_engine(vader_t *s, voice_t *v, int c, const float *P, int ei,
     in.freq = freq;
     in.note = 69.0f + 12.0f * log2f(freq / 440.0f);
     in.vel = v->vel;
-    in.env = v->env;
+    in.env = v->env[c];
     in.bpm = tempo_of(s);
-    in.gate = v->stage != 3;
+    in.gate = v->stage[c] != 3;
     in.wave = 1;
     in.fmRatio = 1.0f;
     in.trig = v->eng_new[c];
@@ -1363,10 +1384,14 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     float semis = s->bend * 2 + vib + v->cents / 100.0f;
     float base = v->freq * powf(2.0f, semis / 12.0f);
     /* envelope coefficients */
-    float at = 0.001f * powf(6000.0f, P[S_ATTACK]), dc = 0.005f * powf(2000.0f, P[S_DECAY]), rl = 0.005f * powf(2000.0f, P[S_RELEASE]);
-    float a_inc = 1.0f / (at * SR), d_k = expf(-6.9f / (dc * SR)), r_k = expf(-6.9f / (rl * SR)), sus = P[S_SUSTAIN];
+    float a_inc[4], d_k[4], r_k[4], sus[4];   /* 0.10.4: one envelope per corner */
+    for (int c = 0; c < 4; c++) {
+        const float *E = P + S_A_ATTACK + c * 4;
+        float at = 0.001f * powf(6000.0f, E[0]), dc = 0.005f * powf(2000.0f, E[1]), rl = 0.005f * powf(2000.0f, E[3]);
+        a_inc[c] = 1.0f / (at * SR); d_k[c] = expf(-6.9f / (dc * SR)); r_k[c] = expf(-6.9f / (rl * SR)); sus[c] = E[2];
+    }
     /* the orbiter */
-    float env_now = v->env;
+    float env_now = voice_env(v);
     float size = m->size_s;
     float oe = P[S_ORB_ENV];
     if (oe > 0) size *= 1 - oe + oe * env_now;
@@ -1521,15 +1546,19 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
         }
     }
     for (int i = 0; i < n; i++) {
-        /* envelope */
-        switch (v->stage) {
-        case 0: v->env += a_inc; if (v->env >= 1) { v->env = 1; v->stage = 1; } break;
-        case 1: v->env = sus + (v->env - sus) * d_k; break;
-        case 3: v->env *= r_k; break;
+        /* the envelopes: one per corner */
+        float emax = 0;
+        for (int c = 0; c < 4; c++) {
+            switch (v->stage[c]) {
+            case 0: v->env[c] += a_inc[c]; if (v->env[c] >= 1) { v->env[c] = 1; v->stage[c] = 1; } break;
+            case 1: v->env[c] = sus[c] + (v->env[c] - sus[c]) * d_k[c]; break;
+            case 3: v->env[c] *= r_k[c]; break;
+            }
+            if (v->env[c] > emax) emax = v->env[c];
         }
         float out = 0;
         for (int c = 0; c < 4; c++) {
-            float wc = w0[c] + wd[c] * i;
+            float wc = (w0[c] + wd[c] * i) * v->env[c];
             if (!on[c]) continue;
             if (eng_on[c]) {   /* a ZYNTH voice: its tone through the corner's filter */
                 out += corner_lim(corner_filter(v, c, &F[c], ebuf[c][i]), P[S_A_LIM + c * 3]) * wc * level[c];
@@ -1573,7 +1602,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
             v->ph[c][0] = p1;
             v->ph[c][1] = p2;
         }
-        float e = v->env * amp;
+        float e = amp, emx = emax * amp;
         float l = out * e * gl, r = out * e * gr;
         if (sh_lvl > 0.001f) {   /* the shape itself as sound: x left, y right */
             float sx, sy;
@@ -1582,13 +1611,13 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
             v->sh_lp[1] += sh_lp * (sy - v->sh_lp[1]);
             v->sh_ph += sh_inc;
             if (v->sh_ph >= 1) v->sh_ph -= 1;
-            l += v->sh_lp[0] * sh_lvl * e * 0.8f;
-            r += v->sh_lp[1] * sh_lvl * e * 0.8f;
+            l += v->sh_lp[0] * sh_lvl * emx * 0.8f;
+            r += v->sh_lp[1] * sh_lvl * emx * 0.8f;
         }
         L[i] += l;
         R[i] += r;
     }
-    if (v->stage == 3 && v->env < 0.0001f) v->active = 0;
+    if (v->stage[0] == 3 && v->stage[1] == 3 && v->stage[2] == 3 && v->stage[3] == 3 && voice_env(v) < 0.0001f) v->active = 0;
 }
 
 /* ------------------------------------------------------------------------------------------------ the screen */
@@ -1782,7 +1811,8 @@ bars:
 
 static void env_update(vader_t *s) {
     const float *P = T(edit(s));
-    screen_env(&s->scr, P[S_ATTACK], P[S_DECAY], P[S_SUSTAIN], P[S_RELEASE]);
+    int c = (int)s->g[G_CORNER] > 3 ? 0 : (int)s->g[G_CORNER];   /* the selected corner's envelope (ALL: corner A's) */
+    screen_env(&s->scr, P[S_A_ATTACK + c * 4], P[S_A_ATTACK + c * 4 + 1], P[S_A_ATTACK + c * 4 + 2], P[S_A_ATTACK + c * 4 + 3]);
     for (int c = 0; c < ENV_COLS; c++)
         if (s->scr.env[c] != s->sent_env[c]) { s->sent_env[c] = s->scr.env[c]; mark(s, P_E00 + c); }
 }
@@ -1822,6 +1852,9 @@ static void set_readout(vader_t *s, int p, float v) {
     if (k == K_DISP || k == K_STR || k == K_POPUP) return;
     value_text(s, p, v, val, sizeof val);
     if (k == K_FRONT) {
+        int c = (int)s->g[G_CORNER];
+        snprintf(name, sizeof name, "%s %s", VP[p].name, c > 3 ? "ALL" : (const char *[]){"A", "B", "C", "D"}[c]);
+    } else if (k == K_SND && VP[p].slot >= S_ATTACK && VP[p].slot <= S_RELEASE) {
         int c = (int)s->g[G_CORNER];
         snprintf(name, sizeof name, "%s %s", VP[p].name, c > 3 ? "ALL" : (const char *[]){"A", "B", "C", "D"}[c]);
     } else if (k == K_SND && VP[p].slot >= S_MK1 && VP[p].slot <= S_MK8) {
@@ -1944,7 +1977,7 @@ static void midi(void *p, const uint8_t *m, int len) {
             s->pedal = d2 >= 64;
             if (!s->pedal)
                 for (int i = 0; i < MAXV; i++)
-                    if (s->v[i].held_by_pedal) { s->v[i].held_by_pedal = 0; s->v[i].released = 1; s->v[i].stage = 3; }
+                    if (s->v[i].held_by_pedal) { s->v[i].held_by_pedal = 0; s->v[i].released = 1; voice_release(&s->v[i]); }
         } else if (d1 == 120 || d1 == 123) {
             s->nheld = 0;
             arp_release(s);
@@ -1980,6 +2013,7 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
         char line[1100];
         const char *q = val;
         char user[1024] = "";
+        int has_cenv = 0;
         mv_defaults(s);
         while (*q) {
             int n = 0;
@@ -2002,8 +2036,15 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
             int i = find(k);
             if (i < 0) continue;
             if (line[0] == 'g' && VP[i].kind == K_GLOB) s->g[VP[i].slot] = v;
-            else if ((line[0] == 'a' || line[0] == 'b') && VP[i].kind == K_SND) s->snd[line[0] - 'a'][VP[i].slot] = v;
+            else if ((line[0] == 'a' || line[0] == 'b') && VP[i].kind == K_SND) {
+                s->snd[line[0] - 'a'][VP[i].slot] = v;
+                if (VP[i].slot >= S_A_ATTACK && VP[i].slot <= S_D_RELEASE) has_cenv = 1;
+            }
         }
+        if (!has_cenv)   /* saved before 0.10.4: one envelope for the timbre: every corner gets it */
+            for (int t = 0; t < 2; t++)
+                for (int k = S_ATTACK; k <= S_RELEASE; k++)
+                    for (int c = 0; c < 4; c++) s->snd[t][env_slot_of(k, c)] = s->snd[t][k];
         s->has_user = 0;
         s->load_select = 0;
         if (user[0]) start_load(s, user);   /* the shape file again, by name */
@@ -2113,6 +2154,12 @@ static void set_param(void *p, const char *key, const char *val) {
     }
     case K_SND:
         T(t)[q->slot] = v;
+        if (q->slot >= S_ATTACK && q->slot <= S_RELEASE) {   /* 0.10.4: the selected corner's envelope (ALL: every corner) */
+            int c = (int)s->g[G_CORNER];
+            for (int k = 0; k < 4; k++)
+                if (c > 3 || c == k) { T(t)[env_slot_of(q->slot, k)] = v; mark(s, SND_P[env_slot_of(q->slot, k)]); }
+        }
+        if (q->slot >= S_A_ATTACK && q->slot <= S_D_RELEASE) { env_update(s); mark_env_front(s); }
         if (q->slot == S_SHAPE || (q->slot >= S_SH_A && q->slot <= S_SH_D)) timbre_shape(s, t);
         if (q->slot < 4 * NCF) mark_corner_view(s);
         if (q->slot >= S_MK1 && q->slot <= S_MK8)
@@ -2237,7 +2284,7 @@ static int get_param(void *p, const char *key, char *buf, int len) {
         const vp_t *q = &VP[i];
         switch (q->kind) {
         case K_FRONT: return put_num(buf, len, front_value(s, q->slot), q);
-        case K_SND: return put_num(buf, len, T(edit(s))[q->slot], q);
+        case K_SND: return put_num(buf, len, q->slot >= S_ATTACK && q->slot <= S_RELEASE ? env_front(s, q->slot) : T(edit(s))[q->slot], q);
         case K_GLOB: return put_num(buf, len, s->g[q->slot], q);
         case K_TRIG: return snprintf(buf, (size_t)len, "0");
         case K_STR:
@@ -2325,13 +2372,17 @@ static int get_param(void *p, const char *key, char *buf, int len) {
     if (kl > 8 && !strcmp(key + kl - 8, "_display")) {
         int j = find_n(key, (int)kl - 8);
         if (j < 0) return 0;
-        float v = VP[j].kind == K_SND ? T(edit(s))[VP[j].slot] : VP[j].kind == K_GLOB ? s->g[VP[j].slot]
-                : VP[j].kind == K_FRONT ? front_value(s, VP[j].slot) : 0;
+        float v = VP[j].kind == K_SND ? (VP[j].slot >= S_ATTACK && VP[j].slot <= S_RELEASE ? env_front(s, VP[j].slot) : T(edit(s))[VP[j].slot])
+                : VP[j].kind == K_GLOB ? s->g[VP[j].slot] : VP[j].kind == K_FRONT ? front_value(s, VP[j].slot) : 0;
         value_text(s, j, v, buf, len);
         return (int)strlen(buf) + 1;
     }
     if (kl > 5 && !strcmp(key + kl - 5, "_name")) {
         int j = find_n(key, (int)kl - 5);
+        if (j >= 0 && VP[j].kind == K_SND && VP[j].slot >= S_ATTACK && VP[j].slot <= S_RELEASE) {   /* ATTACK A / ATTACK ALL */
+            int c = (int)s->g[G_CORNER];
+            return snprintf(buf, (size_t)len, "%s %s", VP[j].name, c > 3 ? "ALL" : (const char *[]){"A", "B", "C", "D"}[c]) + 1;
+        }
         if (j >= 0 && VP[j].kind == K_SND && VP[j].slot >= S_A_ENG && VP[j].slot <= S_D_V4 && (VP[j].slot - S_A_ENG) % 5) {
             char nm[32];
             int off = VP[j].slot - S_A_ENG;
@@ -2634,7 +2685,7 @@ static void render_ex(vader_t *s, int16_t *out, float *fl, float *fr, int frames
         v.oo = best ? best->shown_o : m->orb_o;
         v.hz = m->hz_now;
         v.sub = m->sub_now;
-        v.env = best ? best->env : 0;
+        v.env = best ? voice_env(best) : 0;
         {
             float sx = best ? best->ox : 0, sy = best ? best->oy : 0;
             float u = (sx + 1) * 0.5f, ww = (sy + 1) * 0.5f;

@@ -66,7 +66,7 @@ of the four corners: in the top-left corner you hear only A, in the middle all f
 shape: small keeps the orbiter near the middle (all four mixed), large reaches the corners. This movement is VADER's
 modulation: there are no LFOs to patch, the shape *is* the modulation.
 
-**Envelope.** One ADSR shapes the level of each note (and can grow or shrink the orbit: ORBIT ENV).
+**Envelope.** An ADSR per corner shapes the level of each note (0.10.4): pick a corner with CORNER SELECT and the four lines are its own envelope; ALL moves all four together. The loudest corner's envelope can grow or shrink the orbit (ORBIT ENV).
 
 ## The strip at the top
 
@@ -80,7 +80,11 @@ On every page:
 
 ![MAIN](img/main_star.png)
 
-**ENVELOPE** (left, top). The box draws the envelope as a line, from the four controls under it:
+**ENVELOPE** (left, top). The box draws the envelope as a line, from the four controls under it. Since 0.10.4 the
+envelope is per corner: with **CORNER SELECT** on A, B, C or D the four lines (and the drawn line) are that corner's own
+envelope, and the Q-Link screen names them for it (ATTACK B); on **ALL** they move every corner together, the way one
+envelope worked before. A slow corner and a plucky corner can share one orbit. Projects saved before 0.10.4 load with
+their envelope on all four corners.
 - **ATTACK**: rise time, 1 ms to 6 s. **DECAY**: fall to the sustain level, 5 ms to 10 s.
 - **SUSTAIN**: the level held while the key is down. **RELEASE**: fade after the key is let go, 5 ms to 10 s.
 

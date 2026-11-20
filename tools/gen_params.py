@@ -309,6 +309,10 @@ GLOBAL_LATE6 = [("smp_scroll_%s" % c, "SAMPLE %s SCROLL" % c.upper(), 0, 0, 100,
 TRIGGERS_LATE4 = [("smp_pick_%s%d" % (c, i), "SAMPLE %s PICK %d" % (c.upper(), i + 1)) for c in "abcd" for i in range(PICK_ROWS)] + \
                  [("smp_up_%s" % c, "SAMPLE %s UP" % c.upper()) for c in "abcd"] + [("smp_dn_%s" % c, "SAMPLE %s DOWN" % c.upper()) for c in "abcd"]
 POPUPS_LATE4 = ["smp_%s" % c for c in "abcd"]
+# 0.10.4 (appended): the envelope is per corner. ATTACK/DECAY/SUSTAIN/RELEASE on the main page edit the corner picked with
+# CORNER SELECT (ALL: every corner); these hold each corner's own values
+SOUND_LATE7 = [("%s_%s" % (c, k), "%s %s" % (c.upper(), k.upper()), d, 0, 1, None, False)
+               for c in "abcd" for k, d in (("attack", 0.05), ("decay", 0.4), ("sustain", 0.7), ("release", 0.35))]
 POPUPS_LATE3 = ["%s_eng" % c for c in "abcd"] + ["self_scale", "drone_chord", "spd_curve"] + ["%s_rmode" % c for c in "abcd"] + ["smp_len_%s" % c for c in "abcd"] + ["sub_dir", "sub_shape"]
 
 # lists shown as a field that opens (the wrapper keeps their "open" flags)
@@ -343,7 +347,7 @@ def build():
     for c in "abcd":
         for f, *_ in CORNER:
             snd_slots.append("%s_%s" % (c, f))
-    for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2 + SOUND_LATE3 + SOUND_LATE4 + SOUND_LATE5 + SOUND_LATE6:
+    for k, *_ in SOUND + SOUND_LATE + SOUND_LATE2 + SOUND_LATE3 + SOUND_LATE4 + SOUND_LATE5 + SOUND_LATE6 + SOUND_LATE7:
         snd_slots.append(k)
     glob_slots = [k for k, *_ in GLOBAL + GLOBAL_LATE + GLOBAL_LATE2 + GLOBAL_LATE3 + GLOBAL_LATE4 + GLOBAL_LATE5 + GLOBAL_LATE6]
 
@@ -466,6 +470,12 @@ def build():
     for k in POPUPS_LATE4:
         params.append({"key": k + "__open", "name": k + " list", "default": 0, "min": 0, "max": 1, "popup_of": k})
         rows.append((k + "__open", "POPUP", 0, 0, 1, 0, 0, 0, None))
+    # 0.10.4 (appended): each corner's envelope
+    for k, name, d, lo, hi, opts, isint in SOUND_LATE7:
+        add(k, name, d, lo, hi, opts, isint, "SND", snd_slots.index(k), {"dynamic_display": True})
+    for e in params:
+        if e["key"] in ("attack", "decay", "sustain", "release"):
+            e["dynamic_name"] = True   # the engine names them with the corner: ATTACK A / ATTACK ALL
     return params, rows, snd_slots, glob_slots
 
 

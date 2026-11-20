@@ -127,6 +127,42 @@ int main(void) {
     setp(s, "timbre", 1);
     CHECK(fabs(getp(s, "attack") - 0.9) < 1e-3, "timbre B has its own attack");
     setp(s, "timbre", 0);
+    /* 0.10.4: the envelope is per corner: the main page's ATTACK/DECAY/SUSTAIN/RELEASE edit the selected corner (ALL: every
+     * corner), each corner's generator has its own envelope; the timbre A/B mix is the MIX A/B line as before */
+    {
+        setp(s, "preset", 0);
+        setp(s, "corner", 4); setp(s, "attack", 0.2); setp(s, "release", 0.3);
+        CHECK(fabs(getp(s, "a_attack") - 0.2) < 1e-3 && fabs(getp(s, "d_attack") - 0.2) < 1e-3 && fabs(getp(s, "c_release") - 0.3) < 1e-3, "ATTACK/RELEASE with corner ALL edit every corner");
+        setp(s, "corner", 2); setp(s, "attack", 0.7);
+        CHECK(fabs(getp(s, "c_attack") - 0.7) < 1e-3 && fabs(getp(s, "a_attack") - 0.2) < 1e-3 && fabs(getp(s, "attack") - 0.7) < 1e-3, "ATTACK with corner C edits corner C only and shows C's value");
+        setp(s, "corner", 0);
+        CHECK(fabs(getp(s, "attack") - 0.2) < 1e-3, "corner A selected: ATTACK shows A's value");
+        char nm[64];
+        E->get_param(s, "attack_name", nm, sizeof nm);
+        CHECK(!strcmp(nm, "ATTACK A"), "the line is named for the corner (%s)", nm);
+        setp(s, "corner", 4); E->get_param(s, "attack_name", nm, sizeof nm);
+        CHECK(!strcmp(nm, "ATTACK ALL"), "corner ALL: %s", nm);
+        /* corner A short, corner B long: after the key is let go only B still sounds */
+        setp(s, "a_level", 1.0); setp(s, "b_level", 1.0); setp(s, "c_level", 0); setp(s, "d_level", 0);
+        setp(s, "orb_size", 0); setp(s, "sub_size", 0); setp(s, "orb_env", 0); setp(s, "a_eng", 0); setp(s, "b_eng", 0);
+        setp(s, "mix_rev", 0); setp(s, "mix_dly", 0); setp(s, "mix_ch", 0);
+        setp(s, "corner", 4); setp(s, "attack", 0.0); setp(s, "sustain", 1.0); setp(s, "release", 0.0);
+        setp(s, "corner", 1); setp(s, "release", 1.0);   /* corner B: the longest release */
+        note(s, 1, 60, 100); run(s, 40); note(s, 0, 60, 0); run(s, 30);
+        level_t tail = run(s, 30);
+        CHECK(tail.rms > 0.002, "corner B's long release keeps sounding after the key is let go (rms %.4f)", tail.rms);
+        setp(s, "corner", 1); setp(s, "release", 0.0);
+        note(s, 1, 60, 100); run(s, 40); note(s, 0, 60, 0); run(s, 30);
+        level_t tail0 = run(s, 30);
+        CHECK(tail0.rms < 0.0005, "every corner short: silence after the key (rms %.4f)", tail0.rms);
+        /* an old saved state (no per-corner lines): the timbre's envelope goes to every corner */
+        E->set_param(s, "state", "VADER 1\na attack 0.33\nb release 0.44\n");
+        CHECK(fabs(getp(s, "a_attack") - 0.33) < 1e-3 && fabs(getp(s, "d_attack") - 0.33) < 1e-3, "a state from before 0.10.4: its ATTACK goes to every corner");
+        setp(s, "timbre", 1);
+        CHECK(fabs(getp(s, "b_release") - 0.44) < 1e-3, "timbre B too");
+        setp(s, "timbre", 0);
+        setp(s, "preset", 0);
+    }
     /* split and dual play */
     setp(s, "keys", 1); setp(s, "tmode", 1); setp(s, "split", 60);
     note(s, 1, 40, 100); note(s, 1, 72, 100);

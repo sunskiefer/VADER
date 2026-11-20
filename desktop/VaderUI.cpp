@@ -691,7 +691,8 @@ void VaderUI::drawCtl(const VgCtl &c) {
         if (!b.n) break;
         const float vw = c.big ? 64.f : 56.f, ly = c.big ? 32.f : 30.f, lpx = c.big ? 22.f : 18.f, vpx = c.big ? 26.f : 22.f;
         char lab[96];
-        if (c.front) snprintf(lab, sizeof lab, "%s  [%s]", c.label, VG_CORNER_NAME[corner()]);
+        if (c.front || (c.par >= VGP_ATTACK && c.par <= VGP_RELEASE))   /* 0.10.4: the envelope lines are the selected corner's too */
+            snprintf(lab, sizeof lab, "%s  [%s]", c.label, VG_CORNER_NAME[corner()]);
         else snprintf(lab, sizeof lab, "%s", c.label);
         fitText(c.x, c.y + 13, c.w - vw - 6, lab, lpx, ALIGN_LEFT | ALIGN_MIDDLE, INK);
         valueText(b, val, sizeof val);

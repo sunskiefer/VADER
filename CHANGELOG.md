@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.4 (Force and desktop, one release)
+
+**Not tried on a device yet** (offline only, 2026-11-20).
+
+- MAIN page: the envelope is **per corner**. With CORNER SELECT on A, B, C or D, ATTACK / DECAY / SUSTAIN / RELEASE (and
+  the envelope line in the box) are that corner's own envelope; on ALL they move every corner together, as before. Each
+  corner's voice (or sample) runs its own envelope, so one corner can swell slowly while another plucks. The line names
+  follow the selection on the Q-Link screens (ATTACK B, ATTACK ALL). Projects and presets saved by earlier versions load
+  with their one envelope on all four corners, so they sound the same until a corner is edited. (New parameters are
+  appended; nothing else on the page moved.)
+
 ## 0.10.3 (Force and desktop, one release)
 
 **Not tried on a device yet** (offline only, 2026-11-20).

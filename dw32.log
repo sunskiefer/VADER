@@ -1,113 +1,48 @@
-gen_desktop: 334 host parameters, 13 pages, 7 shapes embedded
--- The C compiler identification is GNU 13.0.0
--- The CXX compiler identification is GNU 13.0.0
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working C compiler: /usr/bin/i686-w64-mingw32-gcc-posix - skipped
--- Detecting C compile features
--- Detecting C compile features - done
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /usr/bin/i686-w64-mingw32-g++-posix - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Found OpenGL: opengl32   
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
--- Found Threads: TRUE  
--- Configuring done (5.8s)
+gen_desktop: 350 host parameters, 13 pages, 7 shapes embedded
+-- Configuring done (0.0s)
 -- Generating done (0.0s)
 -- Build files have been written to: /home/claude/vader/build/desktop-win32
-[  1%] Building C object CMakeFiles/vader_zynth.dir/home/claude/vader/src/zynth/engines.c.obj
-[  2%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/Application.cpp.obj
-[  4%] Building C object CMakeFiles/vader_zynth.dir/home/claude/vader/src/zynth/eng_osc.c.obj
-[  5%] Building C object CMakeFiles/vader_zynth.dir/home/claude/vader/src/zynth/eng_fm.c.obj
-[  7%] Building C object CMakeFiles/vader_zynth.dir/home/claude/vader/src/zynth/eng_more.c.obj
-[  8%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/ApplicationPrivateData.cpp.obj
-[ 10%] Building C object CMakeFiles/vader_zynth.dir/home/claude/vader/src/zynth/eng_new.c.obj
-[ 11%] Building C object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/lxr02open/Core/DSPAudio/wavetable.c.obj
-[ 13%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/src/zynth/mi_bridge.cc.obj
-[ 14%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/Color.cpp.obj
-[ 15%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/braids/macro_oscillator.cc.obj
-[ 17%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/EventHandlers.cpp.obj
-[ 18%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/braids/digital_oscillator.cc.obj
-[ 20%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/Geometry.cpp.obj
-[ 21%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/braids/analog_oscillator.cc.obj
-[ 23%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/braids/resources.cc.obj
-[ 24%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/plaits/dsp/engine/wavetable_engine.cc.obj
-[ 26%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/plaits/dsp/physical_modelling/modal_voice.cc.obj
-[ 27%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/plaits/dsp/physical_modelling/resonator.cc.obj
-[ 28%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/plaits/dsp/physical_modelling/string.cc.obj
-[ 30%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/plaits/dsp/physical_modelling/string_voice.cc.obj
-[ 31%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/ImageBase.cpp.obj
-[ 33%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/plaits/resources.cc.obj
-[ 34%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/stmlib/dsp/units.cc.obj
-[ 36%] Building CXX object CMakeFiles/vader_zynth.dir/home/claude/vader/third_party/mutable/stmlib/utils/random.cc.obj
-[ 37%] Linking CXX static library libvader_zynth.a
-[ 39%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/ImageBaseWidgets.cpp.obj
-[ 39%] Built target vader_zynth
-[ 40%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/Layout.cpp.obj
-[ 42%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/SubWidget.cpp.obj
-[ 43%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/tables.c.obj
-[ 44%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/SubWidgetPrivateData.cpp.obj
-[ 46%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/TopLevelWidget.cpp.obj
-[ 47%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shape.c.obj
-[ 49%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/TopLevelWidgetPrivateData.cpp.obj
-[ 50%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/paths.c.obj
-[ 52%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/Widget.cpp.obj
-[ 53%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/modes.c.obj
-[ 55%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/WidgetPrivateData.cpp.obj
-[ 56%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/Window.cpp.obj
-[ 57%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shapefile.c.obj
-[ 59%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/WindowPrivateData.cpp.obj
-[ 60%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/OpenGL.cpp.obj
-[ 62%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/screen.c.obj
-[ 63%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/fx.c.obj
-[ 65%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/OpenGL2.cpp.obj
-[ 66%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/pictures.c.obj
-[ 68%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/qr.c.obj
-[ 69%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/NanoVG.cpp.obj
-[ 71%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/engine.c.obj
-[ 72%] Building C object CMakeFiles/vader_engine.dir/view_bus.c.obj
-[ 73%] Linking CXX static library libvader_engine.a
-[ 73%] Built target vader_engine
-[ 75%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/Resources.cpp.obj
-[ 76%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/pugl.cpp.obj
-[ 78%] Building CXX object CMakeFiles/VADER.dir/gen/vader_res.cpp.obj
-[ 79%] Linking CXX static library libVADER.a
-[ 79%] Built target VADER
-[ 81%] Building CXX object CMakeFiles/dgl-opengl.dir/home/claude/vader/third_party/DPF/dgl/src/WebViewWin32.cpp.obj
-[ 82%] Building CXX object CMakeFiles/VADER-dsp.dir/VaderPlugin.cpp.obj
+[ 33%] Built target dgl-opengl
+[ 62%] Built target vader_zynth
+[ 63%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shape.c.obj
+[ 65%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/tables.c.obj
+[ 66%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/paths.c.obj
+[ 68%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/modes.c.obj
+[ 69%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shapefile.c.obj
+[ 71%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/screen.c.obj
+[ 72%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/fx.c.obj
+[ 73%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/pictures.c.obj
+[ 75%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/engine.c.obj
+[ 76%] Linking CXX static library libvader_engine.a
+[ 79%] Built target vader_engine
+[ 81%] Building CXX object CMakeFiles/VADER.dir/gen/vader_res.cpp.obj
+[ 82%] Linking CXX static library libVADER.a
+[ 82%] Built target VADER
+[ 84%] Building CXX object CMakeFiles/VADER-ui.dir/VaderUI.cpp.obj
+[ 85%] Building CXX object CMakeFiles/VADER-dsp.dir/VaderPlugin.cpp.obj
 In file included from /home/claude/vader/desktop/VaderPlugin.hpp:11,
                  from /home/claude/vader/desktop/VaderPlugin.cpp:1:
-/home/claude/vader/desktop/gen/vader_gen.h:391: warning: "VG_NENG" redefined
-  391 | #define VG_NENG 14
+/home/claude/vader/desktop/gen/vader_gen.h:407: warning: "VG_NENG" redefined
+  407 | #define VG_NENG 14
       | 
 /home/claude/vader/desktop/gen/vader_gen.h:5: note: this is the location of the previous definition
-    5 | #define VG_NENG 2328
+    5 | #define VG_NENG 2344
       | 
-[ 84%] Linking CXX static library libdgl-opengl.a
-[ 84%] Built target dgl-opengl
-[ 85%] Building CXX object CMakeFiles/VADER-dsp.dir/paths.cpp.obj
-[ 86%] Building CXX object CMakeFiles/VADER-ui.dir/VaderUI.cpp.obj
 In file included from /home/claude/vader/desktop/VaderPlugin.hpp:11,
                  from /home/claude/vader/desktop/VaderUI.cpp:7:
-/home/claude/vader/desktop/gen/vader_gen.h:391: warning: "VG_NENG" redefined
-  391 | #define VG_NENG 14
+/home/claude/vader/desktop/gen/vader_gen.h:407: warning: "VG_NENG" redefined
+  407 | #define VG_NENG 14
       | 
 /home/claude/vader/desktop/gen/vader_gen.h:5: note: this is the location of the previous definition
-    5 | #define VG_NENG 2328
+    5 | #define VG_NENG 2344
       | 
-[ 88%] Building CXX object CMakeFiles/VADER-dsp.dir/mirror.cpp.obj
-[ 89%] Linking CXX static library libVADER-ui.a
-[ 89%] Built target VADER-ui
+[ 86%] Building CXX object CMakeFiles/VADER-dsp.dir/paths.cpp.obj
+[ 88%] Linking CXX static library libVADER-ui.a
+[ 88%] Built target VADER-ui
+[ 89%] Building CXX object CMakeFiles/VADER-dsp.dir/mirror.cpp.obj
 [ 91%] Linking CXX static library libVADER-dsp.a
 [ 91%] Built target VADER-dsp
-[ 92%] Building CXX object CMakeFiles/VADER-vst3.dir/home/claude/vader/third_party/DPF/distrho/DistrhoPluginMain.cpp.obj
-[ 94%] Building CXX object CMakeFiles/VADER-vst2.dir/home/claude/vader/third_party/DPF/distrho/DistrhoPluginMain.cpp.obj
-[ 95%] Building CXX object CMakeFiles/VADER-vst2.dir/home/claude/vader/third_party/DPF/distrho/DistrhoUIMain.cpp.obj
-[ 97%] Building CXX object CMakeFiles/VADER-vst3.dir/home/claude/vader/third_party/DPF/distrho/DistrhoUIMain.cpp.obj
-[ 98%] Linking CXX shared module bin/VADER-vst2.dll
-[ 98%] Built target VADER-vst2
-[100%] Linking CXX shared module bin/VADER.vst3/Contents/x86-win/VADER.vst3
+[ 94%] Linking CXX shared module bin/VADER.vst3/Contents/x86-win/VADER.vst3
+[ 94%] Linking CXX shared module bin/VADER-vst2.dll
+[ 97%] Built target VADER-vst2
 [100%] Built target VADER-vst3
