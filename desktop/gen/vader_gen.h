@@ -22,7 +22,7 @@ static const char *const VG_OPT11[] = {"ROOT", "ROOT + FIFTH", "ROOT + OCTAVE", 
 static const char *const VG_OPT12[] = {"POLY", "DUAL", "MONO"};
 static const char *const VG_OPT13[] = {"SPAN", "RISE", "RANDOM"};
 static const char *const VG_OPT14[] = {"TAPE", "DIGITAL"};
-static const char *const VG_OPT15[] = {"ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS"};
+static const char *const VG_OPT15[] = {"ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS", "OFF"};
 static const char *const VG_OPT16[] = {"LINE", "DOTS"};
 static const char *const VG_OPT17[] = {"CIRCLE", "FIGURE 8", "STAR", "SQUARE", "TRIANGLE", "LISSA 3:2", "LISSA 5:4", "ROSE 3", "ROSE 5", "SPIRAL", "HEART", "ZIGZAG", "SPIRO", "CUBE", "ICOSA", "USER", "N-GON", "BUTTERFLY", "SUPERFORMULA", "LISSAJOUS", "ROSE", "LIMACON", "CARDIOID", "SPIROGRAPH", "ARCHIMEDES", "FERMAT", "HYPERBOLIC", "LITUUS", "LOG SPIRAL", "GOLDEN SPIRAL", "EULER SPIRAL", "TORUS KNOT", "MOBIUS", "HARMONOGRAPH", "PI LISSAJOUS", "EPICYCLES", "PULSE", "ADSR PATH", "POLYHEDRA", "HILBERT", "KOCH", "FOURIER", "SQUEEZE", "DE BROGLIE", "COTES", "POINSOT", "ATOMIC", "MANDALA", "STACKED SPIRO", "TIMES TABLE", "TOY GEARS"};
 static const char *const VG_OPT18[] = {"1", "2", "4", "8"};
@@ -125,10 +125,10 @@ static const VgPar VG_PARS[VG_NEXP] = {
     {"smp_b", "SAMPLE B", VG_GLOB, 0, 1, 2179, 0.0f, 0.0f, 499.0f, 0},
     {"smp_c", "SAMPLE C", VG_GLOB, 0, 1, 2180, 0.0f, 0.0f, 499.0f, 0},
     {"smp_d", "SAMPLE D", VG_GLOB, 0, 1, 2181, 0.0f, 0.0f, 499.0f, 0},
-    {"smp_len_a", "SAMPLE A MODE", VG_GLOB, 5, 0, 2182, 0.0f, 0.0f, 4.0f, VG_OPT15},
-    {"smp_len_b", "SAMPLE B MODE", VG_GLOB, 5, 0, 2183, 0.0f, 0.0f, 4.0f, VG_OPT15},
-    {"smp_len_c", "SAMPLE C MODE", VG_GLOB, 5, 0, 2184, 0.0f, 0.0f, 4.0f, VG_OPT15},
-    {"smp_len_d", "SAMPLE D MODE", VG_GLOB, 5, 0, 2185, 0.0f, 0.0f, 4.0f, VG_OPT15},
+    {"smp_len_a", "SAMPLE A MODE", VG_GLOB, 6, 0, 2182, 5.0f, 0.0f, 5.0f, VG_OPT15},
+    {"smp_len_b", "SAMPLE B MODE", VG_GLOB, 6, 0, 2183, 5.0f, 0.0f, 5.0f, VG_OPT15},
+    {"smp_len_c", "SAMPLE C MODE", VG_GLOB, 6, 0, 2184, 5.0f, 0.0f, 5.0f, VG_OPT15},
+    {"smp_len_d", "SAMPLE D MODE", VG_GLOB, 6, 0, 2185, 5.0f, 0.0f, 5.0f, VG_OPT15},
     {"smp_root_a", "SAMPLE A ROOT NOTE", VG_GLOB, 0, 1, 2186, 48.0f, 0.0f, 127.0f, 0},
     {"smp_root_b", "SAMPLE B ROOT NOTE", VG_GLOB, 0, 1, 2187, 48.0f, 0.0f, 127.0f, 0},
     {"smp_root_c", "SAMPLE C ROOT NOTE", VG_GLOB, 0, 1, 2188, 48.0f, 0.0f, 127.0f, 0},

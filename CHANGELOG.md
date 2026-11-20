@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.2 (Force and desktop, one release)
+
+**Not tried on a device yet** (offline only, 2026-11-20).
+
+- SAMPLES page: each corner's MODE list has **OFF**, and it decides what the corner plays. OFF: only the corner's voice
+  (VOICES page). ONE SHOT or a LOOP, with a SAMPLE chosen: only the sample; while it loads, or when its file is not
+  found, the corner is silent, never the voice. (Before, a corner fell back to its voice whenever its sample was not
+  loaded, so a SAMPLE number past the last file played the voice.) MODE now starts OFF, and the SAMPLE line stops at the
+  last file found. OFF is the last entry of the list, so projects saved by earlier versions keep their mode.
+- Same sound, same pages and same zips as 0.10.1 otherwise.
+
 ## 0.10.1 (Force and desktop, one release)
 
 The same plugin as 0.10.0, packaged the way the Open MPC catalog reads it. **Not tried on a device yet** (offline only,

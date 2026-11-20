@@ -2,6 +2,7 @@
 # Build VADER as VST2 + VST3 for the desktop.
 #   desktop/build.sh linux     -> build/desktop/bin/    (VADER-vst2.so, VADER.vst3)
 #   desktop/build.sh windows   -> build/desktop-win/bin (VADER-vst2.dll, VADER.vst3), cross-compiled with mingw-w64 (posix threads)
+#   desktop/build.sh windows32 -> build/desktop-win32/bin, the 32-bit Windows plugins (0.10.2; g++-mingw-w64-i686-posix)
 #   desktop/build.sh package [version]   -> dist/VADER-<version>-desktop-<os>.zip for whichever builds exist
 # Needs: cmake, a C/C++ compiler, python3, and on Linux the X11/OpenGL dev packages (libx11-dev libxext-dev libxrandr-dev
 # libxcursor-dev libxinerama-dev libgl1-mesa-dev). Windows: g++-mingw-w64-x86-64-posix.
@@ -16,9 +17,12 @@ case "${1:-linux}" in
   windows)
     cmake -S desktop -B build/desktop-win -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$PWD/desktop/toolchain-mingw64.cmake"
     cmake --build build/desktop-win -j"$(nproc)" ;;
+  windows32)
+    cmake -S desktop -B build/desktop-win32 -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$PWD/desktop/toolchain-mingw32.cmake"
+    cmake --build build/desktop-win32 -j"$(nproc)" ;;
   package)
     V="${2:-0.7.0}"; mkdir -p dist
-    for t in linux:build/desktop:linux-x86_64 windows:build/desktop-win:windows-x86_64; do
+    for t in linux:build/desktop:linux-x86_64 windows:build/desktop-win:windows-x86_64 windows32:build/desktop-win32:windows-i686; do
       IFS=: read -r _ dir tag <<<"$t"
       [ -d "$dir/bin" ] || continue
       S="build/pkg/VADER-$V-desktop-$tag"; rm -rf "$S"; mkdir -p "$S"
@@ -30,5 +34,5 @@ case "${1:-linux}" in
       (cd build/pkg && rm -f "../../dist/VADER-$V-desktop-$tag.zip" && python3 -m zipfile -c "../../dist/VADER-$V-desktop-$tag.zip" "VADER-$V-desktop-$tag")
       echo "dist/VADER-$V-desktop-$tag.zip"
     done ;;
-  *) echo "usage: $0 linux|windows|package [version]"; exit 1 ;;
+  *) echo "usage: $0 linux|windows|windows32|package [version]"; exit 1 ;;
 esac

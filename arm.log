@@ -1,0 +1,189 @@
+ok: create
+ok: preset  0 INIT ORBIT       rms 0.141 peak 0.404, after release rms 0.0265
+ok: preset  1 GLASS STAR       rms 0.110 peak 0.364, after release rms 0.0177
+ok: preset  2 DARK FIGURE      rms 0.128 peak 0.383, after release rms 0.0100
+ok: preset  3 VOX CIRCLE       rms 0.056 peak 0.347, after release rms 0.0103
+ok: preset  4 BELL CUBE        rms 0.025 peak 0.233, after release rms 0.0024
+ok: preset  5 PWM ROSE         rms 0.197 peak 0.687, after release rms 0.0328
+ok: preset  6 FM SPIRAL        rms 0.072 peak 0.361, after release rms 0.0107
+ok: preset  7 ARP HEART        rms 0.031 peak 0.170, after release rms 0.0036
+ok: preset  8 DUAL PAD         rms 0.091 peak 0.305, after release rms 0.0291
+ok: preset  9 SPLIT BASS/LEAD  rms 0.062 peak 0.183, after release rms 0.0085
+ok: preset 10 METAL ICOSA      rms 0.073 peak 0.337, after release rms 0.0155
+ok: preset 11 SWEEP LISSA      rms 0.084 peak 0.359, after release rms 0.0203
+ok: preset 12 ORGAN SQUARE     rms 0.134 peak 0.442, after release rms 0.0236
+ok: preset 13 FOLD ZIGZAG      rms 0.160 peak 0.515, after release rms 0.0224
+ok: preset 14 AIR SPIRO        rms 0.103 peak 0.319, after release rms 0.0357
+ok: preset 15 SHAPE SCOPE      rms 0.148 peak 0.545, after release rms 0.0198
+ok: shape CIRCLE     rms 0.098 peak 0.350
+ok: shape FIGURE 8   rms 0.146 peak 0.398
+ok: shape STAR       rms 0.101 peak 0.291
+ok: shape SQUARE     rms 0.135 peak 0.438
+ok: shape TRIANGLE   rms 0.092 peak 0.296
+ok: shape LISSA 3:2  rms 0.164 peak 0.398
+ok: shape LISSA 5:4  rms 0.144 peak 0.408
+ok: shape ROSE 3     rms 0.125 peak 0.363
+ok: shape ROSE 5     rms 0.121 peak 0.348
+ok: shape SPIRAL     rms 0.119 peak 0.330
+ok: shape HEART      rms 0.096 peak 0.329
+ok: shape ZIGZAG     rms 0.144 peak 0.382
+ok: shape SPIRO      rms 0.109 peak 0.315
+ok: shape CUBE       rms 0.115 peak 0.324
+ok: shape ICOSA      rms 0.115 peak 0.363
+ok: 35 blend/filter combinations at full resonance
+ok: FILTER CUTOFF edits corner B only
+ok: corner ALL edits all four
+ok: timbre A keeps its attack when B's changes
+ok: timbre B has its own attack
+ok: split keyboard plays (rms 0.041)
+ok: arpeggiator: 17 steps in 2 s at 1/16, 120 BPM (16 expected)
+ok: load crescent.png   -> LOADED (USER: crescent.png)
+ok:   plays on it (rms 0.089)
+ok: load gear.png       -> LOADED (USER: gear.png)
+ok:   plays on it (rms 0.082)
+ok: load infinity.svg   -> LOADED (USER: infinity.svg)
+ok:   plays on it (rms 0.082)
+ok: load lightning.svg  -> LOADED (USER: lightning.svg)
+ok:   plays on it (rms 0.076)
+ok: load pyramid.obj    -> LOADED (USER: pyramid.obj)
+ok:   plays on it (rms 0.076)
+ok: load torus.obj      -> LOADED (USER: torus.obj)
+ok:   plays on it (rms 0.091)
+ok: load wave.svg       -> LOADED (USER: wave.svg)
+ok:   plays on it (rms 0.084)
+ok: the screen sent 17 changed tiles (of 23 changes) after a shape change
+ok: a moving orbit changes 10 pieces per update
+ok: steady play: the screen reports 6.1 pieces a poll on average, 10 at most
+ok: live screen: a frame draws 15368 lit pixels in 56.3 ms (timing not checked)
+ok: live screen: the box found at 312,286 on a display picture (found 1)
+ok: live screen: not found with the corner covered
+ok: a fast orbiter: MPC shows at most 14 trail tiles (the trail is 14 long)
+ok: the balls: one cell each in every one of 400 updates (0 wrong)
+ok: the balls stay whole inside the screen, on the SQUARE at full size (0 outside)
+ok: the orbiter passes behind the path point and in front of it (174 / 226 updates)
+ok: full ORBIT SIZE and SUBORBIT SIZE: both balls at their last colour
+ok: small ORBIT SIZE: the path point's first colour; SUBORBIT SIZE 50: the orbiter's colour 4 (0, 3)
+ok: MOTION off: no balls
+ok: state round trip (5608 bytes, 0 differences)
+ok: no note keeps sounding after a preset change (rms 0.00000 after 6 s)
+ok: save to MY PRESET 123 ("USER 123   SAVED")
+ok: slot 122 shows empty, slot 123 loads back (preset 3, B tune 7)
+ok: STAR, size 100, turned: picture 36, frame 3
+ok: IMAGE: crescent.png BRIGHT -> LEVEL changes the sound (rms 0.065 -> 0.031), meter 0..100
+ok: IMAGE: all 6 sources x 8 destinations play clean (0 bad)
+(your shape's pictures: loaded and written in 3.22 s)
+ok: your shape's pictures: 8 of 8 strips written at the skin's sizes, the screen shows picture 180
+cpu: 16 voices x 4 corners, ladder filters, AM+PM, all effects: 3871.1 us per 128-frame block on this machine (block = 2902 us)
+ok: SAMPLE A MODE starts OFF (5)
+ok: MODE OFF: corner A plays its voice (rms 0.0378)
+ok: MODE LOOP 1 BAR: sample 1 plays on corner A, not the voice (rms 0.0023 vs voice 0.0378)
+ok: MODE OFF keeps the SAMPLE number (1)
+ok: MODE OFF again: the voice is back (rms 0.0373 vs 0.0378)
+ok: back to LOOP 1 BAR: the same sample again (rms 0.0023 vs 0.0023)
+ok: a SAMPLE number past the list is clamped to the last file (54)
+ok: a sample still loading (or not found) is silence, not the voice (rms 0.00000)
+
+PASSED
+ok: create
+ok: preset  0 INIT ORBIT       rms 0.141 peak 0.404, after release rms 0.0265
+ok: preset  1 GLASS STAR       rms 0.110 peak 0.364, after release rms 0.0177
+ok: preset  2 DARK FIGURE      rms 0.128 peak 0.383, after release rms 0.0100
+ok: preset  3 VOX CIRCLE       rms 0.056 peak 0.347, after release rms 0.0103
+ok: preset  4 BELL CUBE        rms 0.025 peak 0.233, after release rms 0.0024
+ok: preset  5 PWM ROSE         rms 0.197 peak 0.687, after release rms 0.0328
+ok: preset  6 FM SPIRAL        rms 0.072 peak 0.361, after release rms 0.0107
+ok: preset  7 ARP HEART        rms 0.031 peak 0.170, after release rms 0.0036
+ok: preset  8 DUAL PAD         rms 0.091 peak 0.305, after release rms 0.0291
+ok: preset  9 SPLIT BASS/LEAD  rms 0.062 peak 0.183, after release rms 0.0085
+ok: preset 10 METAL ICOSA      rms 0.073 peak 0.337, after release rms 0.0155
+ok: preset 11 SWEEP LISSA      rms 0.084 peak 0.359, after release rms 0.0203
+ok: preset 12 ORGAN SQUARE     rms 0.134 peak 0.442, after release rms 0.0236
+ok: preset 13 FOLD ZIGZAG      rms 0.160 peak 0.515, after release rms 0.0224
+ok: preset 14 AIR SPIRO        rms 0.103 peak 0.319, after release rms 0.0357
+ok: preset 15 SHAPE SCOPE      rms 0.148 peak 0.545, after release rms 0.0198
+ok: shape CIRCLE     rms 0.098 peak 0.350
+ok: shape FIGURE 8   rms 0.146 peak 0.398
+ok: shape STAR       rms 0.101 peak 0.291
+ok: shape SQUARE     rms 0.135 peak 0.438
+ok: shape TRIANGLE   rms 0.092 peak 0.296
+ok: shape LISSA 3:2  rms 0.164 peak 0.398
+ok: shape LISSA 5:4  rms 0.144 peak 0.408
+ok: shape ROSE 3     rms 0.125 peak 0.363
+ok: shape ROSE 5     rms 0.121 peak 0.348
+ok: shape SPIRAL     rms 0.119 peak 0.330
+ok: shape HEART      rms 0.096 peak 0.329
+ok: shape ZIGZAG     rms 0.144 peak 0.382
+ok: shape SPIRO      rms 0.109 peak 0.315
+ok: shape CUBE       rms 0.115 peak 0.324
+ok: shape ICOSA      rms 0.115 peak 0.363
+ok: 35 blend/filter combinations at full resonance
+ok: FILTER CUTOFF edits corner B only
+ok: corner ALL edits all four
+ok: timbre A keeps its attack when B's changes
+ok: timbre B has its own attack
+ok: split keyboard plays (rms 0.041)
+ok: arpeggiator: 17 steps in 2 s at 1/16, 120 BPM (16 expected)
+ok: load crescent.png   -> LOADED (USER: crescent.png)
+ok:   plays on it (rms 0.089)
+ok: load gear.png       -> LOADED (USER: gear.png)
+ok:   plays on it (rms 0.082)
+ok: load infinity.svg   -> LOADED (USER: infinity.svg)
+ok:   plays on it (rms 0.082)
+ok: load lightning.svg  -> LOADED (USER: lightning.svg)
+ok:   plays on it (rms 0.076)
+ok: load pyramid.obj    -> LOADED (USER: pyramid.obj)
+ok:   plays on it (rms 0.076)
+ok: load torus.obj      -> LOADED (USER: torus.obj)
+ok:   plays on it (rms 0.091)
+ok: load wave.svg       -> LOADED (USER: wave.svg)
+ok:   plays on it (rms 0.084)
+ok: the screen sent 17 changed tiles (of 23 changes) after a shape change
+ok: a moving orbit changes 10 pieces per update
+ok: steady play: the screen reports 6.1 pieces a poll on average, 10 at most
+ok: live screen: a frame draws 15368 lit pixels in 48.0 ms (timing not checked)
+ok: live screen: the box found at 312,286 on a display picture (found 1)
+ok: live screen: not found with the corner covered
+ok: a fast orbiter: MPC shows at most 14 trail tiles (the trail is 14 long)
+ok: the balls: one cell each in every one of 400 updates (0 wrong)
+ok: the balls stay whole inside the screen, on the SQUARE at full size (0 outside)
+ok: the orbiter passes behind the path point and in front of it (174 / 226 updates)
+ok: full ORBIT SIZE and SUBORBIT SIZE: both balls at their last colour
+ok: small ORBIT SIZE: the path point's first colour; SUBORBIT SIZE 50: the orbiter's colour 4 (0, 3)
+ok: MOTION off: no balls
+ok: state round trip (5608 bytes, 0 differences)
+ok: no note keeps sounding after a preset change (rms 0.00000 after 6 s)
+ok: save to MY PRESET 123 ("USER 123   SAVED")
+ok: slot 122 shows empty, slot 123 loads back (preset 3, B tune 7)
+ok: STAR, size 100, turned: picture 36, frame 3
+ok: IMAGE: crescent.png BRIGHT -> LEVEL changes the sound (rms 0.065 -> 0.031), meter 0..100
+ok: IMAGE: all 6 sources x 8 destinations play clean (0 bad)
+(your shape's pictures: loaded and written in 2.72 s)
+ok: your shape's pictures: 8 of 8 strips written at the skin's sizes, the screen shows picture 180
+cpu: 16 voices x 4 corners, ladder filters, AM+PM, all effects: 3814.5 us per 128-frame block on this machine (block = 2902 us)
+ok: SAMPLE A MODE starts OFF (5)
+ok: MODE OFF: corner A plays its voice (rms 0.0378)
+ok: MODE LOOP 1 BAR: sample 1 plays on corner A, not the voice (rms 0.0023 vs voice 0.0378)
+ok: MODE OFF keeps the SAMPLE number (1)
+ok: MODE OFF again: the voice is back (rms 0.0373 vs 0.0378)
+ok: back to LOOP 1 BAR: the same sample again (rms 0.0023 vs 0.0023)
+ok: a SAMPLE number past the list is clamped to the last file (54)
+ok: a sample still loading (or not found) is silence, not the voice (rms 0.00000)
+
+PASSED
+page ok 16507
+/icon.png ok 12401
+/manifest.json ok 352
+handshake ok
+frames in 1.5 s: {1: 47, 2: 1}
+upload ok: ['from_phone.png', 'crescent.png']
+engine stopped
+found: VADER 6731 0.10.2
+hello ok: proto 1, 2232 parameters, schema 17314e15, version 0.10.2
+other build refused ok
+state ok: 5585 bytes, 453 lines
+screen frames per second: 61
+delta ok: orb_speed reached the other desktop (1 deltas), not its sender
+readout ok: ORBIT SPEED  [A]   12
+fire ok: RANDOMIZE sent 41 changed values
+state again ok
+MIRROR TEST PASSED

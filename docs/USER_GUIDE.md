@@ -389,7 +389,10 @@ VOICE, NOISE, TONE, METAL, BAZZ, DRONE, TEXTURE, FX) with four character knobs, 
 ![the VOICES page](img/voices.png)
 
 **SAMPLES.** Put WAV files in the plugin's `Samples` folder (or `VADER Samples` on a card or drive) and press rescan.
-Pick one per corner. ONE SHOT plays it once; LOOP 1-4 BARS fits it to the tempo. Every sample is rooted on C2 and follows
+Pick one per corner. MODE decides what the corner plays (0.10.2): OFF, only the corner's voice from the VOICES page;
+ONE SHOT (plays it once) or LOOP 1-4 BARS (fits it to the tempo), only the sample, never the voice (silence while the
+file loads or when it is not found). MODE starts OFF; the SAMPLE number stays when you switch to OFF, and stops at the
+last file found. Every sample is rooted on C2 and follows
 the keys from there. The WINDOW page cuts the selected corner's sample with START, END and LENGTH. Files up to 30 s;
 the example set is named vader 1 to vader 54 (docs/SAMPLE-NAMES.txt lists the originals).
 

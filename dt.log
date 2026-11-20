@@ -1,0 +1,45 @@
+ok:   entry point found
+ok:   AEffect magic
+ok:   effect name 'VADER'
+ok:   vendor 'L'Cronx'
+ok:   at least 147 parameters (got 282)
+ok:   programs (1; DPF's VST2 has one: presets are the PRESET parameter)
+ok:   2 outputs, no inputs
+ok:   unique id AnVd
+      parameter 0 is 'PRESET'
+      program 3 is 'PRESET'
+--- 44100 Hz, latency 0
+ok:   no NaN/Inf at 44100 Hz
+ok:   note is audible at 44100 Hz (rms 0.0472)
+      first sound at host sample 4410 (note at 4410, latency 0)
+ok:   sound starts when it should
+--- 48000 Hz, latency 0
+ok:   no NaN/Inf at 48000 Hz
+ok:   note is audible at 48000 Hz (rms 0.0472)
+      first sound at host sample 4835 (note at 4800, latency 35)
+ok:   sound starts when it should
+--- 96000 Hz, latency 0
+ok:   no NaN/Inf at 96000 Hz
+ok:   note is audible at 96000 Hz (rms 0.0471)
+      first sound at host sample 9669 (note at 9600, latency 70)
+ok:   sound starts when it should
+--- 22050 Hz, latency 0
+ok:   no NaN/Inf at 22050 Hz
+ok:   note is audible at 22050 Hz (rms 0.0473)
+      first sound at host sample 2224 (note at 2205, latency 32)
+ok:   sound starts when it should
+ok:   ORBIT SPEED found (index 99)
+ok:   parameter round trip 0.8000
+ok:   state chunk 8983 bytes
+ok:   state restores the parameter (0.8000)
+      cpu at 44100 Hz: 2.8% of one core (10 voices)
+ok:   faster than real time with room to spare at 44100 Hz
+      cpu at 48000 Hz: 3.4% of one core (10 voices)
+ok:   faster than real time with room to spare at 48000 Hz
+      cpu at 96000 Hz: 3.4% of one core (10 voices)
+ok:   faster than real time with room to spare at 96000 Hz
+ok:   TIMBRE and ORBIT SPEED found (1, 99)
+ok:   state identical after restoring parameters, then the chunk
+ok:   state identical after restoring the chunk, then parameters
+ok:   PRESET 5 selected
+PASSED (0 failures)

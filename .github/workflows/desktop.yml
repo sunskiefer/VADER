@@ -48,12 +48,30 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: VADER-desktop-windows-x86_64
-          path: dist/*windows*.zip
+          path: dist/*windows-x86_64.zip
+
+  windows32:   # 0.10.2: the 32-bit Windows plugins
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++-mingw-w64-i686-posix gcc-mingw-w64-i686-posix
+          pip install pillow numpy
+      - name: Build (mingw-w64 i686 cross-compile, statically linked)
+        run: desktop/build.sh windows32
+      - name: Package
+        run: desktop/build.sh package "$(cat desktop/VERSION)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VADER-desktop-windows-i686
+          path: dist/*windows-i686.zip
 
   # A pre-release is published once per version in desktop/VERSION (tag desktop-<version>: it does not start with "v",
   # so the Force release workflow is not triggered). Not for the catalog.
   release:
-    needs: [linux, windows]
+    needs: [linux, windows, windows32]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     steps:
@@ -73,7 +91,7 @@ jobs:
         with:
           tag_name: desktop-${{ steps.ver.outputs.version }}
           target_commitish: ${{ github.sha }}
-          name: "VADER desktop ${{ steps.ver.outputs.version }} (VST3 + VST2, Windows + Linux)"
+          name: "VADER desktop ${{ steps.ver.outputs.version }} (VST3 + VST2, Windows 64/32-bit + Linux)"
           make_latest: false
           prerelease: false
           files: dist/*.zip

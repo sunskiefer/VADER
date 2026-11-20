@@ -17905,9 +17905,10 @@
     "LOOP 1 BAR",
     "LOOP 2 BARS",
     "LOOP 3 BARS",
-    "LOOP 4 BARS"
+    "LOOP 4 BARS",
+    "OFF"
    ],
-   "default": "ONE SHOT"
+   "default": "OFF"
   },
   {
    "key": "smp_len_b",
@@ -17917,9 +17918,10 @@
     "LOOP 1 BAR",
     "LOOP 2 BARS",
     "LOOP 3 BARS",
-    "LOOP 4 BARS"
+    "LOOP 4 BARS",
+    "OFF"
    ],
-   "default": "ONE SHOT"
+   "default": "OFF"
   },
   {
    "key": "smp_len_c",
@@ -17929,9 +17931,10 @@
     "LOOP 1 BAR",
     "LOOP 2 BARS",
     "LOOP 3 BARS",
-    "LOOP 4 BARS"
+    "LOOP 4 BARS",
+    "OFF"
    ],
-   "default": "ONE SHOT"
+   "default": "OFF"
   },
   {
    "key": "smp_len_d",
@@ -17941,9 +17944,10 @@
     "LOOP 1 BAR",
     "LOOP 2 BARS",
     "LOOP 3 BARS",
-    "LOOP 4 BARS"
+    "LOOP 4 BARS",
+    "OFF"
    ],
-   "default": "ONE SHOT"
+   "default": "OFF"
   },
   {
    "key": "smp_root_a",

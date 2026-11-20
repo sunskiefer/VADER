@@ -496,6 +496,46 @@ int main(void) {
     clock_gettime(CLOCK_MONOTONIC, &t1);
     double us = ((t1.tv_sec - t0.tv_sec) * 1e9 + (t1.tv_nsec - t0.tv_nsec)) / 1e3 / nb;
     printf("cpu: 16 voices x 4 corners, ladder filters, AM+PM, all effects: %.1f us per 128-frame block on this machine (block = 2902 us)\n", us);
+    /* 0.10.2: the corner's SAMPLE MODE decides: OFF = only the voice plays; any other mode with a SAMPLE chosen = only the
+     * sample plays (silence while it loads or when the file is not found, never the voice). Default OFF. */
+    {
+        void *t = E->create("shapes");   /* ./Samples is the plugin folder's Samples here */
+        setp(t, "rescan", 1);
+        for (int i = 0; i < 40; i++) { run(t, 5); drain(t); usleep(20000); }   /* the folder scan */
+        setp(t, "preset", 0);
+        CHECK(getp(t, "smp_len_a") == 5, "SAMPLE A MODE starts OFF (%g)", getp(t, "smp_len_a"));
+        setp(t, "corner", 0); setp(t, "a_level", 1.0); setp(t, "b_level", 0); setp(t, "c_level", 0); setp(t, "d_level", 0);
+        setp(t, "a_eng", 0); setp(t, "a_cutoff", 1.0); setp(t, "a_lim", 0.0);
+        setp(t, "attack", 0.0); setp(t, "sustain", 1.0); setp(t, "release", 0.0);
+        setp(t, "mix_rev", 0); setp(t, "mix_dly", 0); setp(t, "mix_ch", 0);
+        setp(t, "orb_size", 0); setp(t, "sub_size", 0); setp(t, "orb_env", 0);   /* the orbiter at the centre: steady corner weights */
+        level_t voice, on_ = {0, 0, 0}, off_, back, none;
+        note(t, 1, 60, 100); voice = run(t, 60); note(t, 0, 60, 0); run(t, 100);
+        CHECK(voice.rms > 0.002, "MODE OFF: corner A plays its voice (rms %.4f)", voice.rms);
+        /* a loud sample: the first file that sounds on corner A (some of the examples are near-silent drones) */
+        int file = 0;
+        for (int f = 1; f <= 54 && on_.rms < 0.002; f++) {
+            setp(t, "smp_a", f); setp(t, "smp_len_a", 1);   /* LOOP 1 BAR */
+            for (int i = 0; i < 50; i++) { run(t, 5); drain(t); usleep(10000); }   /* the loader thread brings the WAV in */
+            note(t, 1, 60, 100); on_ = run(t, 60); note(t, 0, 60, 0); run(t, 100);
+            file = f;
+        }
+        CHECK(on_.rms >= 0.002 && fabs(on_.rms - voice.rms) > 0.002, "MODE LOOP 1 BAR: sample %d plays on corner A, not the voice (rms %.4f vs voice %.4f)", file, on_.rms, voice.rms);
+        setp(t, "smp_len_a", 5); run(t, 20);   /* OFF */
+        note(t, 1, 60, 100); off_ = run(t, 60); note(t, 0, 60, 0); run(t, 100);
+        CHECK((int)getp(t, "smp_a") == file, "MODE OFF keeps the SAMPLE number (%d)", file);
+        CHECK(fabs(off_.rms - voice.rms) < 0.1 * voice.rms, "MODE OFF again: the voice is back (rms %.4f vs %.4f)", off_.rms, voice.rms);
+        setp(t, "smp_len_a", 1); run(t, 20);   /* LOOP 1 BAR again */
+        note(t, 1, 60, 100); back = run(t, 60); note(t, 0, 60, 0); run(t, 100);
+        CHECK(fabs(back.rms - on_.rms) < 0.3 * on_.rms, "back to LOOP 1 BAR: the same sample again (rms %.4f vs %.4f)", back.rms, on_.rms);
+        setp(t, "smp_a", 499);   /* past the last file: clamped to the last one */
+        CHECK((int)getp(t, "smp_a") <= 54 && (int)getp(t, "smp_a") > 0, "a SAMPLE number past the list is clamped to the last file (%g)", getp(t, "smp_a"));
+        setp(t, "smp_len_a", 1); setp(t, "smp_a", 1); setp(t, "a_level", 0); setp(t, "b_level", 1.0); setp(t, "smp_b", 3); setp(t, "smp_len_b", 0);
+        /* corner B: a sample chosen but not yet loaded must be silent, never the voice: read at once, before the loader is done */
+        note(t, 1, 60, 100); none = run(t, 2); note(t, 0, 60, 0); run(t, 100);
+        CHECK(none.rms < 0.0005, "a sample still loading (or not found) is silence, not the voice (rms %.5f)", none.rms);
+        E->destroy(t);
+    }
     E->destroy(s);
     printf(fails ? "\nFAILED: %d\n" : "\nPASSED\n", fails);
     return fails != 0;

@@ -651,6 +651,7 @@ static void smp_sync_all(vader_t *s) { for (int c = 0; c < 4; c++) smp_request(s
 
 /* a corner's sample for n frames: ONE SHOT follows the key (the ROOT NOTE plays it at its own speed); a LOOP runs the
  * whole sample over 1-4 bars (4/4) of the tempo at the root note, and the keys pitch it from there. */
+#define SMP_MODE_OFF 5   /* SAMPLE x MODE: ONE SHOT, LOOP 1-4 BARS, OFF (0.10.2) */
 static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, int n, const float *P) {
     smp_t *sl = &s->smp[c];
     int cu = __atomic_load_n(&sl->cur, __ATOMIC_ACQUIRE), len = sl->n[cu];
@@ -1479,9 +1480,13 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     for (int c = 0; c < 4; c++) {
         int ei = (int)P[S_A_ENG + c * 5];
         float cfreq = base * powf(2.0f, P[c * NCF + CF_OCT]);
-        if ((int)s->g[G_SMP_A + c] > 0 && on[c] && s->smp[c].n[__atomic_load_n(&s->smp[c].cur, __ATOMIC_ACQUIRE)] > 1) {
+        /* 0.10.2: the corner's MODE on the SAMPLES page decides. OFF: only the corner's voice plays. Any other mode, with a
+         * SAMPLE chosen: only the sample plays, even while it loads or when its file is not found (silence, never the voice). */
+        int smp_sel = (int)s->g[G_SMP_A + c] > 0 && (int)s->g[G_SMP_LEN_A + c] != SMP_MODE_OFF;
+        if (smp_sel && on[c]) {
             eng_on[c] = 1;   /* a sample: through the corner's filter like a voice */
-            smp_render(s, v, c, cfreq, ebuf[c], n, P);
+            if (s->smp[c].n[__atomic_load_n(&s->smp[c].cur, __ATOMIC_ACQUIRE)] > 1) smp_render(s, v, c, cfreq, ebuf[c], n, P);
+            else memset(ebuf[c], 0, sizeof(float) * (size_t)n);
         } else if (ei > 0 && on[c]) {
             eng_on[c] = 1;
             corner_engine(s, v, c, P, ei, base * powf(2.0f, P[c * NCF + CF_OCT]), ebuf[c], n);
@@ -2112,7 +2117,10 @@ static void set_param(void *p, const char *key, const char *val) {
             for (int k = 0; k < 4; k++)
                 if (cc > 3 || cc == k) { T(t)[S_A_SSTART + k * 3 + (q->slot - G_SMP_ST)] = v; mark(s, SND_P[S_A_SSTART + k * 3 + (q->slot - G_SMP_ST)]); }
         }
-        if (q->slot >= G_SMP_A && q->slot <= G_SMP_D) smp_request(s, q->slot - G_SMP_A);
+        if (q->slot >= G_SMP_A && q->slot <= G_SMP_D) {
+            if (s->nwavs > 0 && v > (float)s->nwavs) { s->g[q->slot] = (float)s->nwavs; mark(s, i); }   /* 0.10.2: no number past the last file */
+            smp_request(s, q->slot - G_SMP_A);
+        }
         if (q->slot == G_USER_SLOT) s->ustatus[0] = 0;
         if (q->slot == G_ARP_ON && !(int)v) { s->nheld = 0; arp_release(s); }
         if (q->slot == G_MOTION) s->shape_wait = 0;

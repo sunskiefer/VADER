@@ -258,9 +258,9 @@ GLOBAL_LATE5 = [("voice_cap", "VOICE LIMIT", 16, 1, 16, None, True), ("arp_chain
                 ("screen_dots", "SCREEN STYLE", 0, 0, 0, ["LINE", "DOTS"], False),
                 ("smp_st", "SAMPLE START", 0.0, 0, 1, None, False), ("smp_en", "SAMPLE END", 1.0, 0, 1, None, False), ("smp_ln", "SAMPLE LENGTH", 1.0, 0, 1, None, False)]   # the selected corner's   # 0.8: the most notes sounding (less CPU)
 # 0.8, appended: samples, one per corner (a WAV from the Samples folders; OFF = the corner's own voice)
-SMP_LENS = ["ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS"]
+SMP_LENS = ["ONE SHOT", "LOOP 1 BAR", "LOOP 2 BARS", "LOOP 3 BARS", "LOOP 4 BARS", "OFF"]   # 0.10.2: OFF (appended, so saved projects keep their index): the corner plays its VOICES pick, the SAMPLE number is kept
 GLOBAL_LATE4 = ([("smp_%s" % c, "SAMPLE %s" % c.upper(), 0, 0, 499, None, True) for c in "abcd"]
-                + [("smp_len_%s" % c, "SAMPLE %s MODE" % c.upper(), 0, 0, 0, SMP_LENS, False) for c in "abcd"]
+                + [("smp_len_%s" % c, "SAMPLE %s MODE" % c.upper(), 5, 0, 0, SMP_LENS, False) for c in "abcd"]
                 + [("smp_root_%s" % c, "SAMPLE %s ROOT NOTE" % c.upper(), 48, 0, 127, None, True) for c in "abcd"])
 # 0.8, appended: per-corner extras: GEN 2 TUNE as a ratio (musical or prime, folded into one octave) and a limiter
 RATIO_MODES = ["OFF", "MUSICAL", "PRIME"]

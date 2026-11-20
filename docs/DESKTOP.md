@@ -7,7 +7,7 @@ trail, the two balls, corner bars) drawn in the plugin's own window.
 
 | | VST3 | VST2 |
 |---|---|---|
-| **Windows** (64-bit) | copy the folder `VADER.vst3` to `C:\Program Files\Common Files\VST3\` | copy `VADER-vst2.dll` to your VST2 folder (for example `C:\Program Files\VSTPlugins\`) |
+| **Windows** (64-bit: `-windows-x86_64.zip`; 32-bit hosts: `-windows-i686.zip`, since 0.10.2) | copy the folder `VADER.vst3` to `C:\Program Files\Common Files\VST3\` | copy `VADER-vst2.dll` to your VST2 folder (for example `C:\Program Files\VSTPlugins\`) |
 | **Linux** (x86_64) | copy the folder `VADER.vst3` to `~/.vst3/` | copy `VADER-vst2.so` to `~/.vst/` |
 
 Then rescan plugins in your host. VADER is an instrument (no audio input, stereo out, MIDI in).
@@ -79,6 +79,7 @@ This path has not been tried on a real Force yet.
 ```
 desktop/build.sh linux        # build/desktop/bin/        needs cmake, g++, python3, X11 + OpenGL dev packages
 desktop/build.sh windows      # build/desktop-win/bin/    cross-compile, needs g++-mingw-w64-x86-64-posix
+desktop/build.sh windows32    # build/desktop-win32/bin/  the 32-bit Windows plugins, needs g++-mingw-w64-i686-posix
 desktop/build.sh package 0.7.0   # dist/*.zip
 test/desktop_test.sh          # loads the VST2 in a small host and plays it
 ```
