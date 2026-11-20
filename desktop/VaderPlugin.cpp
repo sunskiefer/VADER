@@ -319,7 +319,8 @@ void VaderPlugin::setParameterValue(uint32_t index, float value) {
     fValues[index].store(value, std::memory_order_relaxed);
     if (fExp2Eng[index] >= 0) fMirror.sendSet((uint16_t)fExp2Eng[index], value);   /* PLUG: and on the Force */
     /* these change the values the others show (a corner's or timbre's sound, a preset's everything) */
-    if ((int)index == VGP_TIMBRE || (int)index == VGP_CORNER || (int)index == VGP_PRESET) pollLocked();
+    if ((int)index == VGP_TIMBRE || (int)index == VGP_CORNER || (int)index == VGP_PRESET
+        || ((int)index >= VGP_ATTACK && (int)index <= VGP_RELEASE) || !strncmp(P.key, "f_", 2)) pollLocked();   /* 0.10.5: a corner's line writes that corner's own parameter too */
     bumpVersion();
 }
 

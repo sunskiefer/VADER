@@ -197,6 +197,28 @@ int main(int argc, char **argv) {
             f->dispatcher(f, effClose, 0, 0, 0, 0);
         }
     }
+    // 0.10.5: the per-corner envelope through the desktop plugin: ATTACK follows CORNER SELECT (the desktop once dropped every
+    // engine-side change past index 14, so the lines never switched corner and a moved line landed in the shown corner)
+    {
+        int co = -1, at = -1, aa = -1, ba = -1;
+        for (int i = 0; i < e->numParams; i++) {
+            e->dispatcher(e, effGetParamName, i, 0, buf, 0);
+            if (!strcmp(buf, "CORNER SELECT")) co = i;
+            if (!strcmp(buf, "ATTACK") && at < 0) at = i;
+            if (!strcmp(buf, "A ATTACK")) aa = i;
+            if (!strcmp(buf, "B ATTACK")) ba = i;
+        }
+        CHECK(co >= 0 && at >= 0 && aa >= 0 && ba >= 0, "CORNER SELECT, ATTACK, A ATTACK, B ATTACK found (%d %d %d %d)", co, at, aa, ba);
+        e->setParameter(e, co, 0.f); e->setParameter(e, at, 0.8f);
+        CHECK(fabsf(e->getParameter(e, aa) - 0.8f) < 1e-3f && fabsf(e->getParameter(e, ba) - 0.05f) < 1e-3f, "corner A: ATTACK 0.8 goes to corner A only (a %.2f, b %.2f)", e->getParameter(e, aa), e->getParameter(e, ba));
+        e->setParameter(e, co, 0.25f);
+        CHECK(fabsf(e->getParameter(e, at) - 0.05f) < 1e-3f, "corner B: ATTACK shows B's own 0.05 (%.2f)", e->getParameter(e, at));
+        e->setParameter(e, at, 0.2f); e->setParameter(e, co, 0.f);
+        CHECK(fabsf(e->getParameter(e, at) - 0.8f) < 1e-3f, "back on A: ATTACK shows 0.8 (%.2f)", e->getParameter(e, at));
+        e->setParameter(e, co, 1.f); e->setParameter(e, at, 0.5f);
+        CHECK(fabsf(e->getParameter(e, aa) - 0.5f) < 1e-3f && fabsf(e->getParameter(e, ba) - 0.5f) < 1e-3f, "ALL: ATTACK 0.5 goes to every corner");
+        e->setParameter(e, co, 1.f);
+    }
     // the PRESET parameter (index 0) loads a preset, which changes the sound parameters
     float before = e->getParameter(e, pi);
     (void)before;

@@ -87,8 +87,8 @@ def main():
     L.append("static const char *const VG_FRONT_NAME[5] = {%s};" % ", ".join(cstr(n) for _, n in G.FRONT))
     L.append("static const char *const VG_CORNER_NAME[5] = {\"A\", \"B\", \"C\", \"D\", \"ALL\"};")
 
-    L.append("#define VG_NENG %d" % len(G.ENGINE_TAB))
-    L.append("static const char *const VG_ENG_KNOBS[VG_NENG][4] = {%s};" % ", ".join(
+    L.append("#define VG_NZYN %d" % len(G.ENGINE_TAB))   # the ZYNTH engines (0.10.4: was VG_NENG, which hid the engine-parameter count VG_NENG above it, so the desktop ignored engine-side changes past index 14)
+    L.append("static const char *const VG_ENG_KNOBS[VG_NZYN][4] = {%s};" % ", ".join(
         "{" + ", ".join(cstr(n) for n in e[3]) + "}" for e in G.ENGINE_TAB))
     L.append("#define VG_NMODES %d" % len(G.SIM_MODES))
     L.append("static const char *const VG_MODE_KNOBS[VG_NMODES][8] = {%s};" % ", ".join(

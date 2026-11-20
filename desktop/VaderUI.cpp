@@ -669,7 +669,7 @@ void VaderUI::drawCtl(const VgCtl &c) {
         if (c.aux >= 100) {   // a corner's character control: named by the corner's voice
             const int idx = c.aux - 101, corner_ = idx / 4, k = idx % 4;
             const int eng = (int)lroundf(fv[VGP_A_ENG + 0 + corner_ * 5]);
-            if (eng > 0 && eng <= VG_NENG) snprintf(nm, sizeof nm, "%s", VG_ENG_KNOBS[eng - 1][k]);
+            if (eng > 0 && eng <= VG_NZYN) snprintf(nm, sizeof nm, "%s", VG_ENG_KNOBS[eng - 1][k]);
         } else {
             const int mode = (int)lroundf(fv[VGP_SIM_MODE]), layer = (int)lroundf(fv[VGP_SIM_LAYER]);
             if (mode > 0 && mode < VG_NMODES) {

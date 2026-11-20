@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.5 (Force and desktop, one release)
+
+**Not tried on a device yet** (offline only, 2026-11-20).
+
+- Desktop fix: the per-corner envelope of 0.10.4 did not work in the desktop plugin. A generated header defined the
+  engine's parameter count twice, so the desktop dropped every value the engine changed by itself past the first 14
+  parameters: ATTACK / DECAY / SUSTAIN / RELEASE never switched to the selected corner's values, and a moved line landed
+  in whichever corner was shown. Now the lines follow CORNER SELECT (A, B, C, D each their own; ALL moves all four).
+  The Force build was not affected; the same sequence is now a test on both (test/corner_env_test.c, the desktop host test).
+
 ## 0.10.4 (Force and desktop, one release)
 
 **Not tried on a device yet** (offline only, 2026-11-20).

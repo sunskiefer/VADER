@@ -4,10 +4,10 @@ gen_desktop: 350 host parameters, 13 pages, 7 shapes embedded
 -- Configuring done (0.1s)
 -- Generating done (0.0s)
 -- Build files have been written to: /home/claude/vader/build/desktop
-[ 32%] Built target dgl-opengl
-[ 61%] Built target vader_zynth
-[ 63%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shape.c.o
-[ 64%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/tables.c.o
+[ 29%] Built target vader_zynth
+[ 61%] Built target dgl-opengl
+[ 63%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/tables.c.o
+[ 64%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shape.c.o
 [ 66%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/paths.c.o
 [ 67%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/modes.c.o
 [ 69%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shapefile.c.o
@@ -22,22 +22,6 @@ gen_desktop: 350 host parameters, 13 pages, 7 shapes embedded
 [ 82%] Built target VADER
 [ 83%] Building CXX object CMakeFiles/VADER-ui.dir/VaderUI.cpp.o
 [ 85%] Building CXX object CMakeFiles/VADER-dsp.dir/VaderPlugin.cpp.o
-In file included from /home/claude/vader/desktop/VaderPlugin.hpp:11,
-                 from /home/claude/vader/desktop/VaderPlugin.cpp:1:
-/home/claude/vader/desktop/gen/vader_gen.h:407: warning: "VG_NENG" redefined
-  407 | #define VG_NENG 14
-      | 
-/home/claude/vader/desktop/gen/vader_gen.h:5: note: this is the location of the previous definition
-    5 | #define VG_NENG 2344
-      | 
-In file included from /home/claude/vader/desktop/VaderPlugin.hpp:11,
-                 from /home/claude/vader/desktop/VaderUI.cpp:7:
-/home/claude/vader/desktop/gen/vader_gen.h:407: warning: "VG_NENG" redefined
-  407 | #define VG_NENG 14
-      | 
-/home/claude/vader/desktop/gen/vader_gen.h:5: note: this is the location of the previous definition
-    5 | #define VG_NENG 2344
-      | 
 /home/claude/vader/desktop/VaderPlugin.cpp: In member function 'void DISTRHO::VaderPlugin::pollLocked()':
 /home/claude/vader/desktop/VaderPlugin.cpp:108:24: warning: '%s' directive output may be truncated writing up to 767 bytes into a region of size 96 [-Wformat-truncation=]
   108 |     snprintf(dst, 96, "%s", src);
@@ -47,7 +31,8 @@ In file included from /usr/include/stdio.h:980,
                  from /usr/include/c++/13/ext/string_conversions.h:45,
                  from /usr/include/c++/13/bits/basic_string.h:4109,
                  from /usr/include/c++/13/string:54,
-                 from /home/claude/vader/desktop/VaderPlugin.hpp:7:
+                 from /home/claude/vader/desktop/VaderPlugin.hpp:7,
+                 from /home/claude/vader/desktop/VaderPlugin.cpp:1:
 In function 'int snprintf(char*, size_t, const char*, ...)',
     inlined from 'void DISTRHO::VaderPlugin::setTextLocked(char*, const char*)' at /home/claude/vader/desktop/VaderPlugin.cpp:108:13,
     inlined from 'void DISTRHO::VaderPlugin::pollLocked()' at /home/claude/vader/desktop/VaderPlugin.cpp:160:53:
@@ -64,7 +49,7 @@ In function 'int snprintf(char*, size_t, const char*, ...)',
 [ 89%] Building CXX object CMakeFiles/VADER-dsp.dir/mirror.cpp.o
 [ 91%] Linking CXX static library libVADER-dsp.a
 [ 91%] Built target VADER-dsp
-[ 92%] Linking CXX shared module bin/VADER.vst3/Contents/x86_64-linux/VADER.so
-[ 94%] Linking CXX shared module bin/VADER-vst2.so
-[ 97%] Built target VADER-vst2
-[100%] Built target VADER-vst3
+[ 92%] Linking CXX shared module bin/VADER-vst2.so
+[ 94%] Linking CXX shared module bin/VADER.vst3/Contents/x86_64-linux/VADER.so
+[ 97%] Built target VADER-vst3
+[100%] Built target VADER-vst2

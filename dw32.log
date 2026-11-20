@@ -1,11 +1,11 @@
 gen_desktop: 350 host parameters, 13 pages, 7 shapes embedded
--- Configuring done (0.0s)
--- Generating done (0.0s)
+-- Configuring done (0.3s)
+-- Generating done (0.1s)
 -- Build files have been written to: /home/claude/vader/build/desktop-win32
-[ 33%] Built target dgl-opengl
-[ 62%] Built target vader_zynth
-[ 63%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shape.c.obj
-[ 65%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/tables.c.obj
+[ 28%] Built target vader_zynth
+[ 62%] Built target dgl-opengl
+[ 63%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/tables.c.obj
+[ 65%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shape.c.obj
 [ 66%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/paths.c.obj
 [ 68%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/modes.c.obj
 [ 69%] Building C object CMakeFiles/vader_engine.dir/home/claude/vader/src/shapefile.c.obj
@@ -20,29 +20,13 @@ gen_desktop: 350 host parameters, 13 pages, 7 shapes embedded
 [ 82%] Built target VADER
 [ 84%] Building CXX object CMakeFiles/VADER-ui.dir/VaderUI.cpp.obj
 [ 85%] Building CXX object CMakeFiles/VADER-dsp.dir/VaderPlugin.cpp.obj
-In file included from /home/claude/vader/desktop/VaderPlugin.hpp:11,
-                 from /home/claude/vader/desktop/VaderPlugin.cpp:1:
-/home/claude/vader/desktop/gen/vader_gen.h:407: warning: "VG_NENG" redefined
-  407 | #define VG_NENG 14
-      | 
-/home/claude/vader/desktop/gen/vader_gen.h:5: note: this is the location of the previous definition
-    5 | #define VG_NENG 2344
-      | 
-In file included from /home/claude/vader/desktop/VaderPlugin.hpp:11,
-                 from /home/claude/vader/desktop/VaderUI.cpp:7:
-/home/claude/vader/desktop/gen/vader_gen.h:407: warning: "VG_NENG" redefined
-  407 | #define VG_NENG 14
-      | 
-/home/claude/vader/desktop/gen/vader_gen.h:5: note: this is the location of the previous definition
-    5 | #define VG_NENG 2344
-      | 
 [ 86%] Building CXX object CMakeFiles/VADER-dsp.dir/paths.cpp.obj
 [ 88%] Linking CXX static library libVADER-ui.a
 [ 88%] Built target VADER-ui
 [ 89%] Building CXX object CMakeFiles/VADER-dsp.dir/mirror.cpp.obj
 [ 91%] Linking CXX static library libVADER-dsp.a
 [ 91%] Built target VADER-dsp
+[ 92%] Linking CXX shared module bin/VADER-vst2.dll
 [ 94%] Linking CXX shared module bin/VADER.vst3/Contents/x86-win/VADER.vst3
-[ 94%] Linking CXX shared module bin/VADER-vst2.dll
-[ 97%] Built target VADER-vst2
+[100%] Built target VADER-vst2
 [100%] Built target VADER-vst3

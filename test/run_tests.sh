@@ -10,11 +10,13 @@ OBJS=$(cat build/host/objs.txt)
 ENG=$(echo $OBJS | tr ' ' '\n' | grep -v vst2_wrap | tr '\n' ' ')
 $CC -O1 -g -w -Ibuild third_party/mpc-vst-plugins/tools/host_test.c $OBJS -lm -lpthread -ldl -lstdc++ -o build/host/host_test
 $CC -O1 -g -w -std=gnu11 -Ibuild -Ithird_party/mpc-vst-plugins/wrapper $INCS test/engine_test.c $ENG -lm -lpthread -ldl -lstdc++ -o build/host/engine_test
+$CC -O1 -g -w -std=gnu11 -Ibuild -Ithird_party/mpc-vst-plugins/wrapper $INCS test/corner_env_test.c $OBJS -lm -lpthread -ldl -lstdc++ -o build/host/corner_env_test
 VG="valgrind -q --error-exitcode=9"
 export VADER_SLOW=1   # the engine test skips its timing check under valgrind
 [ "${NOVG:-}" ] && VG="" && unset VADER_SLOW
 $VG build/host/host_test
 $VG build/host/engine_test
+build/host/corner_env_test
 # 0.10.0: the host's load-time nudge of parameter 0 must not touch the corners
 $CC -O1 -g -w -Ibuild test/nudge_test.c $OBJS -lm -lpthread -ldl -lstdc++ -o build/host/nudge_test
 $VG build/host/nudge_test
