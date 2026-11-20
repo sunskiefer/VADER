@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.6 (Force and desktop, one release)
+
+**Not tried on a device yet** (offline only, 2026-11-20).
+
+- Desktop: the zip carries a **Shapes** folder like Samples: `VADER.vst3/Contents/Resources/Shapes` and `Shapes` beside the
+  VST2 file. The plugin lists shapes from there as well as from its own Shapes folder (`%APPDATA%\VADER\Shapes`,
+  `~/.local/share/VADER/Shapes`). Force: unchanged (the plugin folder's Shapes as before).
+
 ## 0.10.5 (Force and desktop, one release)
 
 **Not tried on a device yet** (offline only, 2026-11-20).

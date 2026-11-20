@@ -160,7 +160,7 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.10.5 has not been tried on a device yet.** 0.10.5 fixes the desktop plugin, where the per-corner envelope did not follow CORNER SELECT; 0.10.4 makes the envelope per corner (CORNER SELECT A–D: that corner's ADSR; ALL: every corner together); 0.10.3 gives each corner a sample dropdown with a scrollbar and makes the desktop window pure black; 0.10.2 made each corner's sample MODE the switch (OFF: the voice only; a sample mode: the sample only). 0.10.0 added the 64-bit build for the newer MPCs and the zip in Akai's plugin
+**0.10.6 has not been tried on a device yet.** 0.10.6 adds a Shapes folder to the desktop zip (inside the VST3 and beside the VST2); 0.10.5 fixes the desktop plugin, where the per-corner envelope did not follow CORNER SELECT; 0.10.4 makes the envelope per corner (CORNER SELECT A–D: that corner's ADSR; ALL: every corner together); 0.10.3 gives each corner a sample dropdown with a scrollbar and makes the desktop window pure black; 0.10.2 made each corner's sample MODE the switch (OFF: the voice only; a sample mode: the sample only). 0.10.0 added the 64-bit build for the newer MPCs and the zip in Akai's plugin
 format (MPC OS 3.10.1); the sound and the pages are 0.9.2's. 0.9.1 was tried on the Force and on a real Windows PC.
 Offline (2026-11-13) it passes the engine test (every preset, shape, mode, voice, blend mode and filter) as x86, 32-bit
 ARM and 64-bit ARM code, the VST2 host test, the modes and shapes test, the companion screen's server test and the PLUG

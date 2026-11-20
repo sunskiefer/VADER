@@ -1,6 +1,6 @@
 gen_desktop: 350 host parameters, 13 pages, 7 shapes embedded
--- Configuring done (0.3s)
--- Generating done (0.1s)
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
 -- Build files have been written to: /home/claude/vader/build/desktop-win32
 [ 28%] Built target vader_zynth
 [ 62%] Built target dgl-opengl
@@ -26,7 +26,7 @@ gen_desktop: 350 host parameters, 13 pages, 7 shapes embedded
 [ 89%] Building CXX object CMakeFiles/VADER-dsp.dir/mirror.cpp.obj
 [ 91%] Linking CXX static library libVADER-dsp.a
 [ 91%] Built target VADER-dsp
-[ 92%] Linking CXX shared module bin/VADER-vst2.dll
-[ 94%] Linking CXX shared module bin/VADER.vst3/Contents/x86-win/VADER.vst3
-[100%] Built target VADER-vst2
+[ 92%] Linking CXX shared module bin/VADER.vst3/Contents/x86-win/VADER.vst3
+[ 94%] Linking CXX shared module bin/VADER-vst2.dll
 [100%] Built target VADER-vst3
+[100%] Built target VADER-vst2

@@ -522,6 +522,15 @@ static void rescan(vader_t *s) {
     s->nfiles = 0;
     if (s->dir[0]) scan_dir(s, s->dir, "", "", 0);
     char root[600];
+    {   /* 0.10.6, the desktop plugin: shapes shipped inside the plugin (VADER_SHAPES_EXTRA, folders separated by '|') */
+        const char *xs = getenv("VADER_SHAPES_EXTRA");
+        while (xs && *xs) {
+            const char *bar = strchr(xs, '|');
+            size_t n = bar ? (size_t)(bar - xs) : strlen(xs);
+            if (n > 0 && n < sizeof root) { memcpy(root, xs, n); root[n] = 0; scan_dir(s, root, "", "", 0); }
+            xs = bar ? bar + 1 : NULL;
+        }
+    }
     snprintf(root, sizeof root, "%s/VADER Shapes", VADER_SDCARD);
     scan_dir(s, root, "", "[CARD] ", 0);
     DIR *m = opendir(VADER_MEDIA);

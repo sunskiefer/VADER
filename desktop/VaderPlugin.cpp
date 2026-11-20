@@ -45,10 +45,18 @@ VaderPlugin::VaderPlugin() : Plugin(VG_NEXP, 16, 1), fEng(mpc_engine()), fInst(n
         add(d1 + "/Samples");
         add(d1 + "/VADER Samples");
         add(d1 + "/Resources/Samples");
+        std::string shapes;   // 0.10.6: and the shapes, the same way (Contents/Resources/Shapes, or Shapes / VADER Shapes beside the file)
+        auto addS = [&](const std::string &p) { if (!p.empty()) shapes += (shapes.empty() ? "" : "|") + p; };
+        addS(d2 + "/Resources/Shapes");
+        addS(d1 + "/Shapes");
+        addS(d1 + "/VADER Shapes");
+        addS(d1 + "/Resources/Shapes");
 #ifdef _WIN32
         _putenv_s("VADER_SAMPLES_EXTRA", list.c_str());
+        _putenv_s("VADER_SHAPES_EXTRA", shapes.c_str());
 #else
         setenv("VADER_SAMPLES_EXTRA", list.c_str(), 1);
+        setenv("VADER_SHAPES_EXTRA", shapes.c_str(), 1);
 #endif
     }
     {

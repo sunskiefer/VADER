@@ -20,6 +20,10 @@ Then rescan plugins in your host. VADER is an instrument (no audio input, stereo
 The example shapes are put there the first time the plugin runs (once; the file `.examples_installed` marks it).
 Add your own pictures (PNG, JPG), SVG or OBJ files and pick them with the SHAPE field.
 
+Since 0.10.6 the zip also carries a `Shapes` folder, like `Samples`: inside the VST3 bundle (`VADER.vst3/Contents/Resources/Shapes`)
+and beside the VST2 file (`Shapes` or `VADER Shapes`). Files in those folders are listed too, so a shape can travel with the
+plugin; RESCAN (ORBIT page) picks up files added while the plugin runs.
+
 ## The window
 
 Resizable (it starts at 1280 x 668). The tabs on top are the pages of the Force's screen: MAIN, CORNERS, ORBIT,

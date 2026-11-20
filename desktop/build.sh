@@ -28,8 +28,9 @@ case "${1:-linux}" in
       S="build/pkg/VADER-$V-desktop-$tag"; rm -rf "$S"; mkdir -p "$S"
       cp -r "$dir"/bin/VADER* "$S/"
       # the example samples: inside the VST3 bundle (found automatically) and as a Samples folder beside the VST2 file
-      for b in "$S"/VADER.vst3; do [ -d "$b/Contents" ] && mkdir -p "$b/Contents/Resources" && cp -r Samples "$b/Contents/Resources/Samples"; done
+      for b in "$S"/VADER.vst3; do [ -d "$b/Contents" ] && mkdir -p "$b/Contents/Resources" && cp -r Samples "$b/Contents/Resources/Samples" && cp -r shapes "$b/Contents/Resources/Shapes"; done
       cp -r Samples "$S/Samples"
+      cp -r shapes "$S/Shapes"   # 0.10.6: the example shapes beside the plugin too (the plugin reads them from here and from its own Shapes folder)
       cp docs/DESKTOP.md "$S/README.md"; cp LICENSE "$S/LICENSE"; cp desktop/THIRD_PARTY.md "$S/THIRD_PARTY.md"
       (cd build/pkg && rm -f "../../dist/VADER-$V-desktop-$tag.zip" && python3 -m zipfile -c "../../dist/VADER-$V-desktop-$tag.zip" "VADER-$V-desktop-$tag")
       echo "dist/VADER-$V-desktop-$tag.zip"
