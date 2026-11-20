@@ -375,7 +375,7 @@ void VaderUI::prepareScreenData() {
         overlay_read_shape(bus, &fShape);
         fShapeVer = overlay_shape_version(bus);
         fImgOk = false;
-        if (fShape.shape_user && fShape.has_img) {
+        if (fShape.has_img) {   // 0.10.7: under any shape (a picture is the IMAGE, not the shape)
             static unsigned char rgba[64 * 64 * 4];
             for (int i = 0; i < 64 * 64; i++) {
                 const float b = clampf(fShape.img[i], 0, 1);

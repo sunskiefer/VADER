@@ -209,7 +209,10 @@ int main(void) {
         }
         char sd[96];
         E->get_param(s, "shape_display", sd, sizeof sd);
-        CHECK(!strcmp(d, "LOADED") && getp(s, "shape") == 15, "load %-14s -> %s (%s)", name, d, sd);
+        /* 0.10.7: a picture (PNG, JPG) is the IMAGE only and leaves the shape alone; an SVG or OBJ becomes the USER shape */
+        int pic = strstr(name, ".png") || strstr(name, ".jpg") || strstr(name, ".PNG") || strstr(name, ".JPG");
+        if (pic) CHECK(!strcmp(d, "LOADED (IMAGE)") && getp(s, "shape") != 15, "load %-14s -> %s (%s, picture: shape kept)", name, d, sd);
+        else CHECK(!strcmp(d, "LOADED") && getp(s, "shape") == 15, "load %-14s -> %s (%s)", name, d, sd);
         chord(s, 1);
         level_t a = run(s, 100);
         chord(s, 0);
@@ -532,7 +535,7 @@ int main(void) {
     clock_gettime(CLOCK_MONOTONIC, &t1);
     double us = ((t1.tv_sec - t0.tv_sec) * 1e9 + (t1.tv_nsec - t0.tv_nsec)) / 1e3 / nb;
     printf("cpu: 16 voices x 4 corners, ladder filters, AM+PM, all effects: %.1f us per 128-frame block on this machine (block = 2902 us)\n", us);
-    /* 0.10.2: the corner's SAMPLE MODE decides: OFF = only the voice plays; any other mode with a SAMPLE chosen = only the
+    /* 0.10.7: the corner's SAMPLE MODE decides: OFF = only the voice plays; any other mode with a SAMPLE chosen = only the
      * sample plays (silence while it loads or when the file is not found, never the voice). Default OFF. */
     {
         void *t = E->create("shapes");   /* ./Samples is the plugin folder's Samples here */

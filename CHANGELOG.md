@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.10.7 (Force and desktop, one release)
+
+Pictures on the IMAGE page work the way the page promises. **Not tried on a device yet** (offline only, 2026-11-20: every
+change checked by running the plugin's own loader on 12 test pictures).
+
+- **A picture is the IMAGE, not the shape.** Loading a PNG or JPG now feeds the IMAGE page only (BRIGHT, HUE, COLOUR,
+  DEPTH read it under the orbiter) and the orbit stays on the shape you have; the file field says `LOADED (IMAGE)`.
+  Before, the picture's outline also took over the USER shape. SVG and OBJ still load as the USER shape. The picture is
+  saved with the project and MY PRESETS (`image` line) and loads back after the shape.
+- MY PRESETS and projects come back exactly as saved: with their picture or shape file, or with none. Factory presets
+  leave the loaded file alone.
+- One loaded file at a time: loading a picture replaces a loaded shape file (SVG/OBJ) and loading a shape file replaces
+  the picture; the FILE field shows what is loaded.
+- The loaded picture is drawn (dim) under **any** shape, on the desktop window, the phone screen and the Force's live
+  screen; it used to show only while the shape was USER, so with the change above it would not have shown at all.
+- Desktop: the dropdowns show their value again. Since 0.10.3 every dropdown without a caption had its whole parameter
+  name drawn inside the box (SUBORBIT DIRECTION, SUBORBIT SHAPE, A RATIO MODE, SAMPLE A MODE, ...), which squeezed the
+  value to a few pixels on top of the arrow. Force: unchanged (its dropdowns were right).
+- **BRIGHT reads brightness.** It used to score colours on a spectrogram scale (black, blue, purple, red, orange,
+  yellow, white), so a bright green or cyan picture read as nearly black and the BRIGHT meter stayed empty. Now black is
+  0, white is 100 and every colour counts by how bright it is.
+- **Smooth readings.** Each cell of the picture map is the average of its patch of the picture (it was one pixel, which
+  made BRIGHT, HUE and COLOUR flicker over any textured picture).
+- **Big files load.** The file size limit goes from 4 MB to 96 MB; pictures up to 24 megapixels (a bigger one says
+  "picture too big (over 24 megapixels)").
+- **Cleaner outlines from pictures.** The small picture is softened before the shape is found, so halftone dots, grain
+  and hairline drawings trace as the shape they make up instead of a scribble.
+- OBJ shapes are unchanged: at most 4096 points and 8192 edges, walked as one line; a mesh from a 3D program is far over
+  that, use the outline of the picture (PNG/JPG/SVG) or a light wireframe instead.
 ## 0.10.6 (Force and desktop, one release)
 
 **Not tried on a device yet** (offline only, 2026-11-20).

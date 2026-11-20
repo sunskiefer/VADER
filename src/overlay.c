@@ -585,8 +585,8 @@ static void render_frame(overlay_t *o, const ovl_shape_t *sh, const ovl_view_t *
     memset(g_acc, 0, sizeof(float) * OVL_W * OVL_H * 3);
     project_view(sh, v, x2, y2, z2);
     float size = v->size, sr_ = v->sub_size * 0.6f;
-    /* the picture under the shape (a PNG/JPG loaded as the shape): dim, in the shape's blue */
-    if (sh->has_img && sh->shape_user) {
+    /* the picture under the shape (a PNG/JPG loaded as the IMAGE): dim, in the shape's blue */
+    if (sh->has_img) {   /* 0.10.7: under any shape (a picture is the IMAGE, not the shape) */
         for (int y = 0; y < OVL_SQUARE; y += 2)
             for (int x = 0; x < OVL_SQUARE; x += 2) {
                 float u = (float)x / OVL_SQUARE, w = (float)y / OVL_SQUARE;

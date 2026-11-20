@@ -134,7 +134,7 @@ function frame(now) {
   project(shape, v.rot, v.yaw, v.tilt);
   const size = v.size, sr = v.sub * 0.6;
   // a loaded picture, dim, under its shape
-  if (shape.img && shape.user) {
+  if (shape.img) {   // 0.10.7: under any shape
     const cell = S / 64 * size;
     ctx.save(); ctx.translate(CX, CY); ctx.rotate(v.rot * TAU);
     for (let j = 0; j < 64; j++) for (let i = 0; i < 64; i++) {

@@ -189,6 +189,8 @@ typedef struct {
     path_t load_buf;
     char load_err[96];
     char load_name[1024];
+    char img_file[1024];         /* 0.10.7: the picture on the IMAGE page (a picture is not the shape) */
+    char pending_load[1024];     /* 0.10.7: a second file to load once the current one is in (a restore: shape, then picture) */
     char status[96];             /* the file field's message (loaded / failed) */
     int load_select;             /* a LOAD press: the loaded shape becomes the edited timbre's (a restore keeps its own) */
     double tap_last;             /* seconds, for TAP */
@@ -693,7 +695,7 @@ static void smp_sync_all(vader_t *s) { for (int c = 0; c < 4; c++) smp_request(s
 
 /* a corner's sample for n frames: ONE SHOT follows the key (the ROOT NOTE plays it at its own speed); a LOOP runs the
  * whole sample over 1-4 bars (4/4) of the tempo at the root note, and the keys pitch it from there. */
-#define SMP_MODE_OFF 5   /* SAMPLE x MODE: ONE SHOT, LOOP 1-4 BARS, OFF (0.10.2) */
+#define SMP_MODE_OFF 5   /* SAMPLE x MODE: ONE SHOT, LOOP 1-4 BARS, OFF (0.10.7) */
 static void smp_render(vader_t *s, voice_t *v, int c, float freq, float *out, int n, const float *P) {
     smp_t *sl = &s->smp[c];
     int cu = __atomic_load_n(&sl->cur, __ATOMIC_ACQUIRE), len = sl->n[cu];
@@ -753,10 +755,23 @@ static void start_load(vader_t *s, const char *path) {
 static void collect_load(vader_t *s) {
     int st = __atomic_load_n(&s->load_state, __ATOMIC_ACQUIRE);
     if (st < 2) return;
-    if (st == 2) {
+    if (st == 2 && s->load_img.ok) {
+        /* 0.10.7: a picture (PNG, JPG) is the IMAGE only: BRIGHT, HUE, COLOUR and DEPTH read it under the orbiter, and the
+         * orbit stays on the shape you have (before, the picture's outline also replaced the USER shape) */
+        s->img = s->load_img;
+        snprintf(s->img_file, sizeof s->img_file, "%s", s->load_name);
+        s->has_user = 0;   /* one loaded file: a picture or a shape, not both */
+        s->user_file[0] = 0;
+        s->upics = 0;
+        for (int t = 0; t < 2; t++) if ((int)T(t)[S_SHAPE] == SHAPE_USER) timbre_shape(s, t);
+        snprintf(s->status, sizeof s->status, "LOADED (IMAGE)");
+        s->shape_ver++;   /* the screens read the picture with the shape */
+        mark(s, P_SHAPE);
+    } else if (st == 2) {
         s->user = s->load_buf;
         s->has_user = 1;
-        if (s->load_img.ok) s->img = s->load_img;   /* a picture: it is the IMAGE too (an SVG or OBJ keeps the last one) */
+        s->img.ok = 0;   /* one loaded file: a shape or a picture, not both */
+        s->img_file[0] = 0;
         s->shape_ver++;
         s->upics = s->load_upics;
         snprintf(s->user_file, sizeof s->user_file, "%s", s->load_name);
@@ -771,6 +786,12 @@ static void collect_load(vader_t *s) {
     }
     __atomic_store_n(&s->load_state, 0, __ATOMIC_RELEASE);
     mark(s, P_FILE);
+    if (s->pending_load[0]) {   /* 0.10.7: the next file of a restore */
+        char next[1024];
+        snprintf(next, sizeof next, "%s", s->pending_load);
+        s->pending_load[0] = 0;
+        start_load(s, next);
+    }
 }
 
 static const shapefile_t *file_at(vader_t *s) {
@@ -1542,7 +1563,7 @@ static void voice_render(vader_t *s, voice_t *v, float *L, float *R, int n, floa
     for (int c = 0; c < 4; c++) {
         int ei = (int)P[S_A_ENG + c * 5];
         float cfreq = base * powf(2.0f, P[c * NCF + CF_OCT]);
-        /* 0.10.2: the corner's MODE on the SAMPLES page decides. OFF: only the corner's voice plays. Any other mode, with a
+        /* 0.10.7: the corner's MODE on the SAMPLES page decides. OFF: only the corner's voice plays. Any other mode, with a
          * SAMPLE chosen: only the sample plays, even while it loads or when its file is not found (silence, never the voice). */
         int smp_sel = (int)s->g[G_SMP_A + c] > 0 && (int)s->g[G_SMP_LEN_A + c] != SMP_MODE_OFF;
         if (smp_sel && on[c]) {
@@ -2021,7 +2042,7 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
         memcpy(T(1), SND_DEF, sizeof(float) * NSND);
         char line[1100];
         const char *q = val;
-        char user[1024] = "";
+        char user[1024] = "", image[1024] = "";
         int has_cenv = 0;
         mv_defaults(s);
         while (*q) {
@@ -2033,6 +2054,7 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
             char k[96];
             float v;
             if (!strncmp(line, "user ", 5)) { snprintf(user, sizeof user, "%s", line + 5); continue; }
+            if (!strncmp(line, "image ", 6)) { snprintf(image, sizeof image, "%s", line + 6); continue; }   /* 0.10.7 */
             if (line[0] == 'v') {
                 int vt, vm, vl, vi;
                 float vv;
@@ -2057,6 +2079,13 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
         s->has_user = 0;
         s->load_select = 0;
         if (user[0]) start_load(s, user);   /* the shape file again, by name */
+        s->img.ok = 0;   /* 0.10.7: a saved preset or project comes back exactly as saved: its picture, or none */
+        s->img_file[0] = 0;
+        s->pending_load[0] = 0;
+        if (image[0]) {   /* the picture again, after the shape (one load at a time) */
+            if (user[0]) snprintf(s->pending_load, sizeof s->pending_load, "%s", image);
+            else start_load(s, image);
+        }
         for (int t = 0; t < 2; t++) { timbre_shape(s, t); mode_load(s, t, 1); }
         release_all(s);
         all_off(s, 1);
@@ -2202,7 +2231,7 @@ static void set_param(void *p, const char *key, const char *val) {
                 if (cc > 3 || cc == k) { T(t)[S_A_SSTART + k * 3 + (q->slot - G_SMP_ST)] = v; mark(s, SND_P[S_A_SSTART + k * 3 + (q->slot - G_SMP_ST)]); }
         }
         if (q->slot >= G_SMP_A && q->slot <= G_SMP_D) {
-            if (s->nwavs > 0 && v > (float)s->nwavs) { s->g[q->slot] = (float)s->nwavs; mark(s, i); }   /* 0.10.2: no number past the last file */
+            if (s->nwavs > 0 && v > (float)s->nwavs) { s->g[q->slot] = (float)s->nwavs; mark(s, i); }   /* 0.10.7: no number past the last file */
             smp_request(s, q->slot - G_SMP_A);
             pick_scroll_to(s, q->slot - G_SMP_A); pick_mark(s, q->slot - G_SMP_A);   /* 0.10.3: the list follows */
         }
@@ -2278,6 +2307,7 @@ static int state_text(vader_t *s, char *buf, int len) {
                     if (fabsf(s->mv[t][m][l][i] - 0.5f) > 1e-6f && n < len)
                         n += snprintf(buf + n, (size_t)(len - n), "v%d %d %d %d %.5g\n", t, m, l, i, s->mv[t][m][l][i]);
     if (s->has_user && n < len) n += snprintf(buf + n, (size_t)(len - n), "user %s\n", s->user_file);
+    if (s->img.ok && s->img_file[0] && n < len) n += snprintf(buf + n, (size_t)(len - n), "image %s\n", s->img_file);   /* 0.10.7 */
     return n + 1;   /* with its NUL: the wrapper asks again with a bigger buffer when this is larger */
 }
 

@@ -51,7 +51,7 @@ artwork; it is not affiliated with Beetlecrab Audio.
   HEART, ZIGZAG, SPIRO, and the 3D CUBE and ICOSA) or your own USER shape. It has speed, size, rotation, 3D spin and
   tilt, and a SUBORBIT circling the path point. It can sync to MPC's tempo, restart on each note, and grow or shrink
   with the envelope.
-- **Your own shapes**: SVG, OBJ, PNG, JPG from the plugin's `Shapes` folder, or a `VADER Shapes` folder on your SD
+- **Your own shapes**: SVG and OBJ from the plugin's `Shapes` folder (a PNG or JPG there is a picture for the IMAGE page, 0.10.2), or a `VADER Shapes` folder on your SD
   card or USB drive. Seven examples come with it.
 - **SHAPE SOUND**: the shape itself played as audio, x on the left, y on the right.
 - **Two timbres**: A and B, layered or split across the keyboard, each a complete sound. Unison up to 8 with detune,
@@ -60,8 +60,8 @@ artwork; it is not affiliated with Beetlecrab Audio.
   (ON, ACCENT, TIE, OFF).
 - **Effects**: drive, chorus, ping-pong delay (synced, or free with TAP), reverb.
 - **22 presets** in MPC's PRESET menu, from INIT ORBIT to the sample presets, and **999 slots for your own** (MY PRESETS).
-- **The IMAGE page**: a picture plays the sound. Four MODs read the picture under the orbiter (BRIGHT on a spectrogram
-  colour scale, HUE, COLOUR, DEPTH as a landscape) or the outline (TURN, HEADING) and move CUTOFF, RESO, OCTAVE, PITCH,
+- **The IMAGE page**: a picture plays the sound. Four MODs read the picture under the orbiter (BRIGHT, HUE, COLOUR, DEPTH as a
+  landscape) or the outline (TURN, HEADING) and move CUTOFF, RESO, OCTAVE, PITCH,
   GEN 1, GEN 2, BLEND or LEVEL.
 - **MODE**: 27 simulations the orbiter can follow instead of a shape (BOIDS, LORENZ, GRAVITY WELLS, THUNDER, ...), each with its own eight live-named knobs and three layers.
 - **35 maths shapes**: spirograph, harmonograph, Fourier drawing of any shape, mandala, times table, toy gears, Hilbert, Koch and more, each with four shape knobs.
@@ -160,7 +160,7 @@ The parameters live in one place, `tools/gen_params.py`. The pages are in `tools
 
 ## Status
 
-**0.10.6 has not been tried on a device yet.** 0.10.6 adds a Shapes folder to the desktop zip (inside the VST3 and beside the VST2); 0.10.5 fixes the desktop plugin, where the per-corner envelope did not follow CORNER SELECT; 0.10.4 makes the envelope per corner (CORNER SELECT A–D: that corner's ADSR; ALL: every corner together); 0.10.3 gives each corner a sample dropdown with a scrollbar and makes the desktop window pure black; 0.10.2 made each corner's sample MODE the switch (OFF: the voice only; a sample mode: the sample only). 0.10.0 added the 64-bit build for the newer MPCs and the zip in Akai's plugin
+**0.10.7 has not been tried on a device yet.** 0.10.7 makes a picture (PNG/JPG) feed the IMAGE page only (the shape stays), fixes BRIGHT (it read green as black), smooths the picture map and lifts the 4 MB file limit to 96 MB / 24 megapixels, checked offline with the plugin's own loader on 12 pictures; 0.10.6 adds a Shapes folder to the desktop zip (inside the VST3 and beside the VST2); 0.10.5 fixes the desktop plugin, where the per-corner envelope did not follow CORNER SELECT; 0.10.4 makes the envelope per corner (CORNER SELECT A–D: that corner's ADSR; ALL: every corner together); 0.10.3 gives each corner a sample dropdown with a scrollbar and makes the desktop window pure black; 0.10.2 made each corner's sample MODE the switch (OFF: the voice only; a sample mode: the sample only). 0.10.0 added the 64-bit build for the newer MPCs and the zip in Akai's plugin
 format (MPC OS 3.10.1); the sound and the pages are 0.9.2's. 0.9.1 was tried on the Force and on a real Windows PC.
 Offline (2026-11-13) it passes the engine test (every preset, shape, mode, voice, blend mode and filter) as x86, 32-bit
 ARM and 64-bit ARM code, the VST2 host test, the modes and shapes test, the companion screen's server test and the PLUG

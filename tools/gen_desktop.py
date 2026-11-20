@@ -146,14 +146,17 @@ def main():
                 return None
             e["par"] = exp_index[key]
         lab = c.get("label") or c.get("caption")
+        # a field or a dropdown shows its caption only (none: just the value). 0.10.7: since 0.10.3 the else below hung on the
+        # picklist test, so every dropdown without a caption got its whole parameter name inside the box and the value was
+        # squeezed onto the arrow
         if k == "field" or k == "popup" or k == "picklist":
             e["label"] = c.get("caption") or ""
+        else:
+            e["label"] = lab or byname[key]["name"]
         if k == "picklist":   # 0.10.3: the dropdown of files; aux = the corner, lx/ly = where the list drops
             e["aux"] = "abcd".index(key[-1])
             la = c.get("list_at") or (c["x"], c["y"] + c["h"] + 4)
             e["lx"], e["ly"] = la[0], la[1] + dy
-        else:
-            e["label"] = lab or byname[key]["name"]
         if k == "radio":
             opts = byname[key].get("options") or []
             labels = c.get("labels") or opts

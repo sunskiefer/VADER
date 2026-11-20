@@ -181,21 +181,19 @@ pitch and stereo).
 
 ![IMAGE](img/image.png)
 
-The IMAGE page lets a **picture** play the sound. Load a PNG or JPG and the orbiter doesn't only follow its outline: as it
-moves, VADER reads the picture under it (how bright, which colour, how colourful, uphill or downhill) and the shape of
-the outline at that point (how sharply it turns, which way it runs). Four **MODs** turn those readings into movement of
-the sound: the filter, the pitch, the overtone generators, the blend or the level.
-
-Nothing happens until you raise a MOD's AMOUNT: every AMOUNT starts at 0, so the presets sound as before.
+The IMAGE page lets a **picture** play the sound. Load a PNG or JPG: as the orbiter moves over the shape you have,
+VADER reads the picture under it (how bright, which colour, how colourful, uphill or downhill) and the shape of
+the orbit line itself (turning, heading), and four MODs send those readings to the sound.
 
 ### Loading a picture
 
-**PICTURE**: FILE, **LOAD**, **RESCAN**: the same file list as the ORBIT page. Load a PNG or JPG: its outline becomes the
-USER shape, and the picture itself becomes the **IMAGE** the MODs read. The picture stays the IMAGE when you pick another
-SHAPE (a STAR orbiting over your photo works) and until you load another PNG or JPG. Loading an SVG or OBJ changes the
-shape but keeps the last picture.
+**PICTURE**: FILE, **LOAD**, **RESCAN**: the same file list as the ORBIT page. Load a PNG or JPG: the picture becomes the
+**IMAGE** the MODs read and the file field says `LOADED (IMAGE)`; the orbit stays on the SHAPE you have (a STAR orbiting
+over your photo works), so the picture is never traced into a shape (0.10.7; before, its outline also took over the USER
+shape). The picture stays the IMAGE when you pick another SHAPE and until you load another PNG or JPG. Loading an SVG or
+OBJ changes the shape but keeps the picture. Pictures up to 96 MB and 24 megapixels load.
 
-The picture lies under its own outline: it is fitted to the square the same way, and it turns with ROTATE and grows with
+The picture is fitted to the square and it turns with ROTATE and grows with
 ORBIT SIZE together with the shape. Where the orbiter leaves the picture, it reads black (0).
 
 ### The four MODs
@@ -214,7 +212,7 @@ DEPTH and HEADING sit in the middle (50) when flat or level.
 
 | Source | What it reads | Range | Use it for |
 |---|---|---|---|
-| **BRIGHT** | the picture's brightness under the orbiter, on a **spectrogram colour scale**: black 0, deep blue, purple, red, orange, yellow, white 100. A grey picture reads as its brightness; a coloured one by where its colours sit on that scale. | 0 to 100 | the filter opening in the light parts and closing in the dark; louder in bright areas |
+| **BRIGHT** | the picture's brightness under the orbiter: black 0, white 100, every colour by how bright it is (a dim green and a bright green read differently). Each reading is the average of the patch of picture under the orbiter, not one pixel. | 0 to 100 | the filter opening in the light parts and closing in the dark; louder in bright areas |
 | **HUE** | where the colour sits round the colour wheel: red 0, yellow, green, cyan, blue, magenta, back to red at 100. Grey reads 0. | 0 to 100 | different colours, different notes or blends: a rainbow picture becomes a melody with TO PITCH |
 | **COLOUR** | how colourful: grey and black 0, a pure colour 100 | 0 to 100 | colourful parts of the picture pushing the sound further (more GEN 2, more resonance) |
 | **DEPTH** | the picture as a landscape (bright = high, dark = low): the slope the orbiter is travelling on. Going uphill reads above 50, downhill below. | -100 to +100 | sounds that climb and dive as the orbiter crosses the picture: TO PITCH or TO CUTOFF |
@@ -394,7 +392,7 @@ VOICE, NOISE, TONE, METAL, BAZZ, DRONE, TEXTURE, FX) with four character knobs, 
 
 **SAMPLES.** Put WAV files in the plugin's `Samples` folder (or `VADER Samples` on a card or drive) and press rescan.
 Pick one per corner from its SAMPLE dropdown (0.10.3): tap the field, the list drops down with a scrollbar (drag it,
-turn the data wheel after touching it, or UP / DOWN), tap a file, CLOSE. MODE decides what the corner plays (0.10.2): OFF, only the corner's voice from the VOICES page;
+turn the data wheel after touching it, or UP / DOWN), tap a file, CLOSE. MODE decides what the corner plays (0.10.7): OFF, only the corner's voice from the VOICES page;
 ONE SHOT (plays it once) or LOOP 1-4 BARS (fits it to the tempo), only the sample, never the voice (silence while the
 file loads or when it is not found). MODE starts OFF; the SAMPLE number stays when you switch to OFF, and stops at the
 last file found. Every sample is rooted on C2 and follows

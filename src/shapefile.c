@@ -23,7 +23,8 @@
 #include "stb_image.h"
 
 #define MAXPTS 16384
-#define MAXFILE (4 << 20)
+#define MAXFILE (96 << 20)   /* 0.10.7: was 4 MB, which refused ordinary photos */
+#define MAXPIX (24 * 1000 * 1000)   /* 0.10.7: a picture of at most 24 megapixels (96 MB decoded) */
 
 typedef struct {
     float *x, *y, *z;
@@ -346,27 +347,12 @@ out:
 /* the picture kept for the IMAGE page, until the outline is fitted (shape_load_file) */
 typedef struct { unsigned char *rgba; int w, h, sc; } picture_t;
 
-/* a colour's place (0..1) on a spectrogram's colour scale: black, deep blue, purple, red, orange, yellow, white.
- * A grey picture reads as its brightness; a colourful one by where its colours sit on the scale. */
-static float spectro(float r, float g, float b) {
-    static const float C[7][3] = {{0, 0, 0}, {10, 20, 150}, {120, 10, 160}, {220, 30, 60}, {255, 140, 0}, {255, 230, 40}, {255, 255, 255}};
-    static const float T[7] = {0, 0.15f, 0.3f, 0.5f, 0.7f, 0.85f, 1};
-    float best = 1e30f, bt = 0;
-    for (int i = 0; i < 6; i++) {
-        float d[3], e[3], dd = 0, de = 0;
-        for (int k = 0; k < 3; k++) { d[k] = C[i + 1][k] - C[i][k]; e[k] = (k == 0 ? r : k == 1 ? g : b) - C[i][k]; dd += d[k] * d[k]; de += d[k] * e[k]; }
-        float u = dd > 0 ? de / dd : 0;
-        if (u < 0) u = 0;
-        if (u > 1) u = 1;
-        float q = 0;
-        for (int k = 0; k < 3; k++) { float x = e[k] - u * d[k]; q += x * x; }
-        if (q < best) { best = q; bt = T[i] + (T[i + 1] - T[i]) * u; }
-    }
-    return bt;
-}
-
 static int load_image(const unsigned char *buf, long len, pts_t *P, char *err, int errlen, picture_t *pic) {
     int w, h, ch;
+    if (stbi_info_from_memory(buf, (int)len, &w, &h, &ch) && (long)w * h > MAXPIX) {
+        snprintf(err, (size_t)errlen, "picture too big (over 24 megapixels)");
+        return -1;
+    }
     unsigned char *img = stbi_load_from_memory(buf, (int)len, &w, &h, &ch, 4);
     if (!img) { snprintf(err, (size_t)errlen, "can't read the picture"); return -1; }
     /* to at most 160 px across, as luminance (transparent = background) */
@@ -393,6 +379,32 @@ static int load_image(const unsigned char *buf, long len, pts_t *P, char *err, i
             lum[y * W + x] = L;
             hist[(int)L > 255 ? 255 : (int)L]++;
         }
+    /* 0.10.7: soften the small picture first (two 3x3 passes), so halftone dots, grain and hairlines merge into the shape
+     * they make up instead of being traced one by one */
+    {
+        float *tmp = malloc(sizeof(float) * (size_t)(W * H));
+        if (tmp) {
+            for (int pass = 0; pass < 2; pass++) {
+                for (int y = 0; y < H; y++)
+                    for (int x = 0; x < W; x++) {
+                        float acc = 0;
+                        int cnt = 0;
+                        for (int j = -1; j <= 1; j++)
+                            for (int i = -1; i <= 1; i++) {
+                                int xx = x + i, yy = y + j;
+                                if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
+                                acc += lum[yy * W + xx];
+                                cnt++;
+                            }
+                        tmp[y * W + x] = acc / (float)cnt;
+                    }
+                memcpy(lum, tmp, sizeof(float) * (size_t)(W * H));
+            }
+            free(tmp);
+            memset(hist, 0, sizeof hist);
+            for (int i = 0; i < W * H; i++) hist[(int)lum[i] > 255 ? 255 : (int)lum[i]]++;
+        }
+    }
     /* Otsu's threshold */
     int total = W * H;
     double sum = 0, sumB = 0, best = -1;
@@ -531,14 +543,30 @@ int shape_load_file(const char *path, path_t *out, image_t *imgout, char *err, i
         if (pic.rgba && imgout) {   /* the picture, laid under the outline: IMG_N x IMG_N over -1..1 */
             for (int gy = 0; gy < IMG_N; gy++)
                 for (int gx = 0; gx < IMG_N; gx++) {
-                    float u = -1 + (gx + 0.5f) * 2.0f / IMG_N, v = -1 + (gy + 0.5f) * 2.0f / IMG_N;
-                    float px = ((x0 + x1) / 2 + u * s - 1 + 0.5f) * pic.sc, py = ((y0 + y1) / 2 + v * s - 1 + 0.5f) * pic.sc;
-                    int ix = (int)px, iy = (int)py;
+                    /* 0.10.7: the cell's whole patch of the picture, averaged (was one pixel: speckled readings) */
+                    float ua = -1 + gx * 2.0f / IMG_N, ub = -1 + (gx + 1) * 2.0f / IMG_N;
+                    float va = -1 + gy * 2.0f / IMG_N, vb = -1 + (gy + 1) * 2.0f / IMG_N;
+                    int px0 = (int)floorf(((x0 + x1) / 2 + ua * s - 1 + 0.5f) * pic.sc), px1 = (int)ceilf(((x0 + x1) / 2 + ub * s - 1 + 0.5f) * pic.sc);
+                    int py0 = (int)floorf(((y0 + y1) / 2 + va * s - 1 + 0.5f) * pic.sc), py1 = (int)ceilf(((y0 + y1) / 2 + vb * s - 1 + 0.5f) * pic.sc);
+                    if (px0 < 0) px0 = 0;
+                    if (py0 < 0) py0 = 0;
+                    if (px1 > pic.w) px1 = pic.w;
+                    if (py1 > pic.h) py1 = pic.h;
                     float val = 0, hue = 0, sat = 0;
-                    if (ix >= 0 && iy >= 0 && ix < pic.w && iy < pic.h) {
-                        const unsigned char *q = pic.rgba + 4 * (iy * pic.w + ix);
-                        float al = q[3] / 255.0f, r = q[0] / 255.0f, g = q[1] / 255.0f, b = q[2] / 255.0f;
-                        val = spectro(q[0], q[1], q[2]) * al;
+                    if (px1 > px0 && py1 > py0) {
+                        double sr = 0, sg = 0, sb = 0, sa = 0;
+                        for (int iy = py0; iy < py1; iy++)
+                            for (int ix = px0; ix < px1; ix++) {
+                                const unsigned char *q = pic.rgba + 4 * (iy * pic.w + ix);
+                                float al = q[3] / 255.0f;
+                                sr += q[0] / 255.0f * al; sg += q[1] / 255.0f * al; sb += q[2] / 255.0f * al; sa += al;
+                            }
+                        double n = (double)(px1 - px0) * (py1 - py0);
+                        float r = (float)(sr / n), g = (float)(sg / n), b = (float)(sb / n), al = (float)(sa / n);
+                        /* 0.10.7: BRIGHT is the colour's brightness (was a spectrogram colour scale, which read green and
+                         * cyan as nearly black whatever their brightness) */
+                        val = 0.3f * r + 0.59f * g + 0.11f * b;
+                        if (al > 1e-4f) { r /= al; g /= al; b /= al; }   /* the hue and saturation of the colour itself */
                         float mx = fmaxf(r, fmaxf(g, b)), mn = fminf(r, fminf(g, b)), c = mx - mn;
                         sat = mx > 0 ? c / mx * al : 0;   /* how colourful */
                         if (c > 1e-4f) {                  /* where round the colour wheel: 0 red .. 1 back to red */

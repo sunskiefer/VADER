@@ -93,9 +93,9 @@ void sim_reset(sim_t *s, int mode, const float *k);
 void sim_step(sim_t *s, const float *k, float dt);
 
 /* ---- shapefile.c: SVG, OBJ, PNG/JPG -> a path. 0 on success, else -1 with err filled. A PNG/JPG also fills img (when
- * given): its colours as values 0..1 on a spectrogram's scale, IMG_N x IMG_N over the same -1..1 as the path */
+ * given): its brightness as values 0..1 (0.10.7; was a spectrogram colour scale), IMG_N x IMG_N over the same -1..1 as the path */
 #define IMG_N 64
-typedef struct { int ok; float v[IMG_N * IMG_N], hue[IMG_N * IMG_N], sat[IMG_N * IMG_N]; } image_t;   /* v: spectrogram scale */
+typedef struct { int ok; float v[IMG_N * IMG_N], hue[IMG_N * IMG_N], sat[IMG_N * IMG_N]; } image_t;   /* v: brightness */
 int shape_load_file(const char *path, path_t *out, image_t *img, char *err, int errlen);
 
 /* ---- fx.c: the effects after the voices (stereo float) */
