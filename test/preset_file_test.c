@@ -63,7 +63,7 @@ static void drain(void *s) {
     E->get_param(s, "dirty", b, sizeof b);
 }
 
-static void waitload(void *s) { char d[128]; for (int k = 0; k < 600; k++) { usleep(5000); E->get_param(s, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) { /* a pending second file */ usleep(20000); E->get_param(s, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) break; } } }
+static void waitload(void *s) { char d[128]; for (int k = 0; k < 6000; k++) { usleep(5000); E->get_param(s, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) { /* a pending second file */ usleep(20000); E->get_param(s, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) break; } } }
 static int findfile(void *s, const char *name) { char d[128]; for (int i = 0; i < 60; i++) { setp(s, "file", i); E->get_param(s, "file_display", d, sizeof d); if (strstr(d, name)) return i; } return -1; }
 static char st[70000];
 static const char *state(void *s) { st[0] = 0; E->get_param(s, "state", st, sizeof st); return st; }
@@ -103,6 +103,12 @@ int main(void) {
     setp(s, "user_slot", 203); setp(s, "load_user", 1); waitload(s);
     t = state(s);
     CHECK(!has(t, "\nuser ") && !has(t, "\nimage "), "MY PRESET 203 (saved with nothing) comes back with nothing loaded");
+    /* a LOAD pressed while a preset is still bringing its file back waits its turn (it used to be dropped) */
+    setp(s, "user_slot", 202); setp(s, "load_user", 1);                      /* starts loading torus.obj */
+    setp(s, "file", findfile(s, "crescent.png")); setp(s, "load", 1);        /* pressed straight away */
+    waitload(s);
+    t = state(s);
+    CHECK(has(t, "\nimage ") && has(t, "crescent.png") && !has(t, "\nuser "), "LOAD pressed during a preset's own load: the picture still loads, last");
     printf(fails ? "FAILED: %d\n" : "PRESET FILE TEST PASSED\n", fails);
     return fails != 0;
 }

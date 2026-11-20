@@ -190,7 +190,10 @@ typedef struct {
     char load_err[96];
     char load_name[1024];
     char img_file[1024];         /* 0.10.7: the picture on the IMAGE page (a picture is not the shape) */
-    char pending_load[1024];     /* 0.10.7: a second file to load once the current one is in (a restore: shape, then picture) */
+    char pending_load[1024];     /* 0.10.7: the file to load once the running load is in (a load is never dropped) */
+    int pending_select;          /* its load_select */
+    int run_select;              /* the running load's load_select (read when it lands) */
+    int load_discard;            /* 1: the running load was overtaken by a restore: its result is thrown away */
     char status[96];             /* the file field's message (loaded / failed) */
     int load_select;             /* a LOAD press: the loaded shape becomes the edited timbre's (a restore keeps its own) */
     double tap_last;             /* seconds, for TAP */
@@ -740,7 +743,16 @@ static void *load_thread(void *arg) {
 
 /* path: the file's full path (a saved project from 0.1.0 has it relative to the Shapes folder) */
 static void start_load(vader_t *s, const char *path) {
-    if (__atomic_load_n(&s->load_state, __ATOMIC_ACQUIRE) == 1) return;   /* one at a time */
+    if (__atomic_load_n(&s->load_state, __ATOMIC_ACQUIRE) == 1) {
+        /* one at a time. 0.10.7: this one waits its turn (it used to be dropped without a word, so a LOAD pressed while a
+         * preset was still bringing its file back did nothing) */
+        snprintf(s->pending_load, sizeof s->pending_load, "%s", path);
+        s->pending_select = s->load_select;
+        snprintf(s->status, sizeof s->status, "LOADING...");
+        mark(s, P_FILE);
+        return;
+    }
+    s->run_select = s->load_select;
     if (s->loader_joinable) { pthread_join(s->loader, NULL); s->loader_joinable = 0; }
     if (path[0] == '/' || access(path, R_OK) == 0) snprintf(s->load_name, sizeof s->load_name, "%s", path);
     else snprintf(s->load_name, sizeof s->load_name, "%s/%s", s->dir, path);
@@ -755,6 +767,11 @@ static void start_load(vader_t *s, const char *path) {
 static void collect_load(vader_t *s) {
     int st = __atomic_load_n(&s->load_state, __ATOMIC_ACQUIRE);
     if (st < 2) return;
+    if (s->load_discard) {   /* 0.10.7: a restore came in while this file was loading: the restore's own state stands */
+        s->load_discard = 0;
+        s->status[0] = 0;
+        st = 0;
+    }
     if (st == 2 && s->load_img.ok) {
         /* 0.10.7: a picture (PNG, JPG) is the IMAGE only: BRIGHT, HUE, COLOUR and DEPTH read it under the orbiter, and the
          * orbit stays on the shape you have (before, the picture's outline also replaced the USER shape) */
@@ -777,19 +794,20 @@ static void collect_load(vader_t *s) {
         snprintf(s->user_file, sizeof s->user_file, "%s", s->load_name);
         snprintf(s->status, sizeof s->status, "LOADED");
         for (int t = 0; t < 2; t++) {
-            if (t == edit(s) && s->load_select) T(t)[S_SHAPE] = SHAPE_USER;
+            if (t == edit(s) && s->run_select) T(t)[S_SHAPE] = SHAPE_USER;
             if ((int)T(t)[S_SHAPE] == SHAPE_USER) timbre_shape(s, t);
         }
         mark(s, P_SHAPE);
-    } else {
+    } else if (st == 3) {
         snprintf(s->status, sizeof s->status, "%s", s->load_err[0] ? s->load_err : "FAILED");
     }
     __atomic_store_n(&s->load_state, 0, __ATOMIC_RELEASE);
     mark(s, P_FILE);
-    if (s->pending_load[0]) {   /* 0.10.7: the next file of a restore */
+    if (s->pending_load[0]) {   /* 0.10.7: the file that waited its turn */
         char next[1024];
         snprintf(next, sizeof next, "%s", s->pending_load);
         s->pending_load[0] = 0;
+        s->load_select = s->pending_select;
         start_load(s, next);
     }
 }
@@ -2076,16 +2094,17 @@ static void restore_state(vader_t *s, const char *val) {   /* restore (the wrapp
             for (int t = 0; t < 2; t++)
                 for (int k = S_ATTACK; k <= S_RELEASE; k++)
                     for (int c = 0; c < 4; c++) s->snd[t][env_slot_of(k, c)] = s->snd[t][k];
+        /* 0.10.7: a saved preset or project comes back exactly as saved: its shape file or its picture, or none. A file
+         * still loading from before is thrown away when it lands, and the saved file loads after it */
         s->has_user = 0;
-        s->load_select = 0;
-        if (user[0]) start_load(s, user);   /* the shape file again, by name */
-        s->img.ok = 0;   /* 0.10.7: a saved preset or project comes back exactly as saved: its picture, or none */
+        s->user_file[0] = 0;
+        s->img.ok = 0;
         s->img_file[0] = 0;
         s->pending_load[0] = 0;
-        if (image[0]) {   /* the picture again, after the shape (one load at a time) */
-            if (user[0]) snprintf(s->pending_load, sizeof s->pending_load, "%s", image);
-            else start_load(s, image);
-        }
+        if (__atomic_load_n(&s->load_state, __ATOMIC_ACQUIRE) == 1) s->load_discard = 1;
+        s->load_select = 0;
+        if (user[0]) start_load(s, user);     /* the shape file again, by name */
+        if (image[0]) start_load(s, image);   /* the picture again (a save holds one or the other) */
         for (int t = 0; t < 2; t++) { timbre_shape(s, t); mode_load(s, t, 1); }
         release_all(s);
         all_off(s, 1);

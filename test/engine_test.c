@@ -431,6 +431,8 @@ int main(void) {
     /* the IMAGE page: a picture under the orbiter moves the sound */
     {
         int fi = -1;
+        /* the MY PRESET loaded above may still be bringing its shape file back (slow under valgrind) */
+        for (int k = 0; k < 4000; k++) { usleep(5000); E->get_param(s, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) break; }
         for (int i = 0; i < 40 && fi < 0; i++) {
             setp(s, "file", i);
             E->get_param(s, "file_display", d, sizeof d);
@@ -438,7 +440,7 @@ int main(void) {
         }
         setp(s, "file", fi);
         setp(s, "load", 1);
-        for (int k = 0; k < 400; k++) { usleep(5000); E->get_param(s, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) break; }
+        for (int k = 0; k < 4000; k++) { usleep(5000); E->get_param(s, "file_display", d, sizeof d); if (strcmp(d, "LOADING...")) break; }
         setp(s, "shape", 0); setp(s, "orb_size", 0.6); setp(s, "sub_size", 0.3); setp(s, "orb_speed", 0.6);
         setp(s, "im1_amt", 0.0);
         chord(s, 1);

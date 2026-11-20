@@ -11,6 +11,8 @@ change checked by running the plugin's own loader on 12 test pictures).
   saved with the project and MY PRESETS (`image` line) and loads back after the shape.
 - MY PRESETS and projects come back exactly as saved: with their picture or shape file, or with none. Factory presets
   leave the loaded file alone.
+- A LOAD pressed while another file is still loading (a preset bringing its file back, a big picture) now waits its
+  turn; it used to be dropped without a word.
 - One loaded file at a time: loading a picture replaces a loaded shape file (SVG/OBJ) and loading a shape file replaces
   the picture; the FILE field shows what is loaded.
 - The loaded picture is drawn (dim) under **any** shape, on the desktop window, the phone screen and the Force's live

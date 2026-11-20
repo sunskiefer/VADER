@@ -1,4 +1,4 @@
-VADER as a VST3 and a VST2 plugin for Windows (x86_64) and Linux (x86_64), with the orbit screen drawn in the plugin's own window. This is the 0.8.0 desktop build: the same engine, pages and presets as the 0.8.0 Force plugin (modes, voices, samples and the new pages).
+VADER as a VST3 and a VST2 plugin for Windows (64-bit and 32-bit) and Linux (x86_64), with the orbit screen drawn in the plugin's own window. This is the 0.10.7 desktop build: the same engine, pages and presets as the 0.10.7 Force plugin. New in 0.10.7: a picture (PNG/JPG) feeds the IMAGE page only and is drawn under the shape, BRIGHT reads real brightness, pictures up to 96 MB load, presets come back with the file they were saved with, and the dropdowns show their value again (see CHANGELOG.md).
 
 ![VADER desktop: the orbit screen on the MAIN page](https://raw.githubusercontent.com/sunskiefer/VADER/main/docs/img/desktop/vader-desktop-main.png)
 
