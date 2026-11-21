@@ -16,5 +16,17 @@
     "device": "Akai Force",
     "firmware": "not recorded",
     "date": "2026-11-12"
+  },
+  {
+    "version": "0.10.7",
+    "device": "Akai Force",
+    "firmware": "3.9.1",
+    "date": "2026-11-21"
+  },
+  {
+    "version": "0.10.7",
+    "device": "MPC Live III",
+    "firmware": "3.10.1",
+    "date": "2026-11-21"
   }
 ]
